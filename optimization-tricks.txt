@@ -1,0 +1,22 @@
+A collection of cute optimization tricks, mostly things I haven't had time to follow up on...
+
+Loads from constant globals with patterns in data
+(Note: LLVM currently handles some cases w/compares, but that's all I can find)
+a = constant global [1,3,5,7,9]
+a[i] -> -1 + i * 2
+(and other assorted idioms)
+
+Use masked loads w/pass through to eliminate selects of addresses
+a = select c, a1, a2
+v = load a
+->
+v1 = masked.load(c, a1, undef)
+v = masked.load(!c, a2, v1)
+(can do better if either are safe to speculate)
+
+trivial specialization (no cost dispatch)
+foo(..., bool b) { if (b) C; else D; }
+->
+foo(...) { if(b) tail C(); else tail D(); }
+(potentially very interesting w/early return idioms)
+
