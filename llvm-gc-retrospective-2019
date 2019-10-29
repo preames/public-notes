@@ -1,0 +1,79 @@
+[DRAFT] A retrospective on GC support in LLVM, and some proposed tweaks
+
+WARNING: This is very much in rough draft state.  Please don't cite until completed and sent to llvm-dev.  
+
+As some of you may remember, a few years back I led an effort to extend LLVM with support for fully relocating garbage collection in the form of the gc.statepoint familiy of intrinsics.  In the meantime, we've successfully shipped a compiler for a VM with a fully relocating collector using this support, and gained a bunch of practical experience with the design.  This has led me to revise my thinking quite a bit, and I want to both summarize my lesson learned, and propose some small changes.
+
+Background and Retrospective
+
+As a reminder, the gc.statepoint mechanism involved three major parts:
+1) The first was the introduction of the abstract machine model (enabled by non-integral pointer types) followed by a lowering to the physical machine model.  The abstract machine model is relocation independent - at the cost of disallowing a few operations like addrspacecast and inttoptr/ptrtoint, and typing memory.  
+2) The second was the gc.statepoint representation itself.  This representation was designed to make all relocations explicit in the physical machine model and was designed from the begining to make integration with the register allocation feasible.  
+3) The third was the notion of late safepoint insertion.  We ended up having to abandon this ourselves due to a need to support deoptimization at the same set of safepoints, but there's still some (unused?) support for this upstream today.  
+
+I think it's safe to say that the abstract machine model has proven itself.  The abstract machine model allows optimization passes to reason about references to objects (as opposed to raw pointers) and makes this like LICM and other loop opts straight-forward.  Without the abstract machin model, we'd have needed to make invasive changes across the entire optimizer.  Instead, the changes which have been made have been pretty isolated in scope and well contained.  Probably the biggest problem with the current implementation (as opposed to the model) is that RewriteStatepointsForGC (the lowering to the physical model) doesn't actually remove the non-integral marker from references; it just happens to work out in practice.  
+
+As I already noted, the late safepoint insertion mechanism turned out not to be practical for our use case.  We had to be able to materialize an abstract machine state at each safepoint, and in the end, that required having safepoint locations (but not relocation semantics) explicit in the IR from the very begining.  I still think that late safepoint insertion could be very practical for a statically compiled language w/o deoptimizatio, but this is really unproven to date.  
+
+Statepoints, well, that's where some of the lessons learned come in.  There were a couple of major assumptions which went into the design:
+1) There was a strong assumption that the quality of safepoint lowering *mattered*.  Everyone we talked to who'd done this before in other compilers seemed to agree that performance was going to be bottlenecked by the safepoint lowering, and thus it was worth a lot of effot to get right.  This drove the whole notion of representing a set of defs explicitly via gc.relocates.
+2) Somewhat following from the previous, we believed that first class support for derived pointers (both interior and exterior to their associated object) was a neccessity.  (If we didn't have first class support, you can always rematerialize an arbitrary derived pointer after a safepoint via a "offset = derived-base, relocate(base), add offset" idiom.  This is exactly what the GC would do internally.)
+
+To my utter and complete suprise, it's turned out that both assumptions have been at least partially incorrect in practice.  
+
+At least on X86, the ability to fold complex addresses into using instructions really deminishes the value of first class derived pointer support.  I'm not saying that there's no value to a fully regalloc integrated derived pointer aware stackmap, but I've seen few cases where it's obviously profitable - that may be largely due to the next point.  
+
+The key surprise for me has been that while quality of safepoint lowering has mattered somewhat, it hasn't been anywhere near the peak performance limiter expected.  Instead, it's been mostly a matter of code size and slowpaths for which the current design is somewhat poor.  The key observations are that:
+1) Any safepoint poll involves a fast and slow path, but *only the slowpath neeeds a stackmap*.  As such, the lowering required for the slowpath can be fairly terrible as long as it doesn't perturb the fastpath too much.
+2) After optimization, safepoint polls are dynamically rare.  They're not as rare statically, but that's almost entirely due to deoptimization side effects.   
+3) Any hot call safepoint is generally an optimization oppurtunity for either devirtualization or inlining.  It's really really rare to see a truly megamophic (i.e. not N morphic for small N) call on a fastpath, or a large function with many hot callers.  
+
+Putting these observations together, there's been little motivation to work on improving the statepoint lowering.  As a result, we've never actually achieved the planned register allocation integration and are still shipping what was expected to be a stop gap implementation which does a poor man's register allocator in SelectionDAG.  It's only been recently that we've really started giving improving this state of affairs this some serious thought, and the motivaion to do so has mostly been driven by compile time and code size, not performance of the slowpath code.  
+
+The other unexpected challenge with statepoints has been the compile time impact caused by the IR growth implied by the explicit relocation representation.  I don't have any hard numbers, but I suspect this to be one of the largest contributors to codegen time.  It's not uncommon to see methods with a large fraction of total instructions being gc.relocates.  
+
+So, I think it's fair to ask whether given what we know now, would we reimplement gc.statepoint the same way?  Honestly, I think the answer has to be no.
+
+Now what?
+
+So, am I about to propose we remove gc.statepoint?  No, I'm not.  It works well enough, and there's no strong incentive to switch away for anyone who has built a working implementation on top of it.
+
+However, I do think we should consider reframing our documentation to default to an alternative, and updating the lowering for the abstract machine model to support that alternative.  
+
+What is that alternative you ask?  Well, gc.root.  (For those of you who were around through the initial rounds of discussion, yes, there's quite some irony here.)  I think we do need to make a slight tweak to the gc.root implementation though.
+
+For those who don't know, the gc.root representation works as so: You explicitly create a stack slot (alloca), escape it via a special gc.root intrinsic, spill at the def of the variable, and reload after every possible safepoint.  The one real subtlety is that for this to be correct for a relocating GC, no function reachable from a function using gc.root can be readonly *or inferred readonly by the optimizer*.  Annoyingly, this issue only exists for relocating GCs, but it basically means that today, if you use gc.root you have to be *very* careful in ensuring none of your functions can be inferred readonly.  Here's the problematic example:
+
+%a = %alloca i8*
+call void @gc.root(i8* %a)
+store i8* %myptr, i8** %a
+call void @readonly()
+%newptr = load i8*, i8** %a
+
+GC.root relies on the capture of %a to force the optimizer to believe the call might clober %a (for a relocating collector, it does).  However, since we've inferred readonly, that fact doesn't hold.  (I've used readonly for the description, but you can create the same issue with writeonly, or argmemonly.)
+
+Now, I want to be careful to stop here and emphasize that gc.root can be used entirely correctly.  It just imposes a subtle invariant on the module as a whole which is error prone.  
+
+With a small tweak, we can remove this subtlety.  Since gc.root was introduced, we've added the notion of operand bundles.  One of the key semantics to operand bundles is that they can model memory semantics of the callsite independent of the callee. As such, we can use an operand bundle to avoid the subtlety around readonly calls.  Here's what a revised example would look like:
+
+%a = %alloca i8*
+call void @gc.root(i8* %a)
+store i8* %myptr, i8** %a
+call void @readonly() ["gc-root" (%a)]
+%newptr = load i8*, i8** %a
+
+This results in a much cleaner, and easier to describe semantic model w/o the global module invariant. 
+
+Summary
+
+So, what all am I proposing?  I'm proposing that we:
+1) add the "gc-root" operand bundle type, and update all the gc.root documentation to use it.
+2) add support for gc.root as a target of RewriteStatepointsForGC (i.e. as a supported physical model when lowering the abstract model).  
+3) update the documentation to default to gc.root, and describe statepoint as an alternative.
+4) update the documentation to encourage new frontends to lower directly to gc.root, then come back to the abstract machine model later.  
+
+The last point needs a bit of justification.  From talking to a number of folks at conferences, getting something working with existing GC infrastructure is generally the biggest problem, and the indirect through the abstract model seems to really confuse folks.  I've witnessed a couple of projects stall here, and I'd like to avoid that going forward. 
+
+
+
+
