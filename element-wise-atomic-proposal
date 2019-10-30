@@ -1,0 +1,33 @@
+[DRAFT] Support element wise atomic vectors and FCAs
+
+WARNING: This is a draft.  It is still under development, and should not be cited until shared on llvm-dev.  
+
+TLDR: We need to be able to model atomicity of individual elements within vectors and structs to support vectorization and load combining of atomic loads and stores.  
+
+Background
+
+LLVM IR currently only supports atomic loads and stores of integer, floating point, and pointer types.  Attempting to use an atomic vector or FCA type is a verifier error.  LLVM supports both ordered and unordered atomics.  
+
+For ease of discussion, I'm going to ignore alignment.  Assume that everything which follows refers to a properly aligned memory access.  The unaligned case is much harder, and is already fairly ill-defined today even for existing atomics.
+
+On modern X86, there are no formal guarantees of atomicity for loads wider than 64 bits.  The practical behavior observed seems to be that loads and stores wider than 64 bits are not atomic on at least some architectures.  (This is exactly what you'd expect as the width of the load/store ports is often smaller than the max vector register size.)  However, all of the architectures I'm aware of seem to provide atomicity of the individual 64 bit chunks.  
+
+In practice, every java virtual machine that I'm aware appears to assume that vector loads and stores are atomic at the 64-bit granularity.  (Java requires atomicity of all - well, most - memory accesses and thus any VM that vectorizes using x86 vector registers is implicitly making this assumption.)
+
+This notion of "atomic in 64 bit chunks" is what I want to formalize in the IR.  Doing so solves two major problems.  
+
+First, it allows vectorization of loops with atomics.  Today, upstream LLVM does not optimize any loop with an atomic load or store, and because of the semantic gap, we can't.  If we converted an atomic i32 load sequence into a non-atomic load of a <N x i32> vector, we'd be miscompiling.  And we can't simply convert to an atomic iM (M = N * 32) load as we likely can't guarantee atomicity for the full load width.
+
+Second, it allows load combining at the IR (or MI) level to be a reversible transformation.  Today, if we merge a pair of atomic i8 loads, our only option is to mark the resulting i16 load as atomic.  Thi is problematic as if we later find a value available for one of the two original loads, we can't split the i16 apart again and perform load forwarding of the available value.  
+
+As a simple example, consider:
+a[0] = 5;
+.... (something which later gets optimized away)
+v1 = a[0];
+v2 = a[1];
+
+If we combine the two loads, we then can't perform the load forwarding from the visible store.  
+
+Proposal
+
+TBD
