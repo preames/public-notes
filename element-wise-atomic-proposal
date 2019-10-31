@@ -30,4 +30,29 @@ If we combine the two loads, we then can't perform the load forwarding from the 
 
 Proposal
 
-TBD
+There are really two potential proposals.  The choice between them comes down to the queston of do we wish to support full width atomicity for vectors and FCAs as well?  Personally, I lean towards the first just due to there being less work, but won't object if the community as a whole things the second is worthwhile.  
+
+Proposal 1 - No full width atomicity
+
+Interpret the existing atomic keyword on load or store as meaning either "full width atomic" or "element wise atomic" based on the type being loaded or stored.   This would have the unfortunate implication that we can't canonicalize from vector to integer (or vice versa).  It also involves the potential for some confusing code, but I think that can mostly be abstracted behind some carefully chosen helper routines on the instruction classes themselves.  
+
+The advantage of this proposal is that a) it requires no change to bitcode or IR, b) it's straight forward to implement, and c) it could be extended into the second at a later time if needed.
+
+Proposal 2 - Both full width and element wise atomic vectors
+
+This would require both a bitcode format change, and an IR change.  
+
+For the IR change, I'd tenatively suggest something like:
+load element_atomic <N x Y>, <N x Y>* %p, unordered, align X (element wise atomic)
+load atomic <N x Y>, <N x Y>* %p, unordered, align X (full width atomic)
+
+I haven't really investigated the bitcode change.  I have little experience in this area, so if someone with experience wants to make a suggestion on best practice, feel free.
+
+The advantage of this proposal is in the generality.  The disadvantage is the additional implementatio complexity, and conceptual complexity of supporting both full width and element wise atomics.  
+
+
+Backend Implications
+
+TBD - representation in MMO
+TBD - initial simple lowering
+TBD - testing
