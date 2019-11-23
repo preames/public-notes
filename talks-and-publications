@@ -1,0 +1,21 @@
+# Past Talks and Public Events
+
+Panel: Inter-procedural Optimization (IPO)
+Teresa Johnson, Philip Reames, Chandler Carruth, Johannes Doerfert
+2019 LLVM Developers Meeting
+
+Panel: The Loop Optimization Working Group
+Kit Barton, Michael Kruse, Philip Reames, Hal Finkel
+2019 LLVM Developers Meeting
+
+Falcon: An optimizing Java JIT
+Philip Reames
+Keynote 2017 LLVM Developers Meeting
+
+LLVM for a managed language: what we’ve learned
+Sanjoy Das and Philip Reames
+2015 LLVM Developers Meeting
+
+Supporting Precise Relocatig Garbage Collection in LLVM
+Sanjoy Das and Philip Reames
+2014 LLVM Developers Meeting
