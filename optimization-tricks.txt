@@ -20,3 +20,41 @@ foo(..., bool b) { if (b) C; else D; }
 foo(...) { if(b) tail C(); else tail D(); }
 (potentially very interesting w/early return idioms)
 
+
+Tricks for encoding long jumps with fewer bytes using implicit fault handlers
+LongJCC: # 6 bytes
+  jle baz
+
+ShortJCC: # 2 bytes
+  jle bar
+  
+forward_jump_int3: # 3 bytes
+  jle continue
+  int3 # bad to have in instruction stream?
+continue: 
+
+forward_jump_ud2: # 4 bytes
+  jle continue2
+  ud2 # bad to have in instruction stream?
+continue2: 
+
+jcc_payload:  # 4 bytes
+  test %rax, %rcx
+  .byte 116 #0x74, je
+fault:
+  .byte 204 #0xcc, int3 as payload of je
+  jle fault #backbrach into previous jcc
+
+and_payload: % 4 bytes
+  test %rax, %rcx
+  .byte 4 #0x04, add AL, 204
+fault2:
+  .byte 204 #0xcc, int3 as payload of add
+  jle fault2 #backbrach into previous add
+  
+bar:
+  retq
+.section ".other"
+baz:
+  retq
+
