@@ -14,7 +14,7 @@ Perf Map
 Jitdump
   The jitdump format is a binary format which is much covers a much broader range of use cases.  There is a `formal spec <https://raw.githubusercontent.com/torvalds/linux/master/tools/perf/Documentation/jitdump-specification.txt>`_ for the binary format.  In addition to basic symbol resolution, jitdump supports disassembly/annotaton and code relocation.
   
-  To work with jitdump files, you have to use "perf inject" to produce a perf.data file which contains both the raw perf.data and the additional jitdump information.  The location of the jitdump file on disk is not documented, and I haven't yet tracked it down.  Once injected, the combined data.perf file can be moved to other machines for analysis.  
+  To work with jitdump files, you have to use "perf inject" to produce a perf.data file which contains both the raw perf.data and the additional jitdump information.  The location of the jitdump file on disk is not documented, and I haven't yet tracked it down.  Once injected, the combined perf.jit.data file can be moved to other machines for analysis.  
   
 From what I can tell, jitdump provides a strict superset of the functionality of perf map files.  Despite this, perf map appears to be much more widely used.  It's not clear to me why this is true; the main value I see in perf map files is that they're easy to generate by hand or by simple scripting from other information sources.
 
