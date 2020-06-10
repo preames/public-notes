@@ -47,4 +47,6 @@ Useful References
 
 The wasmtime folks have a `nice description <https://bytecodealliance.github.io/wasmtime/examples-profiling-perf.html>`_ of using a jitdump based mechanism from a user perspective.
 
+Brenden Gregg has a post on using perf map files to generate `flame graphs for v8 <http://www.brendangregg.com/blog/2014-09-17/node-flame-graphs-on-linux.html>`_.  He also has a lot of other generally awesome perf stuff, but most of it's focused on statically compiled code.  
+
 `perf-map-agent <https://github.com/jvm-profiling-tools/perf-map-agent>`_ and `perf-jitdump-agent <https://github.com/sfriberg/perf-jitdump-agent>`_ are useful examples of how to generate the corresponding file formats.  These are each jvmti agents for Java for each of the corresponding workflows.  
