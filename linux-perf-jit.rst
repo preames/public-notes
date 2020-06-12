@@ -54,5 +54,5 @@ Brenden Gregg has a post on using perf map files to generate `flame graphs for v
 Footnotes
 ----------
 
-.. [1] Several of the perf commands allow you to provide an alternate path to the objdump binary.  If you have an alternate source of disassembly of some of the methods named in the perf map file, you can write a shim script which wraps the real objdump, intercepts the disassembly request sent to objdump, and provides the alternate disassembly.  
+.. [1] Several of the perf commands allow you to provide an alternate path to the objdump binary.  If you have an alternate source of disassembly of some of the methods named in the perf map file, you can write a shim script which wraps the real objdump, intercepts the disassembly request sent to objdump for a particular symbol name, and provides the alternate disassembly.  
 
