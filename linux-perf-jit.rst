@@ -3,7 +3,7 @@ This document discusses how a JIT compiler (or other code generator) can generat
 There are two major mechanisms supported by perf for getting symbols for dynamically generated code: perf map files, and jitdump files.
 
 Perf Map
-  A perfmap is a textual file which maps address ranges to symbol names.  It has no other content and does not support disassembly or annotation.  
+  A perfmap is a textual file which maps address ranges to symbol names.  It has no other content and does not on its own [1]_ support disassembly or annotation.  
   
   I couldn't find a formal description of the format anywhere, but the format appears to have one entry per line of the form "<hex_start_addr> <hex_size> <symbol_string".  An example valid entry would be "30affdb58 a20 my_func".
   
@@ -50,3 +50,9 @@ The wasmtime folks have a `nice description <https://bytecodealliance.github.io/
 Brenden Gregg has a post on using perf map files to generate `flame graphs for v8 <http://www.brendangregg.com/blog/2014-09-17/node-flame-graphs-on-linux.html>`_.  He also has a lot of other generally awesome perf stuff, but most of it's focused on statically compiled code.  
 
 `perf-map-agent <https://github.com/jvm-profiling-tools/perf-map-agent>`_ and `perf-jitdump-agent <https://github.com/sfriberg/perf-jitdump-agent>`_ are useful examples of how to generate the corresponding file formats.  These are each jvmti agents for Java for each of the corresponding workflows.  
+
+Footnotes
+----------
+
+.. [1] Several of the perf commands allow you to provide an alternate path to the objdump binary.  If you have an alternate source of disassembly of some of the methods named in the perf map file, you can write a shim script which wraps the real objdump, intercepts the disassembly request sent to objdump, and provides the alternate disassembly.  
+
