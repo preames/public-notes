@@ -1,3 +1,9 @@
+June 12, 2020
+==============
+
+On the topic of antibody studies, we do one small update from NY State `in minority cummuniy churches <https://www.governor.ny.gov/news/amid-ongoing-covid-19-pandemic-governor-cuomo-announces-results-states-antibody-testing-survey>'_.  I am increasing nervous at the fact the state of NY has not been publishing updates to their aintibody study.  
+
+One correction to the writeup below.  The study I references on hydroxychloroquine has been heavily critized and retracted.  Other studies are still supporting a fairly skeptical attidue here, but the study which initially appeared fairly conclusive turned out not to be.  
 
 May 24, 2020
 ============
