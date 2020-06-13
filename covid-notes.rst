@@ -1,9 +1,11 @@
 June 12, 2020
 ==============
 
-On the topic of antibody studies, we do one small update from NY State `in minority cummuniy churches <https://www.governor.ny.gov/news/amid-ongoing-covid-19-pandemic-governor-cuomo-announces-results-states-antibody-testing-survey>'_.  I am increasing nervous at the fact the state of NY has not been publishing updates to their aintibody study.  
+On the topic of antibody studies, we do have one small update from NY State `in minority cummuniy churches <https://www.governor.ny.gov/news/amid-ongoing-covid-19-pandemic-governor-cuomo-announces-results-states-antibody-testing-survey>'_.  I am increasing nervous at the fact the state of NY has not been publishing updates to their antibody study.  
 
-One correction to the writeup below.  The study I references on hydroxychloroquine has been heavily critized and retracted.  Other studies are still supporting a fairly skeptical attidue here, but the study which initially appeared fairly conclusive turned out not to be.  
+Despite the relatively scarcity of new data, it seems like there is an emerging consensus that the infection fatility rate for COVID-19 is somewhere slightly under 1%.  The case fatality rate on the other hand seems to be hovering right around 6% for all of the data sets we have.  At the national level, we currently have 2.1 million confirmed cases, and 116 thousand deaths for a CFR of 5.5%.  As discussed previously, deaths are skewed very strongly towards the elderly, so what these numbers look like in each community is strongly dependent on demographics, but the rough numbers give us a rough idea of what we're looking at.  
+
+One correction to the writeup below.  The study I referenced on hydroxychloroquine has been heavily critized and retracted.  Other studies are still supporting a fairly skeptical attidute here, but the study which initially appeared fairly conclusive turned out not to be.  
 
 May 24, 2020
 ============
