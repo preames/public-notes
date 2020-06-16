@@ -18,8 +18,6 @@ The question at the end about implications of precompiled binaries is interestin
 Understanding and Optimizing Persistent Memory Allocation
 ----------------------------------------------------------
 
-(In progress, notes evolving)
-
 Focus is on writing crash atomic (i.e. exception safe) allocation code for persistent memory.  Approach take is to persist only heap metadata sufficient to implement a conservative (ambigious) GC.  Previous approaches referenced appear to be analogous to standard persistent techniques for databases (i.e. commit logs).  Positioning is described most clearly in conclusion slide.  Questions at the end are the clearest part of the talk.  
 
 The contribution of this paper appear fairly minor conceptually.  There's a passing mention of first lock free allocator, but the only part actually discussed is persisting only heap metadata and reconstructing rest on recovery.  Previous work had already used conservative GC as fallback.  The choice to use a handlized heap is understandable, but has unfortunate performance implications.  
@@ -31,4 +29,11 @@ An interesting idea to explore in this area would be what a relocating collector
 Exploiting Inter- and Intra-Memory Asymmetries for Data Mapping in Hybrid Tiered-Memories
 ------------------------------------------------------------------------------------------
 
-Up next.
+Starts with a nice overview of problem domain.  Super helpful as I know little about this area!
+
+Approach appears to basically use profiling of first access to classify memory as "likely read heavy" and "likely write heavy".  There's also a bit about "near and far", but that went over my head.  There's a profile mechanism in the page fault handler (pressumably in hardware) which classifies.  On first access to a new page, this *instruction* profile is used to classify new page.  
+
+Key expectation seems to be that individual instructions are either read heavy or write heavy.  This seems reasonable, but it's not clear to me why you need a dynamic profile for this.  The instruction encoding seems to tell you this.   Maybe the dynamic part is needed for near and far?  I didn't follow that part.
+
+This is far enough out of my area that I'm not following details.  If you're interested in topic, highly recommend listening to the talk directly.  
+
