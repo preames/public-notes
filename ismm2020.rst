@@ -1,7 +1,7 @@
 ISMM 2020 Notes
 ===============
 
-Trying something new.  As ISMM 2020 is a virtual conference this year, I'm listening in to all the talks and making notes as I go.  
+Trying something new.  As ISMM 2020 is a virtual conference this year, I'm listening in to all the talks and making notes as I go.  `YouTube Live Stream <https://www.youtube.com/watch?v=skNDP5ZYZJ4&feature=youtu.be>`_.  `Proceedings <https://conf.researchr.org/program/ismm-2020/program-ismm-2020?past=Show%20upcoming%20events%20only>`_.
 
 Verified Sequential Malloc/Free
 -------------------------------
@@ -15,8 +15,12 @@ Partially concurrent collector for GHC.  Presentation is somewhat weak for a aud
 
 The question at the end about implications of precompiled binaries is interesting.  In particular, acknowledged advantage of load barrier and partially incremental collection.  Answer mentioned "customer was strict" about that requirement which provides some context on why the design evolved in the way it did.  
 
+Understanding and Optimizing Persistent Memory Allocation
+----------------------------------------------------------
 
-  
+Focus is on writing crash atomic (i.e. exception safe) allocation code for persistent memory.  Approach take is to persist only heap metadata sufficient to implement a conservative (ambigious) GC.  Unclear from presentation whether this is a back of collector or only collector.  If not just a recovery mechanism, allocation throughput with this design is likely to be an issue since relocation isn't practical.  
+
+Previous approaches referenced appear to be analogous to standard persistent techniques for databases (i.e. commit logs).  At least so far, I'm unconvinced of a need for an alternate approach, much less this alternative approach.
 
   
   
