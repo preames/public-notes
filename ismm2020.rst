@@ -18,9 +18,11 @@ The question at the end about implications of precompiled binaries is interestin
 Understanding and Optimizing Persistent Memory Allocation
 ----------------------------------------------------------
 
-Focus is on writing crash atomic (i.e. exception safe) allocation code for persistent memory.  Approach take is to persist only heap metadata sufficient to implement a conservative (ambigious) GC.  Unclear from presentation whether this is a back of collector or only collector.  If not just a recovery mechanism, allocation throughput with this design is likely to be an issue since relocation isn't practical.  
+Focus is on writing crash atomic (i.e. exception safe) allocation code for persistent memory.  Approach take is to persist only heap metadata sufficient to implement a conservative (ambigious) GC.  Previous approaches referenced appear to be analogous to standard persistent techniques for databases (i.e. commit logs).  Positioning is described most clearly in conclusion slide.  Questions at the end are the clearest part of the talk.  
 
-Previous approaches referenced appear to be analogous to standard persistent techniques for databases (i.e. commit logs).  At least so far, I'm unconvinced of a need for an alternate approach, much less this alternative approach.
+The contribution of this paper appear fairly minor conceptually.  There's a passing mention of first lock free allocator, but the only part actually discussed is persisting only heap metadata and reconstructing rest on recovery.  Previous work had already used conservative GC as fallback.  The choice to use a handlized heap is understandable, but has unfortunate performance implications.  
+
+An interesting idea to explore in this area would be what a relocating collector looks like in this space.  One way to avoid need for handlization is to support pointer fixup.  You could track previous mapped addresses and as long as those don't overlap, you can interpret all previous pointers with a load barrier.  Technically, you can do fixup without mark or relocate, but if you're paying the semantic costs to support fixup you might as well get the fragmentation benefits.  
 
   
   
