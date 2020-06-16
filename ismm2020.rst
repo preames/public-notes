@@ -56,5 +56,31 @@ Basic notion is to use a heap analysis to describe reachable objects from each r
 
 A thought, has anyone considered reversing the liveness result?  If when scanning the stack, you used the liveness analysis to break references to dead objects this *must* be semantic preserving.  At that point, a standard reachability GC can produce the refined results.  Actually, given that, isn't the result equivelent to a complicated DSE which inserts code which only runs at the GC point?  Maybe a compiler could support this with a DSE and gc closure which runs at stack scan time?  (Clarification: The inversion of the analysis result works for single threaded programs or unescaped objects in concurrent languages, but not for objects accessible by multiple threads.)  (Ian asked the same question :) and the other provided a nice answer about AA I'd missed.)
 
+ThinGC: Complete Isolation With Marginal Overhead
+--------------------------------------------------
 
+Objects are grouped into hot and cold pages.  All access is to hot pages; pages are moved to hot region if needed to satisfy a memory access.  (This seems an odd choice and has obvious parallels to compressed heap ideas which have been explored in previous work.)  Implementation builds on ZGC, but that appears to be irrelevant to the main focus of the work.
+
+Question: Why not have cold heap be subset of old gen?  Allows reuse of card mark instead of a separate remembered set.  A: ZGC is single generational.  
+
+Application study looks very promising.  This is probably the key contribution from the paper.  Reheating percentage is low for most application, but high for a few.  This is a problem for the approach.  I was unhappy that this wasn't further discussed.  I asked a question on this at the end, and didn't get the sense this had really been explored
+
+As a result of the variation in reheating, also observed very wide variations in performance and pattern.  Also a verbal mention of run to run variation due to memory arrangement, but this wasn't justified or expanded upon.  (I'm midly suspicious of this without evidence.)
+
+My questions:
+* What was the motivation for requiring reheating rather than directly accessing the cold objects?  Did you evaluate the implications of this choice?  A: plan is to use very slow memory for cold memory; current work does not.
+* Did you explore the patterns which tended to cause reheating?  Is there any idiomatic pattern which might influence the design? A: no information
+
+My takeway: no strong conclusions, haven't either proved or disproved the idea of hot/cold separation; too tied to decision around reheating.  Maybe paper has more useful details?
+
+
+Improving Phase Change Memory Performance with Data Content Aware Access
+-------------------------------------------------------------------------
+
+Skipped this session.
+
+Keynote: Richard Jones
+-----------------------
+
+Schedule conflict, will watch later.
 
