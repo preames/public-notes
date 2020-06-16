@@ -1,0 +1,13 @@
+Trying something new.  As ISMM 2020 is a virtual conference this year, I'm listening in to all the talks and making notes as I go.  
+
+Verified Sequential Malloc/Free
+
+  Seperation logic based proofs, described in DSL for a proof tool I am unfamiliar with.  Basic strategy is to do source level proof w/proof annotations stored separately and rely on CompCert (a verifier C compiler) to produce a verified binary.  Library verified is a malloc library I'm unfamiliar with, unclear how "real" this code is.  Verification work done manually by the author.  The first couple of slides do nicely describe the strength of seperation logic for the domain and some of the key intuitions.
+
+Alligator Collector: A Latency-Optimized Garbage Collector for Functional Programming Languages
+
+  Partially concurrent collector for GHC.  Presentation is somewhat weak for a audience familiar with garbage collection fundementals.  Collector sounds fairly basic by modern Java standards, but it makes for an interesting experience report.  The design used isn't a bad starting point for languages without a mature collector.
+  
+
+  
+  
