@@ -1,3 +1,6 @@
+ISMM 2020 Notes
+===============
+
 Trying something new.  As ISMM 2020 is a virtual conference this year, I'm listening in to all the talks and making notes as I go.  
 
 Verified Sequential Malloc/Free
@@ -9,6 +12,10 @@ Alligator Collector: A Latency-Optimized Garbage Collector for Functional Progra
 -----------------------------------------------------------------------------------------------
 
 Partially concurrent collector for GHC.  Presentation is somewhat weak for a audience familiar with garbage collection fundementals.  Collector sounds fairly basic by modern Java standards, but it makes for an interesting experience report.  The design used isn't a bad starting point for languages without a mature collector.
+
+The question at the end about implications of precompiled binaries is interesting.  In particular, acknowledged advantage of load barrier and partially incremental collection.  Answer mentioned "customer was strict" about that requirement which provides some context on why the design evolved in the way it did.  
+
+
   
 
   
