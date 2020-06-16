@@ -37,3 +37,20 @@ Key expectation seems to be that individual instructions are either read heavy o
 
 This is far enough out of my area that I'm not following details.  If you're interested in topic, highly recommend listening to the talk directly.  
 
+
+Prefetching in Functional Languages
+------------------------------------
+
+Nicely explained problem domain and problem statement.  
+
+I am very skeptical of the value of prefetching on modern hardware; the talk tries to justify the need on OOO hardware and while not wrong, I think it's over stating the problem.  Particularly with a GC which arranges objects in approximate traversal order (single linked lists are trivially to get right) I don't see a strong value here.  (Ah, later performance comparison uses ARM chips and Knights Landing).  I just showed my mainline Intel bias...)
+
+After listening to the talk, it's really not clear what the contribution was.  Most of the discussion is generic prefetch discussion.  Did they add a prefetch instruction to OCaml?  That's pretty basic.  Was this a characterization study?  Was there some form of compiler support?
+
+It is a nice presentation on the basics of prefetching and the performance tradeoffs thereof.  
+
+Garbage Collection Using a Finite Liveness Domain
+-------------------------------------------------
+
+(In progress)
+
