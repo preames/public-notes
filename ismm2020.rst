@@ -18,6 +18,8 @@ The question at the end about implications of precompiled binaries is interestin
 Understanding and Optimizing Persistent Memory Allocation
 ----------------------------------------------------------
 
+(In progress, notes evolving)
+
 Focus is on writing crash atomic (i.e. exception safe) allocation code for persistent memory.  Approach take is to persist only heap metadata sufficient to implement a conservative (ambigious) GC.  Previous approaches referenced appear to be analogous to standard persistent techniques for databases (i.e. commit logs).  Positioning is described most clearly in conclusion slide.  Questions at the end are the clearest part of the talk.  
 
 The contribution of this paper appear fairly minor conceptually.  There's a passing mention of first lock free allocator, but the only part actually discussed is persisting only heap metadata and reconstructing rest on recovery.  Previous work had already used conservative GC as fallback.  The choice to use a handlized heap is understandable, but has unfortunate performance implications.  
@@ -26,3 +28,7 @@ An interesting idea to explore in this area would be what a relocating collector
 
   
   
+Exploiting Inter- and Intra-Memory Asymmetries for Data Mapping in Hybrid Tiered-Memories
+------------------------------------------------------------------------------------------
+
+Up next.
