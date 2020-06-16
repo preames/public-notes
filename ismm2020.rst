@@ -52,5 +52,9 @@ It is a nice presentation on the basics of prefetching and the performance trade
 Garbage Collection Using a Finite Liveness Domain
 -------------------------------------------------
 
-(In progress)
+Basic notion is to use a heap analysis to describe reachable objects from each reference.  Standard GC is reachability based which simply means we use the conservative trivial analysis (i.e. everything is live if there's an edge to it.)   General problem with this approach is scalability, this paper tries to approach that with a restricted set of analysis results.  The basic framing appears to basically be given a tree, which subtree is live?  The set of subtrees is resticted to first level, left recurisve, right recursive, and all.
+
+A thought, has anyone considered reversing the liveness result?  If when scanning the stack, you used the liveness analysis to break references to dead objects this *must* be semantic preserving.  At that point, a standard reachability GC can produce the refined results.  Actually, given that, isn't the result equivelent to a complicated DSE which inserts code which only runs at the GC point?  Maybe a compiler could support this with a DSE and gc closure which runs at stack scan time?  (Clarification: The inversion of the analysis result works for single threaded programs or unescaped objects in concurrent languages, but not for objects accessible by multiple threads.)  (Ian asked the same question :) and the other provided a nice answer about AA I'd missed.)
+
+
 
