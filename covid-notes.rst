@@ -1,3 +1,27 @@
+July 2, 2020
+=============
+
+The virus
+----------
+
+As of today, the United States has had 130 thousand deaths out of 2.74 million confirmed cases.  This gives us an estimated CFR of ~5%, which is in line with the 6% estimate from a few weeks ago.
+
+This week, the `CDC <https://www.cdc.gov/coronavirus/2019-ncov/cases-updates/commercial-lab-surveys.html`_ reported results from antibody studies which seemed to show actual case rates were more than 10x higher than confirmed cases.  I'd honestly love to believe this is true, because if it is, it means the IFR is somewhere around 0.5%.  
+
+However, I think there are some reasons to be cautious here.  First, and I hate saying this, the CDC has come under a lot of political pressure.  That may be biasing the results.  Second, the absolute infection rates in most of the regions studied is low.  From the linked to paper, the false positive rate on the test used was just under 1%.  That would seem to put the results out of the range of likely error, but it does mean the claimed ratios are potentially too high.  In particular, the highest claimed ratios appear to be from the lowest absolute percentages (and thus most influenced by false positives.)  Third, and this is the biggest one, the data is old.  The most recent reported result is from May 2nd.  For a result published almost 60 days later, that is flat out suspicious.  Putting it all together, I'd be willing to say that case rates are at least 4-5x higher than confirmed via testing based on these results, but I wouldn't go beyond that.  (As much as I'd like to.)
+
+Treatments
+-----------
+
+A couple weeks back, we learned that `dexamethasone <https://www.nature.com/articles/d41586-020-01824-5>`_, a common steroid, appears to reduce death rates in severly ill covid patients by about 20%.  This is wonderful news, both because it would reduce our observed CFR, and also because this is a generic medication which is already widely available and *cheap* (less than $8 per dose).  That is by far the best news we've gotten to date.
+
+This week, we're seeing efforts to `scale the collection and distribution <https://www.wsj.com/articles/u-s-seeks-large-scale-expansion-of-blood-plasma-collection-for-covid-19-11593691200>`_ of blood plasma from recovered covid patients.  As mentioned previously, we have good reason to believe that such a strategy works, and can help reduce the severity for many patients.
+
+Putting these two together, that's a dang good bit of news.  I expect we'll start seeing the CFR trending downward over the next few months.  There's some hope we're already seeing that in the national data, but there's also a bunch of other interpretations possible there.  
+
+I will note that I remain sceptical of the possibility of a widely deployed vaccine within the next 12 months.  I suspect we will see one, but almost certainly not this year, and next year is a merely a hope.  In theory, timelines could be accelerated with good planning and coordination, but we haven't exactly seen much evidence of that recently.  
+
+
 June 12, 2020
 ==============
 
