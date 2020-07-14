@@ -1,3 +1,12 @@
+July 14, 2020
+==============
+
+Just a collection of links for the moment.
+
+`WSJ, For Struggling Small Businesses, Bankruptcy Law Change Comes Just in Time <https://www.wsj.com/articles/for-struggling-small-businesses-bankruptcy-law-change-comes-just-in-time-11589794201>`_
+
+`CNN, Covid-19 immunity from antibodies may last only months, UK study suggests <https://www.cnn.com/2020/07/13/health/covid-immunity-antibody-response-uk-study-wellness/index.html>`_
+
 July 2, 2020
 =============
 
