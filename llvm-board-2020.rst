@@ -12,6 +12,8 @@ Why do you want to be on the LLVM Foundation board of directors?
 -----------------------------------------------------------------
 
 What experience or skills can you bring to the board? Which of the above programs could you help drive forward?
+-------------------------
+
 We value diversity and representation of the various interested groups working on LLVM and using it. Do you consider yourself representative of a minority group, underrepresented geographic region, etc?
 -----------------------------------------
 
