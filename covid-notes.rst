@@ -6,6 +6,8 @@ Immunity Duration
 
 The big question being discussed this week was whether COVID-19 provides any form of extended immunity.  Such immunity is a key part of any herd immunity strategy - whether infection or vaccine based.  The best description I've seen so far is from `ArsTechnica <https://arstechnica.com/science/2020/07/beyond-antibodies-the-immune-response-to-coronavirus-is-complicated/>`_.  The summary appears to be "it's complicated", but there's no particular reason to panic just yet.  
 
+One weirdly positive bit of news buried in the discussion of antibodies vs t-cell immunity is that our current surveillance testing only detects antibodies.  If - and this is a big if - it turns out than many people loose antibodies quickly, but retain at least some partial immunity via other mechanisms (t-cells?), then our estimates of the number of people infected so far may turn out to be low.  That would be good news for IFR if true.   I want to emphasize that we just don't know, and shouldn't place much hope in this. 
+
 Death Rates Trending Down
 -------------------------
 
@@ -24,7 +26,7 @@ I don't want to be alarmist, but the current situation in the USA is distincly "
 
 My current personal best guess is that IFR will end up someone around 1/5th of the current estimated CFR.  (So, around 1%.)  I expect we'll continue to see US states relax and then tighten restrictions with the effect of keeping R somewhere close to 1.  Given this, I am expecting to see a slowly increasing number of deaths for each month until we have an effective vaccine.  As a ballpark, let's say around 20k increasing up to around 50k per month, or around 150-300k over the next 6 months. At some point we'll start seeing R drop due to partial herd immunity, but practically, I suspect we're going to be hovering around R~=1 for the forseable future.  
 
-I really hope I'm wrong.  But on the other hand, it is important to keep perspective.  Somewhere around 2.4m people died (of all causes) in 2019.  If we project 600k from COVID, 2020/2021's death rates will definitely be well above average, but they're not going to catestrophic either.  
+I really hope I'm wrong; these are pretty terrible numbers.  But on the other hand, it is important to keep perspective.  Somewhere around 2.4m people died (of all causes) in 2019.  If we project 600k from COVID, 2020/2021's death rates will definitely be well above average, but they're not going to catestrophic either.  
 
 
 
