@@ -1,3 +1,33 @@
+July 19, 2020
+==============
+
+Immunity Duration
+------------------
+
+The big question being discussed this week was whether COVID-19 provides any form of extended immunity.  Such immunity is a key part of any herd immunity strategy - whether infection or vaccine based.  The best description I've seen so far is from `ArsTechnica <https://arstechnica.com/science/2020/07/beyond-antibodies-the-immune-response-to-coronavirus-is-complicated/>`_.  The summary appears to be "it's complicated", but there's no particular reason to panic just yet.  
+
+Death Rates Trending Down
+-------------------------
+
+One apparent bit of very good bit of news, buried in all the bad news, is that death rates definitely appear to be trending down.  As of today, there have been 143k deaths out of 3.83m confirmed cases.  This a CFR under 4%.  
+
+If we look at only the cases and deaths since June 12th, we've got 27k additional deaths and 1.73m additional confirmed cases.  That would give a lower bound on CFR of around 1.5%.  It's a lower bound as deaths are a lagging indicator, and it's hard to say how much the additional death number would increase from currently active cases.
+
+If we take the deaths as of today and the cases as of July 2nd (to try to adjust for the lag in deaths), we'd be looking at 27k additional deaths and 640k additional cases.  That would have our CFR back at something around 4%.
+
+**Conclusion?**  It's really too early to say what's going on with CFR.  It might actual be trending down, or we might be fooling ourselves by combining metrics with different lags.  It's impossible to say.
+
+Big Picture
+-----------
+
+I don't want to be alarmist, but the current situation in the USA is distincly "not good".  We appear to be following a path of barely controlled burn through.  As bad as things currently are, the fact we're seeing shutdowns again mean things aren't fully uncontrolled either.  For reference, fully uncontrolled burn through screnarios are the ones which completely swamp hospital capacity and we see CFRs north of 20%.  We're not seeing that, and I doubt we will for any sustained period.  
+
+My current personal best guess is that IFR will end up someone around 1/5th of the current estimated CFR.  (So, around 1%.)  I expect we'll continue to see US states relax and then tighten restrictions with the effect of keeping R somewhere close to 1.  Given this, I am expecting to see a slowly increasing number of deaths for each month until we have an effective vaccine.  As a ballpark, let's say around 20k increasing up to around 50k per month, or around 150-300k over the next 6 months. At some point we'll start seeing R drop due to partial herd immunity, but practically, I suspect we're going to be hovering around R~=1 for the forseable future.  
+
+I really hope I'm wrong.  But on the other hand, it is important to keep perspective.  Somewhere around 2.4m people died (of all causes) in 2019.  If we project 600k from COVID, 2020/2021's death rates will definitely be well above average, but they're not going to catestrophic either.  
+
+
+
 July 14, 2020
 ==============
 
