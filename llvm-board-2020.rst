@@ -32,6 +32,7 @@ What experience or skills can you bring to the board? Which of the above program
 We value diversity and representation of the various interested groups working on LLVM and using it. Do you consider yourself representative of a minority group, underrepresented geographic region, etc?
 -----------------------------------------
 
+
 Which program are you most interested in supporting?
 -----------------------------------------------------
 
@@ -74,6 +75,7 @@ Yes, with a paricular emphasis on trying to establish periodic giving campaigns 
 
 Is there anything else you would like to add for the board to consider?
 ------------------------------------------------------------------
+No.
 
 New this year, we will accept letters of recommendation to support your application. Please have your references send their letter of recommendation directly to us at boardapp@llvm.org. This is totally optional.
 -------------------
