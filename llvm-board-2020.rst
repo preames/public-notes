@@ -19,7 +19,14 @@ Non Technical Contributions
 
 * Member of the recently established LLVM Security Group.
 * Contact point for all Azul contributions to LLVM.  Representing LLVM internally (e.g. relicensing, etc..), and organizing organization contributions upstream, including internally focused developer education around LLVM community norms and processes.  
-* Presenter at multiple LLVM Developer Conferences including one of the 2017 keynotes on the Falcon project.  Recently, most of my focus at developer meetings has been on the hallway track conversations, and the defacto frontends for dynamic languages sessions which happen each year (whether formally organized or not).  
+* Presenter at multiple LLVM Developer Conferences including one of the 2017 keynotes on the Falcon project.  Recently, most of my focus at developer meetings has been on the hallway track conversations, and the defacto "frontends for dynamic languages" working sessions which happen each year (whether formally organized or not). 
+* Wrote "Performance Tips for Frontend Authors" and "LLVM Loop Terminology (and Canonical Forms)" doc pages.  Also contributed to a bunch of other docs in smaller one-off changes.
+
+Indirect Contributions
+
+* Points that follow are things which Azul does which I have had some role in steering.  Most of the work on these has not been my own, and others should get all the credit for making things actually happen.  :)
+* Fuzzing, regression tracking, and quality improvements - We run one of the only large fuzzer deployments which actual runs generated code.  As a result of this, we catch a disportanate fraction of miscompiles.  We deliberate lag ToT by a few days so that our time and energy is spent on the harder subtle issues.  In addition to the normal "please revert patch X" cases, we've also found a number of deep and interesting bugs in core passes.  My favorite to date was the fuzzer finding incorrect nsw/nuw flag handling in GVN which had been present for almost a decade.  
+* Falcon (our LLVM based compiler for Java bytecode) demonstrated that it was possible to develop compilers non-C family languages on LLVM, and achieve performance which beat existing state of the art approaches.  In the process of doing so, we fixed a number of issues, documented many of the items we stumbled across, and publically discussed most of the key design elements of our approach (including our mistakes).  I'd like to think this has positively impacted the broader LLVM ecosystem.  
 
 TBD - How to describe Falcon, fuzzing efforts, etc..?
 
