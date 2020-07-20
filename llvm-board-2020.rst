@@ -12,6 +12,8 @@ LLVM contributor since 2013.  Major areas of (code) contribution:
 * Main author of gc.statepoint infrastructure, and current defacto code owner of garbage collection support in LLVM
 * Extensively contributed both directly and indirectly (though coworkers) to SCEV, IndVars, and much of our loop canonicalization infrastructure.  Recently became code owner.
 * (Incrementally) rewrote most of LazyValueInfo and CorrelatedValuePropagation.
+* Led effort to optimize unordered atomic loads and stores throughout middle end and x86 backend.  Contributed ~50% of the code directly.  
+* Many smaller contributions through middle end optimizer and (to a much lesser degree) the x86 backend.
 
 Non Technical Contributions
 
@@ -28,6 +30,12 @@ I believe strongly that the LLVM project has become a core piece of infrastructu
 
 What experience or skills can you bring to the board? Which of the above programs could you help drive forward?
 -------------------------
+
+Helped to establish, and fundraise for initial New Haven Pride Center scholarship fund (https://www.newhavenpridecenter.org/youth/scholarship/).  That initial fund has now developed into five distinct scholarship funds with a total of 6 annual awards. 
+
+The areas I'm most interested in contributing towards are scholarship grants, education oppurtunities for students getting started in the community (particular students from non-traditional backgrounds), and support of common project infrastructure.   I will also contribute in areas outside those foci, but they're the ones of most personal interest to me.  
+
+
 
 We value diversity and representation of the various interested groups working on LLVM and using it. Do you consider yourself representative of a minority group, underrepresented geographic region, etc?
 -----------------------------------------
@@ -71,7 +79,7 @@ No
 Are you willing and able to help fundraise for the LLVM Foundation? We rely on donations to fund our programs and need board members to help find new sponsors and donors.
 --------------------------------------------------------------------
 
-Yes, with a paricular emphasis on trying to establish periodic giving campaigns and otherwise diversify the foundations funding.
+Yes, with a paricular emphasis on 1) trying to establish periodic giving campaigns and otherwise diversify the foundations funding, and 2) separate dedicated funding sources for scholarships and student travel grants.
 
 Is there anything else you would like to add for the board to consider?
 ------------------------------------------------------------------
