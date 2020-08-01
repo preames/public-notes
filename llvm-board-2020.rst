@@ -25,20 +25,18 @@ Non Technical Contributions
 Indirect Contributions
 
 * Points that follow are things which Azul does which I have had some role in steering.  Most of the work on these has not been my own, and others should get all the credit for making things actually happen.  :)
-* Fuzzing, regression tracking, and quality improvements - We run one of the only large fuzzer deployments which actual runs generated code.  As a result of this, we catch a disportanate fraction of miscompiles.  We deliberate lag ToT by a few days so that our time and energy is spent on the harder subtle issues.  In addition to the normal "please revert patch X" cases, we've also found a number of deep and interesting bugs in core passes.  My favorite to date was the fuzzer finding incorrect nsw/nuw flag handling in GVN which had been present for almost a decade.  
-* Falcon (our LLVM based compiler for Java bytecode) demonstrated that it was possible to develop compilers non-C family languages on LLVM, and achieve performance which beat existing state of the art approaches.  In the process of doing so, we fixed a number of issues, documented many of the items we stumbled across, and publically discussed most of the key design elements of our approach (including our mistakes).  I'd like to think this has positively impacted the broader LLVM ecosystem.  
-
-TBD - How to describe Falcon, fuzzing efforts, etc..?
+* Fuzzing, regression tracking, and quality improvements - We run one of the only large fuzzer deployments which actually runs generated code.  As a result of this, we catch a disportanate fraction of miscompiles.  We deliberate lag ToT by a few days so that our time and energy is spent on the harder subtle issues.  In addition to the normal "please revert patch X" cases, we've also found a number of deep and interesting bugs in core passes.  My favorite to date was the fuzzer finding incorrect nsw/nuw flag handling in GVN which had been present for almost a decade.  
+* Falcon (our LLVM based compiler for Java bytecode) demonstrated that it was possible to develop compilers for non-C family languages on LLVM, and achieve performance which beat existing state of the art approaches.  In the process of doing so, we fixed a number of issues, documented many of the items we stumbled across, and publically discussed most of the key design elements of our approach (including our mistakes).  I'd like to think this has positively impacted the broader LLVM ecosystem.  
 
 Why do you want to be on the LLVM Foundation board of directors?
 -----------------------------------------------------------------
 
-I believe strongly that the LLVM project has become a core piece of infrastructure and investment is needing accordingly.  I personally greatly appreciate various aspects of the community (e.g. professionalism, creative tension between pragmatism and perfectionism, and a refusal to get lost in bike sheding), but also see stress points forming as the community scales (e.g. infrastructure, decision making, review fragmentation).  I want to ensure the project continues to scale without loosing the aspects which have made it such a wonderful ecosystem in which to work these last few years.  
+I believe that the LLVM project has become a core piece of infrastructure and investment is needing accordingly.  I personally greatly appreciate various aspects of the community (e.g. professionalism, creative tension between pragmatism and perfectionism, and a refusal to get lost in bike sheding), but also see stress points forming as the community scales (e.g. infrastructure, decision making, review fragmentation).  I want to ensure the project continues to scale without loosing the aspects which have made it such a wonderful ecosystem in which to work these last few years.  
 
 What experience or skills can you bring to the board? Which of the above programs could you help drive forward?
 -------------------------
 
-Helped to establish, and fundraise for initial New Haven Pride Center scholarship fund (https://www.newhavenpridecenter.org/youth/scholarship/).  That initial fund has now developed into five distinct scholarship funds with a total of 6 annual awards. 
+Helped to establish, and fundraise for initial New Haven Pride Center scholarship fund (https://www.newhavenpridecenter.org/youth/scholarship/).  That initial fund has now developed into five distinct scholarship funds with a total of six annual awards. 
 
 The areas I'm most interested in contributing towards are scholarship grants, education oppurtunities for students getting started in the community (particular students from non-traditional backgrounds), and support of common project infrastructure.   I will also contribute in areas outside those foci, but they're the ones of most personal interest to me.  
 
@@ -46,6 +44,7 @@ The areas I'm most interested in contributing towards are scholarship grants, ed
 
 We value diversity and representation of the various interested groups working on LLVM and using it. Do you consider yourself representative of a minority group, underrepresented geographic region, etc?
 -----------------------------------------
+No.
 
 
 Which program are you most interested in supporting?
