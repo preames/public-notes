@@ -1,3 +1,12 @@
+Aug 2, 2020
+============
+
+This will be a very short update as nothing major has changed in the last two weeks.  The USA is at 157k deaths with 4.71 million confirmed cases.  That's 13k confirmed deaths in the last two weeks, which unfortunately puts us right on track from my projections last time.  As before, there's some evidence that CFR is trending slightly lower, but the data is noisy enough to be hard to interpret.  
+
+I'd really like to see someone perform an analysis of CFRs for individual {two week periods x locales} and then plot the computed estimates against test positivity rate.  I suspect from the data I've looked at that the national CFRs are being driven quite a bit higher than reality by high positivity rates (and thus low estimations of total confirmed cases).  Unfortunately, no data I've seen would imply an IFR much below 1/2% at the absolute best.  
+
+I'll close by pointing to a nicely written `article by fivethirtyeight <https://fivethirtyeight.com/features/every-decision-is-a-risk-every-risk-is-a-decision/>`_ which has the best description of the calculated risk decisions each of us are making day by day I've seen so far.  The only thing I fault the article for is failing to acknowledge that this is the same decision procedure we have always applied - consciously or not - all that has changed is the (estimated) risks.
+
 July 19, 2020
 ==============
 
