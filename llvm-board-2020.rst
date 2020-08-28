@@ -1,4 +1,4 @@
-This is the draft form of my application to be on the LLVM foundation board.  If successful, the application becomes public, so I've decided simply to publish it from the beginning.  Current status is **very rough**.
+This is the draft form of my 2020 application to be on the LLVM foundation board.  If successful, the application becomes public, so I've decided simply to publish it from the beginning.  My application was not accepted.
 
 Name (First and Surname) *
 --------------------------
