@@ -1,3 +1,14 @@
+Sept 1, 2020
+============
+
+As of today, the USA has had 6.08 million confirmed cases, and 184 thousand confirmedc cases.  Subtracting out the counts from two weeks ago, that's 700 thousand new cases, and 15 thousand new deaths.  That gives us roughly 1.3m new cases in the month of August and 27k confirmed deaths for the same.  
+
+For context, if we assume the 3-10x estimate for number of actual cases vs confirmed cases still holds, this would imply that there has been somewhere around 20 and 60 million cases in the US to date.  That's potentially as much as 20% of the population. There's reason to be a bit skeptical of that since the most recent antibody study results I've seen aren't anywhere near that high, but something in the 5% range seems fairly plausible.  So, "only", 1 in 20 people in the US.  
+
+The other bit of context is that the raw CFR over the last month has been around 2% and the cummulative CFR for the whole period has trended down to ~3%.  As before, if we assume only some fraction of cases are getting caught, that puts IFR somewhere in the 0.2-1% range.  There are much fancier estimations out there; I find doing back of the envelope numbers like this to be useful in keeping context though.
+
+The major thing I'm tracking virus wise is that we've now had our first two confirmed cases of reinfection.  The fact we're seeing cases isn't suprising; with over 6 million cases in the US alone, it would be surprisig if we didn't!  It's clear from the two cases which happen to be documented, and our relatively poor testing situation, that there are probably many more cases out there.  On the other hand, this doesn't seem to be widespread just yet.  The real question is what the population level immunity drop off looks like; that'll be a big factor in reducing spread rate w/ or w/o a vaccine.  So far, I don't see any strong reason to worry just yet.
+
 Aug 16, 2020
 =============
 
