@@ -1,3 +1,16 @@
+Sept 23, 2020
+=============
+
+As of today, the United States has had 6.95 million confirmed COVID-19 cases, and 202 thousand deaths.  That's a plenty grim milestone.  It's also worth noting that the US is now worse on a per capita death rate has now passed Sweden, and we currently rank 11th worst in the world on this metric.  (Well, out of those countries which report at least, and there's a number that don't.)
+
+Looking ahead a bit, the city of Manaus, Brazil `may be showing us <https://www.technologyreview.com/2020/09/22/1008709/brazil-manaus-covid-coronavirus-herd-immunity-pandemic/>_` what things would look like if this continues to burn through the population.  There's reason to believe that they have actually reached (or at least nearly reached) herd immunity.  In the process, roughly 1 in 500 people have died.  This is about 3x worse than where the US stands today. The estimated IFR is around 0.3%.  
+
+If that matched our experience, we'd expect to see somewhere around 600-800k deaths here in the US.  However, even assuming Manaus actually has reached herd immunity, it's important to note the US experience may be much worse.  Manaus is a fairly young city overall with less than 6% of the population over 60.  That same number for the US is roughly 20%.  Given we know the risk on this increases greatly with age, that gives us strong reason to suspect the death rate would be higher here.
+
+I remain interested in trying to understand such worse case scenarios as I remain very skeptical that we're going to have an effective vaccine any time soon.  The Russians have been caught manufacturing data on their vaccine and the US vaccine studies are coming under seriously problematic political preassure.  I remain skeptical that we're going to have an effective vaccine in wide deployment any time in the next six months, and maybe not for a full year or more.
+
+If projections above (and similiar ones I've given before based on estimated IFRs) turn out to be right, we're looking at increasing the death rate for the year by ~25%.  That's bad, but it's also not catestrophic.  Nearly 3 million people die each and every year.  Most years, we - as a society - never really notice unless one of those deaths strikes close to home.  
+
 Sept 1, 2020
 ============
 
