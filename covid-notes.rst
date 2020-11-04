@@ -1,3 +1,29 @@
+Nov 4, 2020
+============
+
+As of today, the US has had 9.47 million confirmed cases, and 233 thousand confirmed deaths.  That puts us just under 30 thousand deaths a month.  This is right in line with my projections from back in July, and if anything, maybe a bit lower than I expected.
+
+I can't really find much in the way of updated population infection estimates (e.g. antibody studies, seroprevalence studies).  What I can find is from back in July (i.e. quite a bit lagged), with two major sources:
+
+* The CDC's`<https://covid.cdc.gov/covid-data-tracker/?CDC_AA_refVal=https%3A%2F%2Fwww.cdc.gov%2Fcoronavirus%2F2019-ncov%2Fcases-updates%2Fcommercial-labs-interactive-serology-dashboard.html#serology-surveillance>`_ estimates still have total case counts somewhere in the 4-8x range of confirmed cases.
+* A `Stanford study <https://med.stanford.edu/news/all-news/2020/09/few-americans-have-coronavirus-antibodies-study-finds.html>`_ came up with a roughly 8% estimate.  Using confirmed case counts from end of July, that's at least a 5x multiple.  
+
+If we assume those ratios still hold - and given the sky high test positivity rates we've been seeing across the country, if anything, they may now be too low - I think it's safe to say we've had something in the order of 50 million cases in the US so far.  Given the number of confirmed deaths, that puts our IFR somewhere around 0.5%.  
+
+At the moment, there's serious concern that cases are broadly trending up across much of the country and that selected areas are reaching capacity limits for local health hacilities.  At least at the moment, I don't see anything to make me thing we're going to enter wide spread care failures; we'll probably see isolated incodents, but nothing broad spread. 
+
+On the good news side of things, we have much improved standards of care since this things started.  Survival rates are up - though importantly, not "way up".  Between basic care, availability of cheap and effective steroids, and the first wave of antibody treatments hitting the market, thinks are looking up on the care front.  
+
+I still remain skeptical of a vaccine in the immediate near term - and recent developments have supported my skeptism - but it's looking more and more likely that we will have a vaccine within the next year or so.  My personal guess is that we'll start seeing availability sometime next summer.  
+
+I expect that a vaccine is not going to be a miracle cure.  Between the likelihood that initial vaccines are likely to only be 50-70% effective, and the strong vaccine hesitancy which exists in this country, I will be suprised if availability of the vaccine does anything more than slow the spread.  I will shoked if we actually reach heard immunity with vaccination in the next two years.
+
+My personal projection is that COVID will become our new normal over the quarters ahead.  Life will go on, many people will get sick, some will die.  But overall, life will go on.
+
+At current rates, we're seeing about 2.5 million confirmed cases (and thus likely around 12 million total cases) per month.  We're at around a 15% population infection rate today, and increasing by about 4% per month.  Projecting that out, we'd expect to start hitting leaves of practical heard immunity (60-70%) late next year.  
+
+If we get a vaccine, or case counts tick up further, that date may pull in some.  If we start seeing dropping transmission rates - entirely possible as even partial herd immunity effects likelihood of any individual infecting another - we may see case counts drop slightly and time lines extend.  During that time, we're looking at around another 700 thousand deaths.  
+
 Sept 23, 2020
 =============
 
