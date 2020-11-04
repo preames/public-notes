@@ -16,13 +16,13 @@ On the good news side of things, we have much improved standards of care since t
 
 I still remain skeptical of a vaccine in the immediate near term - and recent developments have supported my skeptism - but it's looking more and more likely that we will have a vaccine within the next year or so.  My personal guess is that we'll start seeing availability sometime next summer.  
 
-I expect that a vaccine is not going to be a miracle cure.  Between the likelihood that initial vaccines are likely to only be 50-70% effective, and the strong vaccine hesitancy which exists in this country, I will be suprised if availability of the vaccine does anything more than slow the spread.  I will shoked if we actually reach heard immunity with vaccination in the next two years.
-
-My personal projection is that COVID will become our new normal over the quarters ahead.  Life will go on, many people will get sick, some will die.  But overall, life will go on.
+I expect that a vaccine is not going to be a miracle cure.  Between the likelihood that initial vaccines are likely to only be 50-70% effective, and the strong vaccine hesitancy which exists in this country, I will be suprised if availability of the vaccine does anything more than slow the spread.
 
 At current rates, we're seeing about 2.5 million confirmed cases (and thus likely around 12 million total cases) per month.  We're at around a 15% population infection rate today, and increasing by about 4% per month.  Projecting that out, we'd expect to start hitting leaves of practical heard immunity (60-70%) late next year.  
 
 If we get a vaccine, or case counts tick up further, that date may pull in some.  If we start seeing dropping transmission rates - entirely possible as even partial herd immunity effects likelihood of any individual infecting another - we may see case counts drop slightly and time lines extend.  During that time, we're looking at around another 700 thousand deaths.  
+
+Overall, I see a lot less uncertainty in the progress of this pandemic than I did a few months ago.  It's going to by ugly - though as I've said before, not catastrophic.  My personal projection is that COVID will become our new normal over the quarters ahead.  Life will go on, many people will get sick, some will die.  But overall, life will go on.
 
 Sept 23, 2020
 =============
