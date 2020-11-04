@@ -5,7 +5,7 @@ As of today, the US has had 9.47 million confirmed cases, and 233 thousand confi
 
 I can't really find much in the way of updated population infection estimates (e.g. antibody studies, seroprevalence studies).  What I can find is from back in July (i.e. quite a bit lagged), with two major sources:
 
-* The CDC's`<https://covid.cdc.gov/covid-data-tracker/?CDC_AA_refVal=https%3A%2F%2Fwww.cdc.gov%2Fcoronavirus%2F2019-ncov%2Fcases-updates%2Fcommercial-labs-interactive-serology-dashboard.html#serology-surveillance>`_ estimates still have total case counts somewhere in the 4-8x range of confirmed cases.
+* The `CDC's <https://covid.cdc.gov/covid-data-tracker/?CDC_AA_refVal=https%3A%2F%2Fwww.cdc.gov%2Fcoronavirus%2F2019-ncov%2Fcases-updates%2Fcommercial-labs-interactive-serology-dashboard.html#serology-surveillance>`_ estimates still have total case counts somewhere in the 4-8x range of confirmed cases.
 * A `Stanford study <https://med.stanford.edu/news/all-news/2020/09/few-americans-have-coronavirus-antibodies-study-finds.html>`_ came up with a roughly 8% estimate.  Using confirmed case counts from end of July, that's at least a 5x multiple.  
 
 If we assume those ratios still hold - and given the sky high test positivity rates we've been seeing across the country, if anything, they may now be too low - I think it's safe to say we've had something in the order of 50 million cases in the US so far.  Given the number of confirmed deaths, that puts our IFR somewhere around 0.5%.  
