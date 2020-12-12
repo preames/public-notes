@@ -16,12 +16,14 @@ Public Talks
 
 The best intro talk is probably the keynote that I gave at the 2017 LLVM Developers Meeting.  Beyond that, there have been a number of talks presented by members of the team over the development life cycle.  I'm listing the ones I know of in reverse chronological order.  
 
-* An Update on Optimizing Multiple Exit Loops. Philip Reames. 2020 LLVM Virtual Developers Meeting.
-* Control-flow sensitive escape analysis in Falcon JIT. Artur Pilipenko. 2020 LLVM Virtual Developers Meeting.
-* Falcon: An optimizing Java JIT. Philip Reames, 2017 LLVM Developers Meeting 
-* Expressing high level optimizations within LLVM. Artur Pilipenko. 2017 European LLVM Developers Meeting.
-* LLVM for a managed language: what we’ve learned. Sanjoy Das and Philip Reames. 2015 LLVM Developers Meeting
-* Supporting Precise Relocating Garbage Collection in LLVM. Sanjoy Das and Philip Reames. 2014 LLVM Developers Meeting
+* An Update on Optimizing Multiple Exit Loops. Philip Reames. Tech Talk, 2020 LLVM Virtual Developers Meeting.
+* Control-flow sensitive escape analysis in Falcon JIT. Artur Pilipenko. Tech Talk, 2020 LLVM Virtual Developers Meeting.
+* Truly Final Optimization in Zing VM.  Anna Thomas. Tech Talk, JVM Language Summit 2018.
+* Falcon: An optimizing Java JIT. Philip Reames, Keynote, 2017 LLVM Developers Meeting 
+* A Quick Intro to Falcon.  Philip Reames.  Lightning Talk, JVM LAnguage Summit 2017.
+* Expressing high level optimizations within LLVM. Artur Pilipenko. Tech Talk, 2017 European LLVM Developers Meeting.
+* LLVM for a managed language: what we’ve learned. Sanjoy Das and Philip Reames. Tech Talk, 2015 LLVM Developers Meeting
+* Supporting Precise Relocating Garbage Collection in LLVM. Sanjoy Das and Philip Reames. Tech Talk, 2014 LLVM Developers Meeting
 
 Other Citable Stuff
 -------------------
@@ -30,3 +32,5 @@ Other Citable Stuff
 `Using ZVM with the Falcon Compiler <https://docs.azul.com/zing/UseZVM_FalconCompiler.htm>`_ 
 
 These are the public docs for the Zing product.  Here you can find the command line options to see the underlying LLVM IR - mostly interesting for compiler folks.  This is also the only public place I can find which gives the original release date (Dec 2016) and on by default date (March 2017).  Be cautious of the docs in generally though, they're frequently hilariously out of date and sometimes just wrong.  
+
+`Truly Final Optimization in Zing VM <https://medium.com/azulsystems/truly-final-optimization-in-zing-vm-283d28418e55>`_
