@@ -25,4 +25,8 @@ The best intro talk is probably the keynote that I gave at the 2017 LLVM Develop
 
 Other Citable Stuff
 -------------------
-`Introducing the Falcon JIT Compiler <https://www.azul.com/products/zing/falcon-jit-compiler/>`_
+`Introducing the Falcon JIT Compiler <https://www.azul.com/products/zing/falcon-jit-compiler/>`_  -- See also the blog posts linked to the launch at the bottom.  
+
+`Using ZVM with the Falcon Compiler <https://docs.azul.com/zing/UseZVM_FalconCompiler.htm>`_ 
+
+These are the public docs for the Zing product.  Here you can find the command line options to see the underlying LLVM IR - mostly interesting for compiler folks.  This is also the only public place I can find which gives the original release date (Dec 2016) and on by default date (March 2017).  Be cautious of the docs in generally though, they're frequently hilariously out of date and sometimes just wrong.  
