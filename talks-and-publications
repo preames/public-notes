@@ -1,5 +1,9 @@
 # Past Talks and Public Events
 
+An Update on Optimizing Multiple Exit Loops
+Philip Reames
+2020 LLVM Virtual Developers Meeting
+
 Panel: Inter-procedural Optimization (IPO)
 Teresa Johnson, Philip Reames, Chandler Carruth, Johannes Doerfert
 2019 LLVM Developers Meeting
