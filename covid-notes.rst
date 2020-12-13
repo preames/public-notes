@@ -1,3 +1,22 @@
+Dec 12, 2020
+=============
+
+Vaccines
+--------
+
+As of today, we have two vaccines which are either approved for use in the US, or very nearly so.  They're not interchangeable - more on that in a second - but I'm absolutely thrilled by this development.  As I stated a few weeks ago, I was not expecting vaccines to be available this soon.
+
+The Pfizer vaccine appears to be very effective.  The reported efficacy is 95%, but I've seen several folks point out that the result is essentially statistically indistinguishable from 100% efficacy.  The single "severe" case was borderline, and the stats pivot on that singe case.  The challenge with this vaccine is a) the need for a cold chain distribution, and b) the limited supply of 100 million doses (enough for 50 million people) in the near to moderate term.  The supply side is infuriating, as apparently the US government declined to purchase an option on 100 million more doses.  WTF.
+
+The Moderna vaccine appears to be much more of a mixed bag, despite the attempts at spin.  The reported efficacy was 70% - well below that of the Pfizer one - despite an attempt to spin a sub-sample into a headline number.  Ignore the PR spin, that's garbage.  It's classic p-hacking.  On the other hand, the distribution of the Moderna vaccine doesn't require anywhere near as extensive cooling, which is a huge win.
+
+Speaking personally, if I got to chose I'd definitely take the Pfizer vaccine, but either one is much better than nothing.  Of course, I'm also not in a high risk group and am thus probably not getting either until sometime next summer, and a lot can change between now and then.
+
+One thing that concerns me is that we have no idea of the safety profile on taking both.  By taking the Moderna vaccine - which is likely to be in better supply in the moderate term - do you have to avoid taking the Pfizer one in the future?  I can see a bunch of potential complications here.
+
+Over the next few months, logistics of vaccine distribution is going to be a major challenge.  I'm expecting lots of fuck ups, both because the outgoing administration has proven themselves very good at those, and because this is simply a hard problem.  
+
+
 Nov 4, 2020
 ============
 
