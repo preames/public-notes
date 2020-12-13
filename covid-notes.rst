@@ -4,7 +4,7 @@ Dec 12, 2020
 Case Counts
 ------------
 
-As of today, the US has had 16.2 million confirmed cases, and 298 thousand confirmed deaths. This is over 65k deaths in the last 5 1/2 weeks alone.  Assuming a roughly 5x case to confirmed case ratio, that puts us around 81 million cases in the US to date.  
+As of today, the US has had 16.2 million confirmed cases, and 298 thousand confirmed deaths. This is over 65k deaths in the last 5 1/2 weeks alone, and we're rapidly approaching (w/in the next week or so) the point where 1 in 1000 people in the US will have died of COVID-19.  Assuming a roughly 5x case to confirmed case ratio, that puts us around 81 million cases in the US to date.  
 
 I'm expecting these rates to continue increasing over the next few weeks.  Without the availability of vaccines, we'd likely be up around 100k deaths per month by early Spring 2021.  Now that we have some availability of vaccines (see below), it'll be a race to see how many people we can vaccinate vs how quickly people are infected in the general population.
 
