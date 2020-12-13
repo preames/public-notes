@@ -1,6 +1,13 @@
 Dec 12, 2020
 =============
 
+Case Counts
+------------
+
+As of today, the US has had 16.2 million confirmed cases, and 298 thousand confirmed deaths. This is over 65k deaths in the last 5 1/2 weeks alone.  Assuming a roughly 5x case to confirmed case ratio, that puts us around 81 million cases in the US to date.  
+
+I'm expecting these rates to continue increasing over the next few weeks.  Without the availability of vaccines, we'd likely be up around 100k deaths per month by early Spring 2021.  Now that we have some availability of vaccines (see below), it'll be a race to see how many people we can vaccinate vs how quickly people are infected in the general population.
+
 Vaccines
 --------
 
@@ -16,6 +23,19 @@ One thing that concerns me is that we have no idea of the safety profile on taki
 
 Over the next few months, logistics of vaccine distribution is going to be a major challenge.  I'm expecting lots of fuck ups, both because the outgoing administration has proven themselves very good at those, and because this is simply a hard problem.  
 
+Looking Forward
+---------------
+
+Let's use some back of the envelope math to get a feel for what the next few months could look like.  We're seeing around 200k cases per day today.  For both scenarios we'll assume a 5x case to confirmed case ratio, and we use the estimated 80 million cases to date from above.  That means we have roughly 1 million new infections per day.
+
+* Pessimist Scenario - If we did nothing (and ignored the non-linear nature of disease progression modeling), we'd reach 100% of the population roughly 8 months from now.  That won't happen for all kinds of reasons, but it gives us a feel for what to expect at the outside.  
+* Optimistic Scenario - If we assume 65% immunity is enough to dramatically slow infections due to herd immunity, we'd be looking at 4.5 months at current rates.  If we assume 50 million people are vaccinated in the next couple months, we could be looking at as little as 3 months and another 85 million infections.  
+
+Both of these are rough estimates a best, but they give a flavor for what we might be looking at.  I'm reasonable confident in saying the worst of this pandemic will be over by summer, the only question is how bad it'll be between now and then.  
+
+Folks are starting to put out more sophisticated estimates `for a path to herd immunity based on vaccination campaigns <https://covid19-projections.com/path-to-herd-immunity/>`_ which are useful for exploring the possibilities.  
+
+I am fully expecting the next 3-6 months to be ugly.  At this point, there is a light at the end of the tunnel, but we're still a ways from the end of this.  If we reacted well and executed well, we could minimize the costs between now and then, but frankly, the last year has made me anything but hopeful we will.  
 
 Nov 4, 2020
 ============
