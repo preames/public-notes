@@ -1,3 +1,8 @@
+Dec 14, 2020
+============
+
+I'd gotten a key detail wrong in my Dec 12th comments, please see the correction below.  The vaccine section is essentially entirely rewritten, and the tone of the forward looking section got revised to reflect more available vaccine doses.  
+
 Dec 12, 2020
 =============
 
@@ -11,15 +16,13 @@ I'm expecting these rates to continue increasing over the next few weeks.  Witho
 Vaccines
 --------
 
-As of today, we have two vaccines which are either approved for use in the US, or very nearly so.  They're not interchangeable - more on that in a second - but I'm absolutely thrilled by this development.  As I stated a few weeks ago, I was not expecting vaccines to be available this soon.
+**Correction**: I'd originally confused the Moderna vaccine and the AstraZeneca one.  As a result, my original take here was flat out wrong and has been updated 12/14/2020.  
+
+As of today, we have two vaccines which are either approved for use in the US, or very nearly so.  I'm absolutely thrilled by this development.  As I stated a few weeks ago, I was not expecting vaccines to be available this soon.
 
 The Pfizer vaccine appears to be very effective.  The reported efficacy is 95%, but I've seen several folks point out that the result is essentially statistically indistinguishable from 100% efficacy.  The single "severe" case was borderline, and the stats pivot on that singe case.  The challenge with this vaccine is a) the need for a cold chain distribution, and b) the limited supply of 100 million doses (enough for 50 million people) in the near to moderate term.  The supply side is infuriating, as apparently the US government declined to purchase an option on 100 million more doses.  WTF.
 
-The Moderna vaccine appears to be much more of a mixed bag, despite the attempts at spin.  The reported efficacy was 70% - well below that of the Pfizer one - despite an attempt to spin a sub-sample into a headline number.  Ignore the PR spin, that's garbage.  It's classic p-hacking.  On the other hand, the distribution of the Moderna vaccine doesn't require anywhere near as extensive cooling, which is a huge win.
-
-Speaking personally, if I got to chose I'd definitely take the Pfizer vaccine, but either one is much better than nothing.  Of course, I'm also not in a high risk group and am thus probably not getting either until sometime next summer, and a lot can change between now and then.
-
-One thing that concerns me is that we have no idea of the safety profile on taking both.  By taking the Moderna vaccine - which is likely to be in better supply in the moderate term - do you have to avoid taking the Pfizer one in the future?  I can see a bunch of potential complications here.
+The Moderna vaccine also appears to be have high efficacy, and distribution appears more straight forward as this one doesn't require anywhere near as extensive cooling, which is a huge win.  At the moment, it looks like we're about a week out from approval on this one as well.  
 
 Over the next few months, logistics of vaccine distribution is going to be a major challenge.  I'm expecting lots of fuck ups, both because the outgoing administration has proven themselves very good at those, and because this is simply a hard problem.  
 
@@ -29,13 +32,13 @@ Looking Forward
 Let's use some back of the envelope math to get a feel for what the next few months could look like.  We're seeing around 200k cases per day today.  For both scenarios we'll assume a 5x case to confirmed case ratio, and we use the estimated 80 million cases to date from above.  That means we have roughly 1 million new infections per day.
 
 * Pessimist Scenario - If we did nothing (and ignored the non-linear nature of disease progression modeling), we'd reach 100% of the population roughly 8 months from now.  That won't happen for all kinds of reasons, but it gives us a feel for what to expect at the outside.  
-* Optimistic Scenario - If we assume 65% immunity is enough to dramatically slow infections due to herd immunity, we'd be looking at 4.5 months at current rates.  If we assume 50 million people are vaccinated in the next couple months, we could be looking at as little as 3 months and another 85 million infections.  
+* Optimistic Scenario - If we assume 65% immunity is enough to dramatically slow infections due to herd immunity, we'd be looking at 4.5 months at current rates.  That's only 135 million people remaining to herd immunity, and we're looking at the availability of 100 million persons vaccinated based on current supply.  We could be down to as little time as it takes us to deploy the vaccines.  (Current infection rates are almost certain to provide the other 35 million cases in any reasonable deployment timeframe.)
 
 Both of these are rough estimates a best, but they give a flavor for what we might be looking at.  I'm reasonable confident in saying the worst of this pandemic will be over by summer, the only question is how bad it'll be between now and then.  
 
 Folks are starting to put out more sophisticated estimates `for a path to herd immunity based on vaccination campaigns <https://covid19-projections.com/path-to-herd-immunity/>`_ which are useful for exploring the possibilities.  
 
-I am fully expecting the next 3-6 months to be ugly.  At this point, there is a light at the end of the tunnel, but we're still a ways from the end of this.  If we reacted well and executed well, we could minimize the costs between now and then, but frankly, the last year has made me anything but hopeful we will.  
+I am fully expecting the next 2-3 months to be ugly.  At this point, there is a light at the end of the tunnel, but we're still a ways from the end of this.  If we reacted well and executed well, we could minimize the costs between now and then, but frankly, the last year has made me anything but hopeful we will.  
 
 Nov 4, 2020
 ============
