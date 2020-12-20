@@ -1,3 +1,16 @@
+December 20, 2020
+=================
+
+It's been a week of mixed news.  
+
+On one hand, the Moderna vaccine has been `approved by the FDA <https://www.theguardian.com/world/2020/dec/18/fda-authorizes-moderna-coronavirus-vaccine-emergency-use-across-the-us>_`.  Vaccination campaigns have begun with many front line medical staff already being vaccinated (with the Pfizer vaccine to date).  That's wonderful news.
+
+On the other, we have confirmed the virus `is mutating <https://www.bloomberg.com/news/articles/2020-12-20/u-k-s-hancock-says-new-covid-mutatation-is-out-of-control>_` and there are `some reports <https://www.washingtonpost.com/world/europe/coronavirus-mutation-britain-lockdown/2020/12/19/fd010eea-4206-11eb-b58b-1623f6267960_story.html>_` that strain speading in the UK and Europe spreads easier.  (I can't find scientific data to back that yet.)  There's no evidence that the mutated strain is more lethal or resistent to the vaccines.
+
+I don't think this really changes anything in the near term.  It does make it more likely that COVID will be with us for a while, and that we may need to evolve the vaccine as the virus evolves.  (Like influenza and the flu vaccines each year.)  This is one of the semi expected outcomes of having failed to tightly control tranmission and now having so many people infected.  (The more oppurtunities for mutation, the more likely we were to see one.)  At the moment, I'm not worried by this news, but it is something to keep an eye on.
+
+We've also seen the first of the expected `operational confusion <https://www.washingtonpost.com/health/2020/12/17/pfizer-vaccine-supply-states/>_` impacting vaccine distribution.  
+
 Dec 14, 2020
 ============
 
