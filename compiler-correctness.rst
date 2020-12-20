@@ -31,15 +31,15 @@ well defined source programs, b) a sanitizer like tool to make any program
 well defined in practice, or c) a very good scoring/filtering mechanism.  
 (a) or (b) are the strongly preferred approaches.
 
-Maximum code expansion - A desireable property in a compiler is to not produce
-output sizes which are expotential in the input size.  A fuzzer can be useful
+Maximum code expansion - A desirable property in a compiler is to not produce
+output sizes which are exponential in the input size.  A fuzzer can be useful
 way of finding such cornercases, though I'm not aware of anyone who has done
 so to date.  
 
 
 Performance fuzzing
 
-One area which I think is very underexplored is using fuzzers to find regresions
+One area which I think is very under-explored is using fuzzers to find regressions
 in optimization effectiveness or missing optimizations in compilers.  If you have
 a means of generating well defined programs and two compilers (or two compiler 
 *versions*) you can simply run the same program compiled with both, and compare
@@ -62,7 +62,7 @@ doing it for generic missed optimizations is not a problem I know how to approac
 
 Other random notes around fuzzing
 
-Empherically, finding regressions requires about a million unique test executions.
+Empirically, finding regressions requires about a million unique test executions.
 No idea why, but most regressions fall out somewhere between a million and two
 million unique tests executions.  (With a niave fuzzer, nothing fancy.  May differ
 with better fuzzer technology.)  Assuming an average of 30 seconds per test (i.e.
@@ -70,11 +70,11 @@ a fairly slow fuzzer), that's only ~280 CPU hours at the high end.  (i.e. one 32
 core machine running for about 10 hours - or $5 at recent AWS spot prices.) At this
 point, there is economically no excuse not to fuzz heavily.  
 
-Empherically, finding long standing subtle miscompiles takes quite a bit longer.
+Empirically, finding long standing subtle miscompiles takes quite a bit longer.
 One "interesting" (i.e. nasty, been latent for years, "how did we never see this?"
 bug) seems to fall out about once per 150 million unique test inputs.  
 
-The empherical statements above apply to fuzzing LLVM indirectly through Azul's
+The empirical statements above apply to fuzzing LLVM indirectly through Azul's
 Falcon JIT using https://github.com/AzulSystems/JavaFuzzer.  Note that this
 fuzzer is not coverage based and doesn't play any other "fun tricks".  
 

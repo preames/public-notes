@@ -20,7 +20,7 @@ The best intro talk is probably the keynote that I gave at the 2017 LLVM Develop
 * Control-flow sensitive escape analysis in Falcon JIT. Artur Pilipenko. Tech Talk, 2020 LLVM Virtual Developers Meeting.
 * Truly Final Optimization in Zing VM.  Anna Thomas. Tech Talk, JVM Language Summit 2018.
 * Falcon: An optimizing Java JIT. Philip Reames, Keynote, 2017 LLVM Developers Meeting 
-* A Quick Intro to Falcon.  Philip Reames.  Lightning Talk, JVM LAnguage Summit 2017.
+* A Quick Intro to Falcon.  Philip Reames.  Lightning Talk, JVM Language Summit 2017.
 * Expressing high level optimizations within LLVM. Artur Pilipenko. Tech Talk, 2017 European LLVM Developers Meeting.
 * LLVM for a managed language: what we’ve learned. Sanjoy Das and Philip Reames. Tech Talk, 2015 LLVM Developers Meeting
 * Supporting Precise Relocating Garbage Collection in LLVM. Sanjoy Das and Philip Reames. Tech Talk, 2014 LLVM Developers Meeting
