@@ -9,7 +9,7 @@ On the other, we have confirmed the virus `is mutating <https://www.bloomberg.co
 
 I don't think this really changes anything in the near term.  It does make it more likely that COVID will be with us for a while, and that we may need to evolve the vaccine as the virus evolves.  (Like influenza and the flu vaccines each year.)  This is one of the semi expected outcomes of having failed to tightly control tranmission and now having so many people infected.  (The more oppurtunities for mutation, the more likely we were to see one.)  At the moment, I'm not worried by this news, but it is something to keep an eye on.
 
-We've also seen the first of the expected `operational confusion <https://www.washingtonpost.com/health/2020/12/17/pfizer-vaccine-supply-states/>_` impacting vaccine distribution.  
+We've also seen the first of the expected `operational confusion <https://www.washingtonpost.com/health/2020/12/17/pfizer-vaccine-supply-states/>`_ impacting vaccine distribution.  
 
 Dec 14, 2020
 ============
