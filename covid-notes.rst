@@ -5,9 +5,9 @@ It's been a week of mixed news.
 
 On one hand, the Moderna vaccine has been `approved by the FDA <https://www.theguardian.com/world/2020/dec/18/fda-authorizes-moderna-coronavirus-vaccine-emergency-use-across-the-us>`_.  Vaccination campaigns have begun with many front line medical staff already being vaccinated (with the Pfizer vaccine to date).  That's wonderful news.
 
-On the other, we have confirmed the virus `is mutating <https://www.bloomberg.com/news/articles/2020-12-20/u-k-s-hancock-says-new-covid-mutatation-is-out-of-control>`_ and there are `some reports <https://www.washingtonpost.com/world/europe/coronavirus-mutation-britain-lockdown/2020/12/19/fd010eea-4206-11eb-b58b-1623f6267960_story.html>`_ that strain speading in the UK and Europe spreads easier.  (I can't find scientific data to back that yet.)  There's no evidence that the mutated strain is more lethal or resistent to the vaccines.
+On the other, we have confirmed the virus `is mutating <https://www.bloomberg.com/news/articles/2020-12-20/u-k-s-hancock-says-new-covid-mutatation-is-out-of-control>`_ and there are `some reports <https://www.washingtonpost.com/world/europe/coronavirus-mutation-britain-lockdown/2020/12/19/fd010eea-4206-11eb-b58b-1623f6267960_story.html>`_ that strain spreading in the UK and Europe spreads easier.  (I can't find scientific data to back that yet.)  There's no evidence that the mutated strain is more lethal or resistent to the vaccines.
 
-I don't think this really changes anything in the near term.  It does make it more likely that COVID will be with us for a while, and that we may need to evolve the vaccine as the virus evolves.  (Like influenza and the flu vaccines each year.)  This is one of the semi expected outcomes of having failed to tightly control tranmission and now having so many people infected.  (The more oppurtunities for mutation, the more likely we were to see one.)  At the moment, I'm not worried by this news, but it is something to keep an eye on.
+I don't think this really changes anything in the near term.  It does make it more likely that COVID will be with us for a while, and that we may need to evolve the vaccine as the virus evolves.  (Like influenza and the flu vaccines each year.)  This is one of the semi expected outcomes of having failed to tightly control transmission and now having so many people infected.  (The more opportunities for mutation, the more likely we were to see one.)  At the moment, I'm not worried by this news, but it is something to keep an eye on.
 
 We've also seen the first of the expected `operational confusion <https://www.washingtonpost.com/health/2020/12/17/pfizer-vaccine-supply-states/>`_ impacting vaccine distribution.  
 
@@ -58,18 +58,18 @@ Nov 4, 2020
 
 As of today, the US has had 9.47 million confirmed cases, and 233 thousand confirmed deaths.  That puts us just under 30 thousand deaths a month.  This is right in line with my projections from back in July, and if anything, maybe a bit lower than I expected.
 
-I can't really find much in the way of updated population infection estimates (e.g. antibody studies, seroprevalence studies).  What I can find is from back in July (i.e. quite a bit lagged), with two major sources:
+I can't really find much in the way of updated population infection estimates (e.g. antibody studies, prevalence studies).  What I can find is from back in July (i.e. quite a bit lagged), with two major sources:
 
 * The `CDC's <https://covid.cdc.gov/covid-data-tracker/?CDC_AA_refVal=https%3A%2F%2Fwww.cdc.gov%2Fcoronavirus%2F2019-ncov%2Fcases-updates%2Fcommercial-labs-interactive-serology-dashboard.html#serology-surveillance>`_ estimates still have total case counts somewhere in the 4-8x range of confirmed cases.
 * A `Stanford study <https://med.stanford.edu/news/all-news/2020/09/few-americans-have-coronavirus-antibodies-study-finds.html>`_ came up with a roughly 8% estimate.  Using confirmed case counts from end of July, that's at least a 5x multiple.  
 
 If we assume those ratios still hold - and given the sky high test positivity rates we've been seeing across the country, if anything, they may now be too low - I think it's safe to say we've had something in the order of 50 million cases in the US so far.  Given the number of confirmed deaths, that puts our IFR somewhere around 0.5%.  
 
-At the moment, there's serious concern that cases are broadly trending up across much of the country and that selected areas are reaching capacity limits for local health hacilities.  At least at the moment, I don't see anything to make me thing we're going to enter wide spread care failures; we'll probably see isolated incodents, but nothing broad spread. 
+At the moment, there's serious concern that cases are broadly trending up across much of the country and that selected areas are reaching capacity limits for local health facilities.  At least at the moment, I don't see anything to make me thing we're going to enter wide spread care failures; we'll probably see isolated incidents, but nothing broad spread. 
 
 On the good news side of things, we have much improved standards of care since this things started.  Survival rates are up - though importantly, not "way up".  Between basic care, availability of cheap and effective steroids, and the first wave of antibody treatments hitting the market, thinks are looking up on the care front.  
 
-I still remain skeptical of a vaccine in the immediate near term - and recent developments have supported my skeptism - but it's looking more and more likely that we will have a vaccine within the next year or so.  My personal guess is that we'll start seeing availability sometime next summer.  
+I still remain skeptical of a vaccine in the immediate near term - and recent developments have supported my skepticism - but it's looking more and more likely that we will have a vaccine within the next year or so.  My personal guess is that we'll start seeing availability sometime next summer.  
 
 I expect that a vaccine is not going to be a miracle cure.  Between the likelihood that initial vaccines are likely to only be 50-70% effective, and the strong vaccine hesitancy which exists in this country, I will be suprised if availability of the vaccine does anything more than slow the spread.
 
@@ -88,9 +88,9 @@ Looking ahead a bit, the city of Manaus, Brazil `may be showing us <https://www.
 
 If that matched our experience, we'd expect to see somewhere around 600-800k deaths here in the US.  However, even assuming Manaus actually has reached herd immunity, it's important to note the US experience may be much worse.  Manaus is a fairly young city overall with less than 6% of the population over 60.  That same number for the US is roughly 20%.  Given we know the risk on this increases greatly with age, that gives us strong reason to suspect the death rate would be higher here.
 
-I remain interested in trying to understand such worse case scenarios as I remain very skeptical that we're going to have an effective vaccine any time soon.  The Russians have been caught manufacturing data on their vaccine and the US vaccine studies are coming under seriously problematic political preassure.  I remain skeptical that we're going to have an effective vaccine in wide deployment any time in the next six months, and maybe not for a full year or more.
+I remain interested in trying to understand such worse case scenarios as I remain very skeptical that we're going to have an effective vaccine any time soon.  The Russians have been caught manufacturing data on their vaccine and the US vaccine studies are coming under seriously problematic political pressure.  I remain skeptical that we're going to have an effective vaccine in wide deployment any time in the next six months, and maybe not for a full year or more.
 
-If projections above (and similiar ones I've given before based on estimated IFRs) turn out to be right, we're looking at increasing the death rate for the year by ~25%.  That's bad, but it's also not catestrophic.  Nearly 3 million people die each and every year.  Most years, we - as a society - never really notice unless one of those deaths strikes close to home.  
+If projections above (and similar ones I've given before based on estimated IFRs) turn out to be right, we're looking at increasing the death rate for the year by ~25%.  That's bad, but it's also not catastrophic.  Nearly 3 million people die each and every year.  Most years, we - as a society - never really notice unless one of those deaths strikes close to home.  
 
 Sept 1, 2020
 ============
@@ -203,7 +203,7 @@ On the topic of antibody studies, we do have one small update from NY State `in 
 
 Despite the relatively scarcity of new data, it seems like there is an emerging consensus that the infection fatility rate for COVID-19 is somewhere slightly under 1%.  The case fatality rate on the other hand seems to be hovering right around 6% for all of the data sets we have.  At the national level, we currently have 2.1 million confirmed cases, and 116 thousand deaths for a CFR of 5.5%.  As discussed previously, deaths are skewed very strongly towards the elderly, so what these numbers look like in each community is strongly dependent on demographics, but the rough numbers give us a rough idea of what we're looking at.  
 
-One correction to the writeup below.  The study I referenced on hydroxychloroquine has been heavily critized and retracted.  Other studies are still supporting a fairly skeptical attidute here, but the study which initially appeared fairly conclusive turned out not to be.  
+One correction to the writeup below.  The study I referenced on hydroxychloroquine has been heavily critized and retracted.  Other studies are still supporting a fairly skeptical attitude here, but the study which initially appeared fairly conclusive turned out not to be.  
 
 May 24, 2020
 ============
