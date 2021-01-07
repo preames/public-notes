@@ -1,6 +1,15 @@
 # public-notes
 A collection of (public) notes on assorted topics.  If there's enough on a single topic, I've moved them into individual pages, otherwise individual notes are listed below. 
 
+# A Line Crossed
+Jan 7, 2021 - I write this today having witnessed yesterday armed insurrection in the nations capital.  Armed rioters, at the direct instigation of our sitting President, invaded the capital of our country, threatened the safety of our elected officials, and attempted to overthrow the results of a valid election. 
+
+This **can not** be allowed to stand.
+
+Every single person who participated in yesterday's shame upon our country must be identified, arrested, and placed on trial.  To do otherwise is to admit that we are no longer a democracy.  Some may be convicted of minor crimes.  Others should be charged with armed insurrection against the state, convicted, and spend their remaining years in prison.
+
+I join many others in calling for the immediate removal of President Trump from office.  We must not wait until his term expires.  Congress should impeach immediately.  The Cabinet should exercise the 25th amendment.  This is not a question of which, it's a question of which can be concluded sooner.  He literally just attempted a coup.  Leaving him in office for the remainder of his term is dangerous in the extreme.
+
 # 2020 Highlights
 Dec 19, 2020 - With as overall terrible as this year has been, I wanted to highlight a few things which give me hope for the future.
 
