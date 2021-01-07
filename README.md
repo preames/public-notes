@@ -20,3 +20,20 @@ Between solar power and natural gas, the US is rapidly transitioning away from c
 Despite the headlines, the US election system worked.  Election day went smoothly, votes were counted and certified, and there was no actual disruption or ambiguity about the outcome.  We did have an outgoing president who tried to create drama and far too many republican politicians who supported him for far too long, but the system itself worked.  Leading into election day itself, it was not at all clear this was going to be the case (regardless of outcome).  
 
 The development of vaccines for COVID has been an amazing scientific success.  Our previous record for vaccine development was 4 years; this time we did it in 10 months.  It's hard to understate how positive that is, both for the current pandemic, and for the future.  This won't be our last pandemic and the technology developed now (and over the last few decades) are going to be world changing going forward.
+
+# As Posted to Facebook and Twitter, Election Day 2019
+Nov 3rd, 2019 -- Today is election day.  I have two requests of everyone reading this.
+
+First, if you are eligible to and haven't already, vote.  Voting is one of our most important civic duties as citizens.  Make the time, and go vote.  Personally, I strongly prefer you voted to remove Trump and all of his supporters from office as I believe he has demonstrated himself grossly unfit to hold the office, but even if you disagree with me, please vote.
+
+Second, expect and demand respect for the electoral process itself over the next few days.  Our system has it's problems, but it's also been one of the longest running democracies in this world.  An absolutely critical component of that is the graceful transition of power, and the ability of the loosing party to accept the results.  Up until recently, the US has been blessed with the ability to simply presume such, but this year, things look concerning.  Regardless of who you vote for, please be ready to sit back, wait for the votes to be counted, demand that all votes be counted, and accept the winner of the election.  You don't have to like the winners, but it is critical that we all commit to accept them. 
+
+Those are my two key asks.  Now, let me explain why I personally feel Trump is unfit for office.  It doesn't come down to policy - though I disagree with many.  Instead, it comes down to the fact that he has repeatedly endangered the very bedrock of our democratic system. 
+
+He has publicly said he may not accept the election results; that is dangerous, extremely so.  Refusal to accept election results and commit to peaceful transitions of power is how democracies fall.  And no, I'm really not exaggerating here. 
+
+Earlier this year, he signaled an intention to send in the military to suppress political protests.  It was only the very public rejections of military involvement in civilian affairs by senior leaders which restrained him.  If you haven't read the letters from the Joint Chiefs of Staff, General Mattis, or watched the press conference given by the Secretary of Defense that week, please do.  Each was a historic document, and one I never want to see again. 
+
+These are the two single largest incidents, but the last four years have been filled with smaller ones.  I sincerely believe that electing Trump for another term is dangerous for the very existence of our country. 
+
+Having said that, I also commit to respecting the results of the election if he does win.  As dangerous as I believe his election to be, refusing to accept the valid result of the electoral process would be even more so.
