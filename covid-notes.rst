@@ -1,3 +1,21 @@
+January 24, 2021
+================
+
+As of today, the US has had 25 million confirmed cases, 417 thousand confirmed deaths, and 20.5 million doses of vaccine administered.  I'm so glad to be able to finally include that last number.
+
+If we assume for our back of the envelope math that each dose works out to one half of an immune person (either because they got two or because each person is less prone to catch it even with one), and that the 5x estimate of total cases versus confirmed cases still applies, that means we have something like 135 million people now immune.  This is already ~40% of the US population.
+
+Given our current infection rates of around 175k confirmed cases per day, and vaccinations of around one million doses per day, that gives us around 1.375 million newly immune people per day.  That means we should hit 65% of the population in roughly 58 days, 70% in 70 days, 75% in 82 days, etc...
+
+It is important to highlight that this back of the envelope math isn't exact by any measure.  
+
+* As we get higher and higher immune rates, we should expect to see transmission rates start to drop.  On the other hand, with the new UK variant having a higher base tranmission rate, that effect may be muted or reversed. Given that, the linear projections I used above are probably inaccurate, but in which direction I make no predictions.  
+* The 5x ratio of confirmed cases to total cases is based on estimates from early in this pandemic.  It's probably wrong.  By how much, I don't know.  The fact I can't find more recent refined estimates for this is a sign of just how badly our state and national response has been.  We do at least have `some data <https://covid.cdc.gov/covid-data-tracker/?CDC_AA_refVal=https%3A%2F%2Fwww.cdc.gov%2Fcoronavirus%2F2019-ncov%2Fcases-updates%2Fcommercial-labs-interactive-serology-dashboard.html#national-lab>`_ from the CDC from back in November which seems to indicate the estimates aren't too far off.
+
+The only real takeaway is that we're within months of the end of this.  We don't know exactly how many months, but it's much more likely to be 3 than 12 at this point.  
+
+I'm loosly tracking the emerging news about vaccine variants.  So far, nothing I've seen materially impacts the picture just described.  As previously mentioned, the UK variant may increase transmission in the near term - though probably not severity or death rates.  I'm more concerned by the news that the Brazil variant 'may be leading to a large number of reinfections <https://www.npr.org/sections/goatsandsoda/2021/01/21/958953434/reinfections-more-likely-with-new-coronavirus-variants-evidence-suggests>_.  I consider the evidence of this poor to date, but if true, that could be concerning long term.  We know that the 'UK variant doesn't impact the effectiveness of our current vaccines <https://www.statnews.com/2021/01/20/pfizer-biontech-covid-19-vaccine-works-just-as-well-against-variant-first-detected-in-u-k-study-indicates/>'_; there's reason to hope for the same with the others, but we just don't know yet.
+
 December 20, 2020
 =================
 
