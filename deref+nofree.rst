@@ -5,6 +5,8 @@ RFC: Decomposing deref(N) into deref(N) + nofree
 
 TLDR: ...
 
+.. contents::
+
 The Basic Problem
 ==================
 
