@@ -1,5 +1,6 @@
-This is a DRAFT of a RFC I'm considering sending to llvm-dev.  The current status is more an attempt to organize thoughts than an actually proposal.  
+.. header:: This is a DRAFT of a RFC I'm considering sending to llvm-dev.  The current status is more an attempt to organize thoughts than an actually proposal.  
 
+-------------------------------------------------
 RFC: Decomposing deref(N) into deref(N) + nofree
 -------------------------------------------------
 
