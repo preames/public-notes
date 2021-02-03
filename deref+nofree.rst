@@ -40,6 +40,7 @@ More specifically:
 
 * A deref attribute on a function parameter will imply that the memory is dereferenceable for a specified number of bytes at the instant the function call occurs.  
 * A deref attribute on a function return will imply that the memory is dereferenceable at the moment of return.
+* A deref(N) argument to a function with the nofree function attribute is known to be globally dereferenceable within the scope of the function call.  
 * An argument which is both deref(N) and nofree is known to be globally dereferenceable within the scope of the function call.  (ATTN: The current nofree spec is vague about whether the object can be freed through another copy of the pointer?)
 * A return which is both deref(N) and nofree is known to be globally dereferenceable from the moment or return onward.  There is no scoping here.  This requires that we extend the nofree attribute to allow return values to be specified with "never freed from this point onwards" semantics.  
 
@@ -96,3 +97,12 @@ Use Cases
   ...
   // a.f is (still) trivially deref 
   x = a.f;
+
+Migration
+==========
+
+Existing bytecode will be upgraded to the weaker non-global semantics.  This provides forward compatibility, but does loose optimization potential.
+
+Frontends which want the point in time semantics should emit deref and not nofree.
+
+Frontends which want the global semantics should emit nofree where appropriate.  In particular, GCed languages using the abstract machine model should tag every function as nofree.  
