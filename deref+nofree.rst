@@ -54,7 +54,8 @@ Use Cases
 
 **C++ References** -- A C++ reference implies that the value pointed to is dereferenceable at point of declaration, and that the reference itself is non-null.  Of particular note, an object pointed to through a reference can be freed without introducing UB.  
 
-::
+.. code:: c++
+
   class A { int f; };
   
   void ugly_delete(A &a) { delete &a; }
@@ -81,7 +82,8 @@ Use Cases
 
 **Garbage Collected Objects (Java)** -- LLVM supports two models of GCed objects, the abstract machine and the physical machine model.  The later is essentially the same as that for c++ as deallocation points (at safepoints) are explicit.  The former has objects conceptually live forever (i.e. reclaimation is handled outside the model).  
 
-::
+.. code:: java
+
   class A { int f; }
   
   void foo(A a) {
