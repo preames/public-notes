@@ -26,7 +26,7 @@ There's a couple important points to this definition:
 Exploratory Examples
 --------------------
 
-Let's start with a trivial example::
+Let's start with a trivial example:
 
 .. code:: c++
 
@@ -36,7 +36,7 @@ Let's start with a trivial example::
     delete o;
   }
 
-Object o is nocapture in the scope of foo.  Next, let's consider an example which introduces multiple scopes::
+Object o is nocapture in the scope of foo.  Next, let's consider an example which introduces multiple scopes:
 
 .. code:: c++
 
