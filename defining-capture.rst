@@ -90,6 +90,9 @@ In this example, the allocation is captured in both foo and wrap_alloc, but for 
 
 With the additional fact, we can now infer that the allocation is nocapture in foo, but not in wrap_alloc.
 
+Object Graphs
+=============
+
 Moving on, let's consider connected object graphs.  
 
 .. code:: c++
