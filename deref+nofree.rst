@@ -102,6 +102,15 @@ Use Cases
   ...
   // a.f is (still) trivially deref 
   x = a.f;
+  
+** Rust Borrows** -- A rust reference argument (e.g. "borrow") points to an object whose lifetime is guaranteed to be longer than the reference's defining scope.  As such, the object is dereferenceable through the scope of the function.  Today, rustc does emit a dereferenceable attribute using the current globally dereferenceable semantic.  
+
+.. code:: rust
+
+  pub fn square(num: &i32) -> i32 {
+    num * num
+  }
+  square(&5);
 
 Migration
 ==========
