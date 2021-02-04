@@ -39,7 +39,7 @@ Let's start with a trivial example::
 Object o is nocapture in the scope of foo.  Next, let's consider an example which introduces multiple scopes::
 
 .. code:: c++
-  
+
   X* wrap_alloc() {
     return new X();
   }
@@ -48,4 +48,4 @@ Object o is nocapture in the scope of foo.  Next, let's consider an example whic
     o.f = 5;
     delete o;
   }
-  
+
