@@ -48,7 +48,7 @@ More specifically:
 Inference cases:
 
 * A deref(N) argument to a function with the nofree and nosync function attribute is known to be globally dereferenceable within the scope of the function call.  We need the nosync to ensure that no other thread is freeing the memory on behalf of the callee in a coordinated manner.
-* An argument which is all of deref(N), noalias, and nofree in an argmemonly function is known to be globally dereferenceable within the scope of the function call.  This relies on the fact that free is modeled as writing to the memory freed, and thus noalias ensures there is no other argument which can be freed.
+* An argument which is all of deref(N), noalias, and nofree is known to be globally dereferenceable within the scope of the function call.  This relies on the fact that free is modeled as writing to the memory freed, and thus noalias ensures there is no other argument which can be freed.
 * (NEEDS REWORK) A return which is both deref(N) and nofree is known to be globally dereferenceable from the moment or return onward.  There is no scoping here.  This requires that we extend the nofree attribute to allow return values to be specified with "never freed from this point onwards" semantics.  
 
 The items above are described in terms of deref(N) for ease of description.  The other attributes are handle analogously.
