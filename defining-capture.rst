@@ -36,7 +36,33 @@ Let's start with a trivial example:
     delete o;
   }
 
-Object o is nocapture in the scope of foo.  Next, let's consider an example which introduces multiple scopes:
+Object o is nocapture in the scope of foo.  
+
+Leaking the object doesn't change that.
+
+.. code:: c++
+
+  void foo() {
+    X* o = new X();
+    o.f = 5;
+  }
+
+Adding a self referencial cycle doesn't change that.
+
+.. code:: c++
+
+  void foo() {
+    X* o = new X();
+    o.f = o;
+    delete o;
+  }
+
+As a notational conviance, further examples are listed without an explicit deletion to emphasize that the scope it tied to last observation, not allocation or deletion.  It is worth noting that it follow from the definition of deletion in most languages there can be no (defined) observations past deletion.
+
+Scopes
+=======
+
+Next, let's consider an example which introduces multiple scopes:
 
 .. code:: c++
 
@@ -48,4 +74,64 @@ Object o is nocapture in the scope of foo.  Next, let's consider an example whic
     o.f = 5;
     delete o;
   }
+
+In this example, the allocation is captured in both foo and wrap_alloc, but for different reasons.  For wrap_alloc, the pointer is redundant and potentially observable outside it's scope.  For foo, we don't have the knowledge that the return value of wrap_alloc hasn't been captured inside wrap_alloc in a way observable outside of it.  The optimizer would in practice infer that fact, leading to out first instance of refinement.
+
+.. code:: c++
+
+  X* noalias wrap_alloc() {
+    return new X();
+  }
+  void foo() {
+    X* o = wrap_alloc();
+    o.f = 5;
+    delete o;
+  }
+
+With the additional fact, we can now infer that the allocation is nocapture in foo, but not in wrap_alloc.
+
+Moving on, let's consider connected object graphs.  
+
+.. code:: c++
+
+  void foo() {
+    X* o1 = new X();
+    X* o2 = new X();
+    o1.f = o2;
+    o2.f = o1;
+  }
+
+In this example, both o1 and o2 are nocapture in the scope of foo.  
+
+If any object is observable in a parent scope, then all objects reachable through that object are observable in that scope.  
+
+.. code:: c++
+
+  X* foo() {
+    X* o1 = new X();
+    X* o2 = new X();
+    o1.f = o2;
+    o2.f = o1;
+    return o1;
+  }
+
+  void bar() {
+    X* o = foo();
+  }
+
+In this case, we see that both allocations are captured in foo, but nocapture in bar.  In the following example, o1 is nocapture in both foo and bar, while o2 is only nocapture in bar.
+
+.. code:: c++
+
+  X* foo() {
+    X* o1 = new X();
+    X* o2 = new X();
+    o1.f = o2;
+    return o2;
+  }
+
+  void bar() {
+    X* o = foo();
+  }
+
 
