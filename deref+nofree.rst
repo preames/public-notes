@@ -43,7 +43,10 @@ More specifically:
 
 * A deref attribute on a function parameter will imply that the memory is dereferenceable for a specified number of bytes at the instant the function call occurs.  
 * A deref attribute on a function return will imply that the memory is dereferenceable at the moment of return.
-* A deref(N) argument to a function with the nofree function attribute is known to be globally dereferenceable within the scope of the function call.  
+* We will then use the point in time fact combined with other information to drive inference of the global facts.  See below for a sampling of inference rules.
+
+Inference cases:
+* A deref(N) argument to a function with the nofree and nosync function attribute is known to be globally dereferenceable within the scope of the function call.  We need the nosync to ensure that no other thread is freeing the memory on behalf of the callee in a coordinated manner.
 * An argument which is both deref(N) and nofree is known to be globally dereferenceable within the scope of the function call.  (ATTN: The current nofree spec is vague about whether the object can be freed through another copy of the pointer?)
 * A return which is both deref(N) and nofree is known to be globally dereferenceable from the moment or return onward.  There is no scoping here.  This requires that we extend the nofree attribute to allow return values to be specified with "never freed from this point onwards" semantics.  
 
