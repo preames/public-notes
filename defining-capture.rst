@@ -138,3 +138,7 @@ In this case, we see that both allocations are captured in foo, but nocapture in
   }
 
 
+Defects
+--------
+
+As currently written, the definition makes allocas trivially nocapture.  Thus, it's clearly missing something.  Maybe we defined escape instead?
