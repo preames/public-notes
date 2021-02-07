@@ -1,16 +1,16 @@
 Feb 6, 2021
 ===========
 
-As mentioned last time, I've been lightly following developments with the new variants and new vaccines.  Unforuntately, what I'm seeing is looking more concerning not less.
+As mentioned last time, I've been lightly following developments with the new variants and new vaccines.  Unfortuntately, what I'm seeing is looking more concerning not less.
 
 Developments
 -------------
 
-The biggest item is that the South African variant appears to widely reinfect those who have already had the original strain. (`Washington Post <https://www.washingtonpost.com/health/2021/02/05/virus-variant-reinfection-south-africa/>`_, `twitter thread <https://twitter.com/drericding/status/1358065355785134083?s=11>`_) This is seriously bad news as it means that existing infections to date don't contribute to slowing the spread of this new strain.  The good news is that vaccines do appear affective against this strain, but at lower rates.  We're still figuring out what those rates are, but they appear to be substaintial drops from the high 90s we saw for the first strain.  
+The biggest item is that the South African variant appears to widely reinfect those who have already had the original strain. (`Washington Post <https://www.washingtonpost.com/health/2021/02/05/virus-variant-reinfection-south-africa/>`_, `twitter thread <https://twitter.com/drericding/status/1358065355785134083?s=11>`_) This is seriously bad news as it means that existing infections to date don't contribute to slowing the spread of this new strain.  The good news is that vaccines do appear effective against this strain, but at lower rates.  We're still figuring out what those rates are, but they appear to be substaintial drops from the high 90s we saw for the first strain.  
 
 And this is on top of the fact that the UK variant appears to be becoming broadly established around the world.  That one may have a higher mortality rate than the original, though that's not conclusively confirmed.  Importantly, it does appear to spread 50% more easily.  Thankfully, vaccines appear fully effective here.
 
-On the good news side of things, manufactures and `the FDA <https://www.reuters.com/article/us-health-coronavirus-usa-fda/u-s-fda-gearing-up-for-rapid-review-of-potential-covid-19-booster-shots-idUSKBN2A5086>`_ both seem to be getting set up to rapidally iterate on vaccine boosters for the new strains.  I've seen some takes which are very positive on how fast this can be done, but frankly, I don't know enough to assess how realist that is.
+On the good news side of things, manufactures and `the FDA <https://www.reuters.com/article/us-health-coronavirus-usa-fda/u-s-fda-gearing-up-for-rapid-review-of-potential-covid-19-booster-shots-idUSKBN2A5086>`_ both seem to be getting set up to rapidly iterate on vaccine boosters for the new strains.  I've seen some takes which are very positive on how fast this can be done, but frankly, I don't know enough to assess how realistic that is.
 
 Vaccination Progress
 --------------------
