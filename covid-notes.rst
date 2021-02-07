@@ -6,11 +6,11 @@ As mentioned last time, I've been lightly following developments with the new va
 Developments
 -------------
 
-The biggest item is that the South African variant appears to widely reinfect those who have already had the original strain. (`<https://www.washingtonpost.com/health/2021/02/05/virus-variant-reinfection-south-africa/> Washington Post`_, `<https://twitter.com/drericding/status/1358065355785134083?s=11> twitter thread`_) This is seriously bad news as it means that existing infections to date don't contribute to slowing the spread of this new strain.  The good news is that vaccines do appear affective against this strain, but at lower rates.  We're still figuring out what those rates are, but they appear to be substaintial drops from the high 90s we saw for the first strain.  
+The biggest item is that the South African variant appears to widely reinfect those who have already had the original strain. (`Washington Post <https://www.washingtonpost.com/health/2021/02/05/virus-variant-reinfection-south-africa/>`_, `twitter thread <https://twitter.com/drericding/status/1358065355785134083?s=11>`_) This is seriously bad news as it means that existing infections to date don't contribute to slowing the spread of this new strain.  The good news is that vaccines do appear affective against this strain, but at lower rates.  We're still figuring out what those rates are, but they appear to be substaintial drops from the high 90s we saw for the first strain.  
 
 And this is on top of the fact that the UK variant appears to be becoming broadly established around the world.  That one may have a higher mortality rate than the original, though that's not conclusively confirmed.  Importantly, it does appear to spread 50% more easily.  Thankfully, vaccines appear fully effective here.
 
-On the good news side of things, manufactures and `<https://www.reuters.com/article/us-health-coronavirus-usa-fda/u-s-fda-gearing-up-for-rapid-review-of-potential-covid-19-booster-shots-idUSKBN2A5086> the FDA`_ both seem to be getting set up to rapidally iterate on vaccine boosters for the new strains.  I've seen some takes which are very positive on how fast this can be done, but frankly, I don't know enough to assess how realist that is.
+On the good news side of things, manufactures and `the FDA <https://www.reuters.com/article/us-health-coronavirus-usa-fda/u-s-fda-gearing-up-for-rapid-review-of-potential-covid-19-booster-shots-idUSKBN2A5086>`_ both seem to be getting set up to rapidally iterate on vaccine boosters for the new strains.  I've seen some takes which are very positive on how fast this can be done, but frankly, I don't know enough to assess how realist that is.
 
 Vaccination Progress
 --------------------
@@ -19,7 +19,7 @@ As of today, the US has administed something along the lines of 39 million doses
 
 To be honest, that's probably a best case.  Given the lower efficacy numbers we're seeing with the new vaccines, I'm guessing we'll need higher vaccination rates too.  Much higher.
 
-Even taking the best case, the situation is not looking good.  At current vaccination rates, it'll take almost 11 months to achieve the required level of vaccinations.  There is an `<https://twitter.com/ashishkjha/status/1357669053213659136> optimistic scenario`_ here, but it requires sharp increases in the daily vaccination rates and even then, we're looking at June/July at earliest.
+Even taking the best case, the situation is not looking good.  At current vaccination rates, it'll take almost 11 months to achieve the required level of vaccinations.  There is an `optimistic scenario <https://twitter.com/ashishkjha/status/1357669053213659136>`_ here, but it requires sharp increases in the daily vaccination rates and even then, we're looking at June/July at earliest.
 
 Looking forward
 ---------------
