@@ -1,5 +1,12 @@
 .. header:: This page is my personal notes on COVID.  I write to help organize my thoughts and track what's going on.  I'm not an expert on this topic by any means; please don't take anything I say as authorative.  
 
+=====================
+Periodic COVID Notes
+=====================
+
+.. contents::
+   :depth: 1
+
 Feb 6, 2021
 ===========
 
