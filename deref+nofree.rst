@@ -136,6 +136,17 @@ Use Cases
   }
   square(&5);
 
+  // a could be noalias, but isn't today
+  pub fn bar(a: & mut i32, b: &i32) {
+    a = *a * b
+  }
+
+  bar(i32::new(5), 2);
+  
+  // At first appearance, rust does not allow returning references.  So return
+  // attributes are not relevant.  This seems like a major language hole, so this
+  // should probably be checked with a language expert.
+
 Migration
 ==========
 
@@ -145,9 +156,32 @@ Frontends which want the point in time semantics should emit deref and not nofre
 
 Frontends using the GC abstract machine model (in which deallocation is UB) should emit the "gc.abstract_model" flags.
 
-Rustc should continue to emit noalias where possible.  Existing rustc appears to do this for all cases examined so we should be able to retain global deref facts in the cases considered.
+Rustc should emit noalias where possible.  In particular, 'a' in the case 'bar' above is currently not marked noalias and results in lost optimization potential as a result of this change.
 
 Frontends which want the global semantics should emit noalias, nofree, and nosync where appropriate. If this is not enough to recover optimizations in common cases, please follow up on llvm-dev.  
 
 Alternative Designs
 ===================
+
+Extend nofree to object semantics
+----------------------------------
+
+The nofree argument attribute current describes whether an object can freed through some particular copy of the pointer.  We could strength the semantics to imply that the object is not freed through any copy of the pointer in the specified scope.
+
+Doing so greatly weakens our ability to infer the nofree property.  The current nofree property when combined with capture tracking in the caller is enough to prove interest deref facts over calls.  We don't want to loose the ability to infer that.
+
+Add a separate nofreeobj
+------------------------
+
+Rather than change nofree, we could add a parallel attribute with the stronger object property.  This - combined with deref(N) as a point in time fact - would be enough to recover the current globally deferenceable semantics.  
+
+The downside of this proposal is a) possible overkill, and b) the "ugly" factor of having two similiar but not quite identical attributes.
+
+Add an orthonganal attribute to promote pointer facts to object ones
+--------------------------------------------------------------------
+
+To address the weakness of the former alternative, we could specify an attribute which strengthens arbitrary pointer facts to object facts.  Examples of current pointer facts are attributes such as readonly, and writeonly.  
+
+This has not been well explored; there's a huge possible design space here. 
+
+
