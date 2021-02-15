@@ -43,7 +43,6 @@ More specifically:
 
 * A deref attribute on a function parameter will imply that the memory is dereferenceable for a specified number of bytes at the instant the function call occurs.  
 * A deref attribute on a function return will imply that the memory is dereferenceable at the moment of return.
-* We extend the nofree argument attribute to return values with analogous semantics.  (See below)
 * We will then use the point in time fact combined with other information to drive inference of the global facts.  See below for a sampling of inference rules.
 
 Inference cases:
