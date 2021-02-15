@@ -61,10 +61,10 @@ First, the current wording of nofree argument attribute implies that the callee 
 
 Second, the noalias argument attribute is subtle.  There's a couple of sub-cases worth discussing:
 
-* If the noalias argument is written to (and free is modeled as a write), then it must be the only copy of the pointer passed to the function and there can be no copies pass through memory.
-* If the noalias argument is only read from, then there may be other copies of the pointer.  However, all of those copies must also be read only.  If the object was friend through one of those other copies, then we must have at least one write copy and having the noalias on the read copy was undefined behavior to begin with.
+* If the noalias argument is written to (reminder: free is modeled as a write), then it must be the only copy of the pointer passed to the function and there can be no copies passed through memory used in the scope of function.
+* If the noalias argument is only read from, then there may be other copies of the pointer.  However, all of those copies must also be read only.  If the object was freed through one of those other copies, then we must have at least one writeable copy and having the noalias on the read copy was undefined behavior to begin with.
 
-Essentially, what we're doing with noalias is using it to promote a fact about the pointer to a fact about the object being pointed to.  
+Essentially, what we're doing with noalias is using it to promote a fact about the pointer to a fact about the object being pointed to.  Code structure wise, we should probably write it exactly that way.  
 
 **Result**
 
@@ -166,10 +166,10 @@ Extend nofree to object semantics
 
 The nofree argument attribute current describes whether an object can freed through some particular copy of the pointer.  We could strength the semantics to imply that the object is not freed through any copy of the pointer in the specified scope.
 
-Doing so greatly weakens our ability to infer the nofree property.  The current nofree property when combined with capture tracking in the caller is enough to prove interest deref facts over calls.  We don't want to loose the ability to infer that.
+Doing so greatly weakens our ability to infer the nofree property.  The current nofree property when combined with capture tracking in the caller is enough to prove interest deref facts over calls.  We don't want to loose the ability to infer that since it enables interesting transforms (such as code reordering over calls).  
 
-Add a separate nofreeobj
-------------------------
+Add a separate nofreeobj attribute
+-----------------------------------
 
 Rather than change nofree, we could add a parallel attribute with the stronger object property.  This - combined with deref(N) as a point in time fact - would be enough to recover the current globally deferenceable semantics.  
 
