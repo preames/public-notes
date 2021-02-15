@@ -154,7 +154,7 @@ Frontends which want the point in time semantics should emit deref and not nofre
 
 Frontends using the GC abstract machine model (in which deallocation is UB) should emit the "gc.abstract_model" flags.
 
-Rustc should emit noalias where possible.  In particular, 'a' in the case 'bar' above is currently not marked noalias and results in lost optimization potential as a result of this change.
+Rustc should emit noalias where possible.  In particular, 'a' in the case 'bar' above is currently not marked noalias and results in lost optimization potential as a result of this change.  According to the rustc code, this is legal, but currently blocked on a noalias related miscompile.  See https://github.com/rust-lang/rust/issues/54462 and https://github.com/rust-lang/rust/issues/54878 for further details.
 
 Frontends which want the global semantics should emit noalias, nofree, and nosync where appropriate. If this is not enough to recover optimizations in common cases, please follow up on llvm-dev.  
 
