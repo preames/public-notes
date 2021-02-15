@@ -51,7 +51,6 @@ Inference cases:
 * A deref(N) argument to a function with the nofree and nosync function attribute is known to be globally dereferenceable within the scope of the function call.  We need the nosync to ensure that no other thread is freeing the memory on behalf of the callee in a coordinated manner.
 * A deref argument to a function in a module with the "gc.abstract-model" flag is known to be globally dereferenceable as the program globally can not contain deallocation.  (Until after lowering at which point the flag is removed.)
 * An argument with the attributes deref(N), noalias, and nofree is known to be globally dereferenceable within the scope of the function call.  This relies on the fact that free is modeled as writing to the memory freed, and thus noalias ensures there is no other argument which can be freed.  (See discussion below.)
-* A return which is both deref(N) and nofree is known not to be freed through this copy of the pointer.  We must still establish that either a) this is the only copy of the pointer, or b) that no other copy of the pointer can be freed.  This requies extending the nofree attribute to returns in a manner analogous to it's current argument semantic.  
 
 The items above are described in terms of deref(N) for ease of description.  The other attributes are handle analogously.
 
