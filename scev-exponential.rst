@@ -1,9 +1,7 @@
 .. header:: This is a collection of notes on a topic that may someday make it into a proposed extension to LLVM's SCEV, but that I have no plans to move forward with in the near future.  
 
 -------------------------------------------------
-
 SCEV, shifts, and M^N as a primitive
-
 -------------------------------------------------
 
 .. contents::
