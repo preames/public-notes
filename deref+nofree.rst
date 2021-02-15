@@ -43,15 +43,36 @@ More specifically:
 
 * A deref attribute on a function parameter will imply that the memory is dereferenceable for a specified number of bytes at the instant the function call occurs.  
 * A deref attribute on a function return will imply that the memory is dereferenceable at the moment of return.
+* We extend the nofree argument attribute to return values with analogous semantics.  (See below)
 * We will then use the point in time fact combined with other information to drive inference of the global facts.  See below for a sampling of inference rules.
 
 Inference cases:
 
 * A deref(N) argument to a function with the nofree and nosync function attribute is known to be globally dereferenceable within the scope of the function call.  We need the nosync to ensure that no other thread is freeing the memory on behalf of the callee in a coordinated manner.
-* An argument which is all of deref(N), noalias, and nofree is known to be globally dereferenceable within the scope of the function call.  This relies on the fact that free is modeled as writing to the memory freed, and thus noalias ensures there is no other argument which can be freed.
-* (NEEDS REWORK) A return which is both deref(N) and nofree is known to be globally dereferenceable from the moment or return onward.  There is no scoping here.  This requires that we extend the nofree attribute to allow return values to be specified with "never freed from this point onwards" semantics.  
+* A deref argument to a function in a module with the "gc.abstract-model" flag is known to be globally dereferenceable as the program globally can not contain deallocation.  (Until after lowering at which point the flag is removed.)
+* An argument with the attributes deref(N), noalias, and nofree is known to be globally dereferenceable within the scope of the function call.  This relies on the fact that free is modeled as writing to the memory freed, and thus noalias ensures there is no other argument which can be freed.  (See discussion below.)
+* A return which is both deref(N) and nofree is known not to be freed through this copy of the pointer.  We must still establish that either a) this is the only copy of the pointer, or b) that no other copy of the pointer can be freed.  This requies extending the nofree attribute to returns in a manner analogous to it's current argument semantic.  
 
 The items above are described in terms of deref(N) for ease of description.  The other attributes are handle analogously.
+
+**Explanation**
+
+The "deref(N), noalias, + nofree" argument case requires a bit of explaination as it involves a bunch of subtleties.
+
+First, the current wording of nofree argument attribute implies that the callee can not arrange for another thread to free the object on it's behalf.  This is different than the specification of the nofree function attribute.  There is no "nosync" equivelent for function attributes.
+
+Second, the noalias argument attribute is subtle.  There's a couple of sub-cases worth discussing:
+
+* If the noalias argument is written to (and free is modeled as a write), then it must be the only copy of the pointer passed to the function and there can be no copies pass through memory.
+* If the noalias argument is only read from, then there may be other copies of the pointer.  However, all of those copies must also be read only.  If the object was friend through one of those other copies, then we must have at least one write copy and having the noalias on the read copy was undefined behavior to begin with.
+
+Essentially, what we're doing with noalias is using it to promote a fact about the pointer to a fact about the object being pointed to.  
+
+**Result**
+
+It's important to acknowledge that with this change, we will loose the ability to specify global dereferenceability of arguments and return values in the general case.  We believe the current proposal allows us to recover that fact for all interesting cases, but if we've missed an important use case we may need to iterate a bit.  
+
+We've discussed a few alternatives (below) which could be revisited if it turns out we are missing an important use case.
 
 Use Cases
 =========
@@ -82,7 +103,6 @@ Use Cases
   // If a and b point to the same object, a.f may not be deref here
   if (unknown2)
     a.f;
-
 
 **Garbage Collected Objects (Java)** -- LLVM supports two models of GCed objects, the abstract machine and the physical machine model.  The later is essentially the same as that for c++ as deallocation points (at safepoints) are explicit.  The former has objects conceptually live forever (i.e. reclaimation is handled outside the model).  
 
@@ -123,4 +143,11 @@ Existing bytecode will be upgraded to the weaker non-global semantics.  This pro
 
 Frontends which want the point in time semantics should emit deref and not nofree.
 
-Frontends which want the global semantics should emit nofree where appropriate.  In particular, GCed languages using the abstract machine model should tag every function as nofree.  
+Frontends using the GC abstract machine model (in which deallocation is UB) should emit the "gc.abstract_model" flags.
+
+Rustc should continue to emit noalias where possible.  Existing rustc appears to do this for all cases examined so we should be able to retain global deref facts in the cases considered.
+
+Frontends which want the global semantics should emit noalias, nofree, and nosync where appropriate. If this is not enough to recover optimizations in common cases, please follow up on llvm-dev.  
+
+Alternative Designs
+===================
