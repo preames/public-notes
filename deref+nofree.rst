@@ -32,7 +32,7 @@ This has been discussed relatively extensively in the past, included an accepted
 
 The need for a broader solution comes from the observation that deref(N) is not the only attribute with this problem.  deref_or_null(N) is a fairly obvious case we'd known about with the previous proposal, but it was recently realized that other allocation related facts have this problem as well.  We now have specific examples with allocsize(N,M) - and the baked in variants in MemoryBuiltins - and suspect there are other attributes, either current or future, with the same challenge.
 
-The oppurtunity comes from the addition of "nofree" attribute.  Up until recently, we really didn't have a good notion of "free"ing an allocation in the abstract machine model.  We used to comingle this with our notion of capture, and sometimes even aliasing.  (i.e. We'd assume that functions which could free must also capture and/or write.)  With the explicit notion of "nofree", we have an approach available to us we didn't before.
+The opportunity comes from the addition of "nofree" attribute.  Up until recently, we really didn't have a good notion of "free"ing an allocation in the abstract machine model.  We used to comingle this with our notion of capture, and sometimes even aliasing.  (i.e. We'd assume that functions which could free must also capture and/or write.)  With the explicit notion of "nofree", we have an approach available to us we didn't before.
 
 The Proposal Itself
 ====================
@@ -68,7 +68,7 @@ Essentially, what we're doing with noalias is using it to promote a fact about t
 
 **Result**
 
-It's important to acknowledge that with this change, we will loose the ability to specify global dereferenceability of arguments and return values in the general case.  We believe the current proposal allows us to recover that fact for all interesting cases, but if we've missed an important use case we may need to iterate a bit.  
+It's important to acknowledge that with this change, we will lose the ability to specify global dereferenceability of arguments and return values in the general case.  We believe the current proposal allows us to recover that fact for all interesting cases, but if we've missed an important use case we may need to iterate a bit.  
 
 We've discussed a few alternatives (below) which could be revisited if it turns out we are missing an important use case.
 
@@ -114,7 +114,7 @@ Use Cases
     x = a.f;
   }
   
-  A *a = new A();
+  A a = new A();
   ...
   // a.f is trivially deref following it's definition
   x = a.f;
@@ -135,11 +135,11 @@ Use Cases
   square(&5);
 
   // a could be noalias, but isn't today
-  pub fn bar(a: & mut i32, b: &i32) {
-    a = *a * b
+  pub fn bar(a: &mut i32, b: &i32) {
+    *a = a * b
   }
 
-  bar(i32::new(5), 2);
+  bar(&mut 5, &2);
   
   // At first appearance, rust does not allow returning references.  So return
   // attributes are not relevant.  This seems like a major language hole, so this
@@ -148,7 +148,7 @@ Use Cases
 Migration
 ==========
 
-Existing bytecode will be upgraded to the weaker non-global semantics.  This provides forward compatibility, but does loose optimization potential.
+Existing bytecode will be upgraded to the weaker non-global semantics.  This provides forward compatibility, but does lose optimization potential.
 
 Frontends which want the point in time semantics should emit deref and not nofree.
 
@@ -175,7 +175,7 @@ Rather than change nofree, we could add a parallel attribute with the stronger o
 
 The downside of this proposal is a) possible overkill, and b) the "ugly" factor of having two similiar but not quite identical attributes.
 
-Add an orthonganal attribute to promote pointer facts to object ones
+Add an orthogonal attribute to promote pointer facts to object ones
 --------------------------------------------------------------------
 
 To address the weakness of the former alternative, we could specify an attribute which strengthens arbitrary pointer facts to object facts.  Examples of current pointer facts are attributes such as readonly, and writeonly.  
