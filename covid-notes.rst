@@ -7,6 +7,17 @@ Periodic COVID Notes
 .. contents::
    :depth: 1
 
+Feb 23, 2021
+============
+
+Minor update today.  
+
+Per the CDC, we're up to about 65 million vaccine doses administered.  We're still hovering just under 1.5 million doses per day.  There's reason to hope this is about to improve, but it hasn't happened yet.  
+
+The good news is that cases are down.  Way down.  As of yesterday, we had 59 thousand cases reported.  The last time we were that low was mid October.  This is hugely good news, and I will freely admit that I have been shocked by how fast the case numbers are dropping.  From what I can tell, no one really knows why this is happening, so I'll refrain from joining the speculation.   Death rates are also dropping, though more slowly (as to be expected given inherent lag).  
+
+Looking forward, I'm still concerned about the new variants on the horizon.  Things are looking much better now than I expected them to be, so I'm starting to hope the UK variant triggered wave won't be too awful.  We're getting more and more evidence the vaccines at least prevent severe cases and death with the new variants; that's awesome news!  On the other hand, vaccination rates are still low and at current rates, the variants have several months to get established and cause headaches.  We desperately need to increase vaccination rates.  There's some hopeful signs - e.g. the availability of the J&J vaccine in the near future - but I won't fully believe it until it happens.  
+
 Feb 6, 2021
 ===========
 
