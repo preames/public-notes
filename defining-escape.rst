@@ -1,5 +1,5 @@
 
-.. header:: This is a DRAFT of a RFC I'm considering sending to llvm-dev.  The current status is more an attempt to organize thoughts than an actually proposal.  
+.. header:: This is a snapshot of a previous version of the defining-capture.rst file.  As noted at the bottom, this is a *incorrect* definition of capture, but the text seemed potentially useful, so I saved it for later.
 
 -------------------------------------------------
 Defining Capture
