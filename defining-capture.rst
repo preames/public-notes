@@ -16,7 +16,7 @@ As with any property, there are both may and must variations.  Unless explicitly
 Candidate Definition
 ---------------------
 
-A captured object is one whose contents or address can be inspected by an external party which controls the implementation of externally defined functions, and can call back into the module through any external exposed entry point (potentially concurrently).  The external party is restricted from "guessing" the addresses of uncaptured objects.  Once captured, an object remains captured indefinitely.
+A captured object is one whose contents or address can be observed by an external party which controls the implementation of externally defined functions, and can call back into the module through any external exposed entry point (potentially concurrently).  The external party is restricted from "guessing" the addresses of uncaptured objects.  Once captured, an object remains captured indefinitely.
 
 Some specific examples of captured objects:
 
@@ -27,14 +27,14 @@ Some specific examples of captured objects:
 * A memory object which was *previously* reachable (even if transiently so) from a captured object remains captured.
 * A memory object whose address could be propagated to a captured location is captured if there exists a non-private function which when invoked could perform said propagation.  (Remember, our externally party is both adversarial and running concurrently, so it can arrange perfect timing attacks as needed.)
 
-corollaries
+Corollaries
 -----------
 
-An object which is eventually captured (i.e. visible to our external observer) may be uncaptured at a particular program point.  For instance, all static allocs start as uncaptured.
+An object which is eventually captured (i.e. visible to our external observer) may not yet have been captured at a particular program point.  We say that such objects as "nocapture before Ctx" where "Ctx" is the program point being discussed.  For instance, all static allocs start as uncaptured, and while the allocation may be eventually captured, that doesn't change the fact the object was nocapture before that point.
 
 A capturing operation is one which exposes a previously uncaptured object to our external observer.
 
-An object is uncaptured in a particular scope if the object was not previously captured before that scope, and no action performed within the scope is a capturing operation.  In particular, not that there's nothing preventing an enclosing scope from capturing the object provided that the capturing operation occurs strictly after the end of our inner scope.
+An object is uncaptured in a particular scope if the object was not previously captured before that scope, and no action performed within the scope is a capturing operation.  In particular, note that there's nothing preventing an enclosing scope from capturing the object provided that the capturing operation occurs strictly after the end of our inner scope.
 
 FOR DISCUSSION: The last point differs from our currently implementation.  We'd consider an object captured in the current scope if returned.  We could phrase this as simple conservatism, but is there something deeper we're missing?
 
