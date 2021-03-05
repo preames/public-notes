@@ -152,3 +152,28 @@ Transient Captures
 In this example, both X and Y are captured.  Our external observed can arrange oops to execute (since it's an external function) and read the address of X between the two writes.
 
 This does nicely highlight that the optimizer can refine this program from one which captures X into one which doesn't by running dead store elimiantion.  As such, it's important to note that capture statements apply to the program at a moment in time.
+
+Capture vs Lifetime
+------------------
+
+.. code:: c++
+
+  int* Y;
+
+  void foo() {
+    Y = new X();
+    free(Y);
+    Y = nullptr;
+  }
+
+In this example, Y has been captured.  Criticially, the memory object associated with the particular instance of X remains captured even once deallocated.  While the contents of said object are no longer defined, the address thereof continues to exist and may be validly used.
+
+It's worth highlighting one counter intuitive implication.  If our adverserial observer calls this routine twice, a reasonable memory allocation may reuse the same physical memory for both instances of X.  This does not change the fact that conceptually these are two distinct memory objects.  Immediately before the store to Y on the second invocation, the first object may be captured (and deallocated) while the second one is not yet captured.  Even though they share the same address.
+
+FOR DISCUSSION - I think this implies we need to tweak the definition slightly.  In particular, I think we need to incorporate something which references the based on rules to make access through the first copy UB, or we seem to have captured both (since per the proposed definition the address captures.)
+
+(This discussion is not meant to be authorative on explaining the semantics of deallocation, for details, see the relevant section of langref.)
+
+
+
+
