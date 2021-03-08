@@ -181,11 +181,11 @@ Draft LangRef Text
 nocapture argument attribute
 ============================
 
-If we have a pointer to an object which has not yet been captured passed to a nocapture argument of a function, we know that the callee will not perform a capturing operation on this argument.  Additionally, we also know that the callee hasn't increased the number of locations in which references to the object can be observed after the call. Thus, if the caller can precisely enumerate said set before the call, that said set remains precise after the call completes.
+If we have a pointer to an object which has not yet been captured passed to a nocapture argument of a function, we know that the callee will not perform a capturing operation on this argument.  Note that this only restricts operations by the callee performed on this argument.  If a separate copy of the pointer is passed through an argument or memory, the callee may capture or store aside in an unknown location that copy of the pointer.
 
-Note that this only restricts operations by the callee performed on this argument.  If a separate copy of the pointer is passed through an argument or memory, the callee may capture or store aside in an unknown location that copy of the pointer.
+In addition to the capture fact just stated, a nocapture argument attribute also provides an additional "trackability" fact.  If before the call, the callee is aware of all copies of a pointer, and all copies of the pointer passed to the callee are passed through nocapture arguments, then after the call, the caller can assume that no new copies of the pointer have been created.  (Even if those copies are in uncaptured locations.)
 
-Note as well that this says nothing about what the callee might do if the object was already captured before the call.
+Note that this definition says nothing about what the callee might do if the object was already captured before the call.
 
 nofree function attribute
 =========================
