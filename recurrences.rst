@@ -28,6 +28,7 @@ A **AND and OR recurrence** w/ a loop invariant step value stablize after the fi
 Is equivalent to:
 
 ::
+   
   %next = and i64 %start, %LIV
   ...
   %phi = phi i64 [%start, %entry], [%next, %backedge]
