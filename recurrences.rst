@@ -19,7 +19,7 @@ Notation
 
 Skip this until one my examples doesn't make sense, then come back.
 
-**<STart,Op,Step>** follows the convention SCEV uses for displaying add recurrences and generalizes for any Op.  <Start,Op,Step> expands to:
+**<Start,Op,Step>** follows the convention SCEV uses for displaying add recurrences and generalizes for any Op.  <Start,Op,Step> expands to:
 
 ::
 
