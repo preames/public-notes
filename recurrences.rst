@@ -19,7 +19,7 @@ Fun w/Recurrences
 
 A **AND and OR recurrence** w/ a loop invariant step value stablize after the first iteration.  That is, anding (oring) a value repeatedly has no effect.  Thus
 
-... code: llvm
+::
 
   %phi = phi i64 [%start, %entry], [%next, %backedge]
   ...
@@ -27,8 +27,7 @@ A **AND and OR recurrence** w/ a loop invariant step value stablize after the fi
 
 Is equivalent to:
 
-... code: llvm
-
+::
   %next = and i64 %start, %LIV
   ...
   %phi = phi i64 [%start, %entry], [%next, %backedge]
