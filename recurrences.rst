@@ -10,7 +10,7 @@ This page is a mixture of a writeup on some recent work I've done around recurre
 Problem Statement
 =================
 
-A recurrence is simply a sequence where the value of f(x) is computable from f(x-1) and some constant terms.  I find `this definition <https://mathinsight.org/definition/recurrence_relation>_` useful.
+A recurrence is simply a sequence where the value of f(x) is computable from f(x-1) and some constant terms.  I find `this definition <https://mathinsight.org/definition/recurrence_relation>`_ useful.
 
 Historically, LLVM has primarily used ScalarEvolution for modeling loop recurrences, but SCEV is rather specialized for add recurrences.  Over the years, we've grown a collection of one-off logic in a couple different places, mostly because pragmatic concerns about a) compile time of SCEV, and b) difficulty of plumbing SCEV through to all the places.
 
@@ -55,7 +55,7 @@ That is, f(x) = LIV - f(x-1).  This alternates between Start, and LIV - Start.  
 Status: Unimplemented
 
 
-A **mul recurrence** w/a loop invariant step value is a power sequence of the form Start*Step^CIV when overflow can be disproven.  (TODO: Does this hold with wrapping twos complement arithmetic?)   See my notes on `exponentiation in SCEV <https://github.com/preames/public-notes/blob/master/scev-exponential.rst>_` for ideas on what we could do here.  It's worth noting that the overflow cases may be identical to the cases we could canonicalize the shifts.  (TBD)
+A **mul recurrence** w/a loop invariant step value is a power sequence of the form Start*Step^CIV when overflow can be disproven.  (TODO: Does this hold with wrapping twos complement arithmetic?)   See my notes on `exponentiation in SCEV <https://github.com/preames/public-notes/blob/master/scev-exponential.rst>`_ for ideas on what we could do here.  It's worth noting that the overflow cases may be identical to the cases we could canonicalize the shifts.  (TBD)
 
 A **udiv/sdiv recurrence** w/a loop invariant step forms a sequence of the form Start div (Step ^ CIV) when overflow can be disproven.  Again, exponentiation?
 
@@ -85,7 +85,7 @@ Is equivalent to:
   %phi = phi i64 [%start, %entry], [%next, %backedge]
   ...
 
-Status: Implemented in `D97578 <https://reviews.llvm.org/D97578>_` + existing LICM transform.
+Status: Implemented in Instcombine (via`D97578 <https://reviews.llvm.org/D97578>`_) + existing LICM transform.
 
 A **XOR recurrence** w/ a loop invariant step value will alternate between two values.  As such, there is a potential to eliminate the recurrence by unrolling the loop by a factor of two.
 
@@ -97,4 +97,4 @@ Floating Point Arithmetic
 
 In general, floating point is tricky because many operators are not commutative.
 
-Most of the obvious options involve proving floating point IVs can be done in integer math.  I have some old patches pending review (`D68954 <https://reviews.llvm.org/D68954>_` and `D68844 <https://reviews.llvm.org/D68844>_`), but there's little active progress here.
+Most of the obvious options involve proving floating point IVs can be done in integer math.  I have some old patches pending review (`D68954 <https://reviews.llvm.org/D68954>`_ and `D68844 <https://reviews.llvm.org/D68844>`_), but there's little active progress here.
