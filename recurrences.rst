@@ -46,6 +46,7 @@ Integer Arithmetic
 **SUB recurrences** are generally canonicalized to add recurrences.  One interesting case is:
 
 ::
+
   %phi = phi i64 [%start, %entry], [%next, %backedge]
   ...
   %next = sub i64 %LIV, %phi
@@ -62,7 +63,7 @@ A **udiv/sdiv recurrence** w/a loop invariant step forms a sequence of the form 
 Shift Operators
 ---------------
 
-TBD - A bunch of work here on known bits, range info, and SCEV bits.
+TBD - A bunch of work here on known bits, range info, and SCEV, both inflight, landed, and planned.  Needs written up.
 
 
 Bitwise Operators
