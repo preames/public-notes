@@ -99,3 +99,19 @@ Floating Point Arithmetic
 In general, floating point is tricky because many operators are not commutative.
 
 Most of the obvious options involve proving floating point IVs can be done in integer math.  I have some old patches pending review (`D68954 <https://reviews.llvm.org/D68954>`_ and `D68844 <https://reviews.llvm.org/D68844>`_), but there's little active progress here.
+
+
+.. Ideas to explore
+
+   KnownBits
+   Ranges
+
+   w/ and w/o loop trip counts
+
+   Alternating patterns - unroll costing?
+   
+   RLEV (e.g. closed form answers for iteration i)
+   -- easy for constant i
+   -- "interesting" for invariant i
+   
+   
