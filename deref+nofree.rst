@@ -4,9 +4,18 @@
 RFC: Decomposing deref(N) into deref(N) + nofree
 -------------------------------------------------
 
-TLDR: ...
+TLDR: We should change the existing dereferenceability related attributes to imply point in time facts only, and re-infer stronger global dereferenceability facts where needed.
 
 .. contents::
+
+Meta
+====
+
+If you prefer to read proposals in HTML, you can read this email `here <https://github.com/preames/public-notes/blob/master/deref+nofree.rst>`_.  
+
+This proposal greatly benefited from multiple rounds of feedback from Johannes, Artur, and Nick.  All remaining mistakes are my own.
+
+Johannes deserves a lot of credit for driving previous iterations on this design.  In particular, I want to note that we've basically returned to something Johannes first proposed several years ago, before we had specified the nofree attribute family.
 
 The Basic Problem
 ==================
@@ -32,7 +41,7 @@ This has been discussed relatively extensively in the past, included an accepted
 
 The need for a broader solution comes from the observation that deref(N) is not the only attribute with this problem.  deref_or_null(N) is a fairly obvious case we'd known about with the previous proposal, but it was recently realized that other allocation related facts have this problem as well.  We now have specific examples with allocsize(N,M) - and the baked in variants in MemoryBuiltins - and suspect there are other attributes, either current or future, with the same challenge.
 
-The opportunity comes from the addition of "nofree" attribute.  Up until recently, we really didn't have a good notion of "free"ing an allocation in the abstract machine model.  We used to comingle this with our notion of capture, and sometimes even aliasing.  (i.e. We'd assume that functions which could free must also capture and/or write.)  With the explicit notion of "nofree", we have an approach available to us we didn't before.
+The opportunity comes from the addition of "nofree" attribute.  Up until recently, we really didn't have a good notion of "free"ing an allocation in the abstract machine model.  We used to comingle this with our notion of capture.  (i.e. We'd assume that functions which could free must also capture.)  With the explicit notion of "nofree", we have an approach available to us we didn't before.
 
 The Proposal Itself
 ====================
@@ -43,12 +52,13 @@ More specifically:
 
 * A deref attribute on a function parameter will imply that the memory is dereferenceable for a specified number of bytes at the instant the function call occurs.  
 * A deref attribute on a function return will imply that the memory is dereferenceable at the moment of return.
-* We will then use the point in time fact combined with other information to drive inference of the global facts.  See below for a sampling of inference rules.
 
-Inference cases:
+We will then use the point in time fact combined with other information to drive inference of the global facts.  While in principle we may loose optimization potential, we believe this is sufficient to infer the global facts in all practical cases we care about.  
+
+Sample inference cases:
 
 * A deref(N) argument to a function with the nofree and nosync function attribute is known to be globally dereferenceable within the scope of the function call.  We need the nosync to ensure that no other thread is freeing the memory on behalf of the callee in a coordinated manner.
-* A deref argument to a function in a module with the "gc.abstract-model" flag is known to be globally dereferenceable as the program globally can not contain deallocation.  (Until after lowering at which point the flag is removed.)
+* A deref argument to a function with a garbage collector which guarantees collection occurs only at explicit safepoints and uses the gc.statepoint infrastructure, is known to be globally dereferenceable if there are no calls to gc.statepoint anywhere in the module.
 * An argument with the attributes deref(N), noalias, and nofree is known to be globally dereferenceable within the scope of the function call.  This relies on the fact that free is modeled as writing to the memory freed, and thus noalias ensures there is no other argument which can be freed.  (See discussion below.)
 
 The items above are described in terms of deref(N) for ease of description.  The other attributes are handle analogously.
@@ -148,15 +158,13 @@ Use Cases
 Migration
 ==========
 
-Existing bytecode will be upgraded to the weaker non-global semantics.  This provides forward compatibility, but does lose optimization potential.
+Existing bytecode will be upgraded to the weaker non-global semantics.  This provides forward compatibility, but does lose optimization potential for previously compiled bytecode.
 
-Frontends which want the point in time semantics should emit deref and not nofree.
+C++ and GC'd language frontends don't change.  
 
-Frontends using the GC abstract machine model (in which deallocation is UB) should emit the "gc.abstract_model" flags.
+Rustc should emit noalias where possible.  In particular, 'a' in the case 'bar' above is currently not marked noalias and results in lost optimization potential as a result of this change.  According to the rustc code, this is legal, but currently blocked on a noalias related miscompile.  See https://github.com/rust-lang/rust/issues/54462 and https://github.com/rust-lang/rust/issues/54878 for further details.  (My current belief is that all llvm side blockers have been resolved.)
 
-Rustc should emit noalias where possible.  In particular, 'a' in the case 'bar' above is currently not marked noalias and results in lost optimization potential as a result of this change.  According to the rustc code, this is legal, but currently blocked on a noalias related miscompile.  See https://github.com/rust-lang/rust/issues/54462 and https://github.com/rust-lang/rust/issues/54878 for further details.
-
-Frontends which want the global semantics should emit noalias, nofree, and nosync where appropriate. If this is not enough to recover optimizations in common cases, please follow up on llvm-dev.  
+Frontends which want the global semantics should emit noalias, nofree, and nosync where appropriate. If this is not enough to recover optimizations in common cases, please explain why not.  It's possible we've failed to account for something.
 
 Alternative Designs
 ===================
@@ -181,5 +189,3 @@ Add an orthogonal attribute to promote pointer facts to object ones
 To address the weakness of the former alternative, we could specify an attribute which strengthens arbitrary pointer facts to object facts.  Examples of current pointer facts are attributes such as readonly, and writeonly.  
 
 This has not been well explored; there's a huge possible design space here. 
-
-
