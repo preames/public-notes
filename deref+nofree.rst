@@ -169,6 +169,8 @@ Frontends which want the global semantics should emit noalias, nofree, and nosyn
 Alternative Designs
 ===================
 
+All of the alternate designs listed focus on recovering the full global deref semantics.  Our hope is that any common case we've missed can be resolved with additional inference rules instead.
+
 Extend nofree to object semantics
 ----------------------------------
 
@@ -181,7 +183,7 @@ Add a separate nofreeobj attribute
 
 Rather than change nofree, we could add a parallel attribute with the stronger object property.  This - combined with deref(N) as a point in time fact - would be enough to recover the current globally deferenceable semantics.  
 
-The downside of this proposal is a) possible overkill, and b) the "ugly" factor of having two similiar but not quite identical attributes.
+The downside of this alternative is a) possible overkill, and b) the "ugly" factor of having two similiar but not quite identical attributes.
 
 Add an orthogonal attribute to promote pointer facts to object ones
 --------------------------------------------------------------------
