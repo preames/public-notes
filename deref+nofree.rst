@@ -11,7 +11,7 @@ TLDR: We should change the existing dereferenceability related attributes to imp
 Meta
 ====
 
-If you prefer to read proposals in HTML, you can read this email `here <https://github.com/preames/public-notes/blob/master/deref+nofree.rst>`_.  
+If you prefer to read proposals in a browser, you can read this email `here <https://github.com/preames/public-notes/blob/master/deref+nofree.rst>`_.  
 
 This proposal greatly benefited from multiple rounds of feedback from Johannes, Artur, and Nick.  All remaining mistakes are my own.
 
@@ -58,8 +58,8 @@ We will then use the point in time fact combined with other information to drive
 Sample inference cases:
 
 * A deref(N) argument to a function with the nofree and nosync function attribute is known to be globally dereferenceable within the scope of the function call.  We need the nosync to ensure that no other thread is freeing the memory on behalf of the callee in a coordinated manner.
-* A deref argument to a function with a garbage collector which guarantees collection occurs only at explicit safepoints and uses the gc.statepoint infrastructure, is known to be globally dereferenceable if there are no calls to gc.statepoint anywhere in the module.
 * An argument with the attributes deref(N), noalias, and nofree is known to be globally dereferenceable within the scope of the function call.  This relies on the fact that free is modeled as writing to the memory freed, and thus noalias ensures there is no other argument which can be freed.  (See discussion below.)
+* A memory allocation in a function with a garbage collector which guarantees collection occurs only at explicit safepoints and uses the gc.statepoint infrastructure, is known to be globally dereferenceable if there are no calls to gc.statepoint anywhere in the module.  This effectively refines the abstract machine model used for garbage collection before lowering by RS4GC to disallow explicit deallocation (for collectors which opt in).
 
 The items above are described in terms of deref(N) for ease of description.  The other attributes are handle analogously.
 
