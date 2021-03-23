@@ -100,18 +100,41 @@ In general, floating point is tricky because many operators are not commutative.
 
 Most of the obvious options involve proving floating point IVs can be done in integer math.  I have some old patches pending review (`D68954 <https://reviews.llvm.org/D68954>`_ and `D68844 <https://reviews.llvm.org/D68844>`_), but there's little active progress here.
 
+Index
+=====
 
-.. Ideas to explore
+This section has the same information as above, but indexed by optimization type.
 
-   KnownBits
-   Ranges
+Known Bits
+----------
 
-   w/ and w/o loop trip counts
+Computing known bits for simple recurrences.  Currently handled: lshr, ashr, shl, add, sub, and, or, mul.  Missing cases of note include: overflow intrinsics, udiv, sdiv, urem, srem.
 
-   Alternating patterns - unroll costing?
-   
-   RLEV (e.g. closed form answers for iteration i)
-   -- easy for constant i
-   -- "interesting" for invariant i
-   
-   
+isKnownNonZero
+--------------
+
+Can we tell a recurrence is non-zero through it's entire range?  Currently only handles add (with an alternate code structure), but under review for mul.  
+
+Constant Range
+--------------
+
+Entirely TODO
+
+SCEV Range
+----------
+
+Exploiting trip count information to refine constant range results.  Currently, only shl is handled.  Other shift recurrences are obvious.
+
+RLEV
+----
+
+IndVarSimplify can rewrite loop exit values.  For some of the alternating patterns (e.g. see xor above) if we know the trip count, we can select a single exit value and fold uses outside the loop.  (e.g. select between two values based on primary IV).  We can also use knowledge of trip count multiple (which SCEV computes) to avoid the select in some cases.
+
+Entirely unimplemented.
+
+Unroll/Vectorize Costing
+----------------------------
+
+For alternating patterns, we can exploit the fact that unrolling the loop by a multiple of the alternation length results in fixed patterns for each lane.  This could effect unrolling and vector codegen, but most importantly, should drive costing.
+
+Entirely unimplemented.  We can also do this for general SCEV formulas as well.  
