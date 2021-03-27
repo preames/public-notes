@@ -7,6 +7,19 @@ Periodic COVID Notes
 .. contents::
    :depth: 1
 
+March 27, 2021
+===============
+
+In the US, we've been hovering around 60k new cases a day for the last month.  That's a heck of a lot better than I expected to be seeing right now.  We've recently seen the beginning of what might be an uptick, and in particular `an increasing fraction of cases coming for new variants <https://www.cdc.gov/coronavirus/2019-ncov/cases-updates/variant-proportions.html>`_, but so far, nothing I consider too worry worthy.  
+
+On the vaccine side, we've administed roughly 140 miilion doses to date, and are up to around 2.7 million doses per day.  (`Bloomberg <https://www.bloomberg.com/graphics/covid-vaccine-tracker-global-distribution/>`_) Given a month ago, we'd only administed 60 million doses and were running at 1.5 million per day, these are awesome numbers.  There's still a long way to go, but the progress to date has been impressive.  
+
+For context, we'll need to have administered something around 460 million does to reach 70% coverage.  Given it seems even a single dose of the existing vaccine provides strong protection, I expect we'll see dramatic improvements in case counts before then.  If we guess it takes 300 million does to get 240 million first doses, then we can reasonably expect to be there in roughly 2-3 months from today.  
+
+There's still need for concern with the new variants as there's potentially room for a fourth wave of infections to spike between now and then, but overall, I'm seeing a much more hopeful picture than I expected to be.  Right now, we seem to be nearing the end of this thing, and the window for serious uptick in cases seems to be closing rapidly.  If we can get through another few weeks without a huge surge in cases, we'll be in pretty good shape.  
+
+And, even if we did see a sharp spike in cases, given the high vaccination rates in older adults we'd expect death rates to be lower.  So, we might get out of this thing with "only" 600-700 thousand dead. "Only".
+
 Feb 23, 2021
 ============
 
