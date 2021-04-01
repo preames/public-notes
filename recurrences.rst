@@ -113,17 +113,22 @@ Computing known bits for simple recurrences.  Currently handled: lshr, ashr, shl
 isKnownNonZero
 --------------
 
-Can we tell a recurrence is non-zero through it's entire range?  Currently only handles add (with an alternate code structure), but under review for mul.  
+Can we tell a recurrence is non-zero through it's entire range?  Currently handles add, mul, shl, ashr, and lshr.  Missing cases of note include: overflow intrinsics, udiv, sdiv.
+
+isKnownNonEqual
+----------------
+
+Can we tell two recurrences are inequal (cheaply)?  Used by BasicAA.  Patch out for review which handles add, sub, mul, shl, lshr, and ashr.  
 
 Constant Range
 --------------
 
-Entirely TODO
+Entirely TODO - not clear how worthwhile this is a known bits gets the common cases which constant ranges could handle.  
 
 SCEV Range
 ----------
 
-Exploiting trip count information to refine constant range results.  Currently, only shl is handled.  Other shift recurrences are obvious.
+Exploiting trip count information to refine constant range results.  Currently, only shl is handled.  Changes for ashr and lshr are out for review.
 
 RLEV
 ----
