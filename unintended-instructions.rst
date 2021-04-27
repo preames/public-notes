@@ -55,9 +55,27 @@ Performance Optimization
   
 I do want to highlight that the lines between these categories are somewhat blurry and subject to interpretation.  Is a system which attempts to sandbox user code but fails to account for the undocumented instruction issue (described above) or the spectre family of side channel attacks a sandbox or a mitigation?  I don't see much value in answering that question.  This writeup focuses on the commonalities between them, not the distinctions.  I view them more as a spectrum from weakest mitigation to strongest.  It is important to acknowledge that our perception of strength changes as new issues are discovered.  
 
-Instruction Families of Interest
---------------------------------
-
-
 Approaches
 ----------
+
+There are three major family of approaches I'm aware of: trap-and-check, avoiding generation, and controlling reachability.  Let's go through each in turn.
+
+Trap-and-check
+  Works by identifying at load time all problematic byte sequences (whether intended or misaligned), and then using some combination of breakpoint-like mechanisms to trap on execution of code around the byte sequence of interest.  Mechanisms I'm aware of involve either hardware breakpoints, page protection tricks, or single stepping in an interrupt handler.  In all, some kind of fault handler is reasonable for insuring that unintended instructions aren't executed (e.g. the program counter never points to the stard of the unintended instruction and instead steps through the expected instruction stream.).
+  The worst case performance of such systems tends to be poor (as trapping on the hot path can be extremely expensive), but perform at native speed when unintended instructions are not in the hot path.  They also tend to be operationally simpler as they don't require toolchain changes.
+
+Controlling reachability
+  Involves mechanisms to disallow edges in the (hardware) control flow graph.  The core idea is to prevent a control flow instruction from transfering control to the offset of the unintended instruction.  This ends up being a subset of control flow integrety to which there have been hundreds of approaches taken with different tradeoffs.  The core takeaway for me is that achieving both reasonable implementation complexity, full concurrency support, and low performance overhead is extremely challenging.  We'll come back in a moment to discussing two such approaches in a bit more depth.
+
+Avoid generating unintended instructions
+  Involves some adjustment to the toolchain used to generate the binary (and possibly to dynamic loaders) to avoid introducing unintended instructions into the binary to begin with.  This is the family of techniques we'll spent the most time discussing below.
+  
+I've listed these in the order of *seemingly* simplest to most complicated. Unfortunately, both of the former have hard to resolve challenges, so we'll end up spending most of our time talking about the third.
+
+The challenge of the trap-and-check is that it is very hard to implement efficiently for concurrent programs with large number of unintended instructions.  Use of hardware breakpoints handles small numbers (e.g. < 4) unintended instructions well, which is enough for some use cases.  When the number of unintended instruction exceeds the number of debug registers, concurrency turns out to be a core challenge.  The critical race involves one thread unprotecting a page to allow it to make progress in single-step mode and another then accessing the same page thus bypassing the check.  You end up essentially needing to ensure that if any thread must single step through a page that all threads are either single stepping or stalled.  It is worth noting that a toolchain which avoiding emitting most (but not all) unintended instructions would pair very well with a trap-and-check fallback.
+
+For the reachability based approaches, we'll briefly discuss two options.
+
+NACL...
+
+CET...
