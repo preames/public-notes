@@ -8,8 +8,8 @@ This document is (intended to eventually be) an overview of techniques for handl
 
 .. contents::
 
-Background
-----------
+The Unintended Instruction Problem
+----------------------------------
 
 X86 and X86-64 use a variable length instruction encoding.  There are some instructions which take just a byte, with others that can consume up to 15 bytes (the architectural limit).  This results in a situation where a valid instruction can start at any byte in the instruction stream.  The hardware does not enforce any alignment restrictions on branch targets, and thus each byte is potentially the target of some jump.
 
@@ -27,12 +27,37 @@ Consider as an example, the byte sequence represented by the hex string "89 50 0
   0x00000001: 04d0          : add al, -0x30
   0x00000003: c3            : ret
 
-It is worth noting that since encodings are variable length, many unintended instruction sequences tend to eventually align to a boundary in the indended stream.  In practice, since X86 has many valid one byte instructions and one byte prefix bytes which are often not semantic, it is not uncommon to find a sequence of misaligned bytes which decode validly and yet end at a boundary in the original intended stream.  This results in a case where only the prefix of a sequence need be misaligned, and thus greatly increases the ease with which an attacker can exercise interesting control flow after executing their unintended instruction of interest.
+It is worth noting that since encodings are variable length, many unintended instruction sequences tend to eventually align to a boundary in the intended stream.  In practice, since X86 has many valid one byte instructions and one byte prefix bytes which are often not semantic, it is not uncommon to find a sequence of misaligned bytes which decode validly and yet end at a boundary in the original intended stream.  This results in a case where only the prefix of a sequence need be misaligned, and thus greatly increases the ease with which an attacker can exercise interesting control flow after executing their unintended instruction of interest.
 
-One last bit of complexity comes up with the interpretation of bytes in the (misaligned) stream which don't decode to any known instruction.  Unfortunately, the key part of that staement is the word "known".  Unfortunately, it's been well established in the literature that just because a byte sequence isn't *documented* as having meaning does not mean it will not have *effects*.  It turns out that real processor behavior can and does differ from the documentation.  For instance:
+One last bit of complexity comes up with the interpretation of bytes in the (misaligned) stream which don't decode to any known instruction.  Unfortunately, the key part of that statement is the word "known".  Unfortunately, it's been well established in the literature that just because a byte sequence isn't *documented* as having meaning does not mean it will not have *effects*.  It turns out that real processor behavior can and does differ from the documentation.  For instance:
 
-* Various generations of intel processors differ in their handling of redundant or duplicate prefix bytes on instructions.  As a result, without knowing the exact processor executing the byte stream, it's impossible to accurately decode such a case.  For this particular case, thankfully all known behaviors either ignore the redundant prefixes or generate an illegal instruction fault.
-* On certian VIA processors the byte sequence "0f3f" happens to transfer control to a highly privledged coprocessor despite not being a documented valid instruction.  While this is an extreme example, it's not unreasonable to expect processors to have unexpected behavior when executing garbage bytes.  This has in fact been reasonable well documented (e.g. sandshifter)
+* Various generations of Intel processors differ in their handling of redundant or duplicate prefix bytes on instructions.  As a result, without knowing the exact processor executing the byte stream, it's impossible to accurately decode such a case.  For this particular case, thankfully all known behaviors either ignore the redundant prefixes or generate an illegal instruction fault.
+* On certain VIA processors the byte sequence "0f3f" happens to transfer control to a highly privileged co-processor despite not being a documented valid instruction.  While this is an extreme example, it's not unreasonable to expect processors to have unexpected behavior when executing garbage bytes.  This has in fact been reasonable well documented (e.g. sandshifter)
 
-As a result, depending on our threat model, we may need to take great care when handling garbage bytes appearing in a misalgined stream.  At a minimum, an appropriate paraniod engineer is advised *not* to assume that executing garbage bytes will deterministic fault. Allowing for fallthrough is probably enough, but in principle there's nothing preventing those unknown effects from including control flow or other arbitrary processor side effects. In practice, all of the work I can find ignores this issue - which is probably fine in practice, but leaves at least a conceptual hole to be aware of.
+As a result, depending on our threat model, we may need to take great care when handling garbage bytes appearing in a misaligned stream.  At a minimum, an appropriate paranoid engineer is advised *not* to assume that executing garbage bytes will deterministic fault. Allowing for fallthrough is probably enough, but in principle there's nothing preventing those unknown effects from including control flow or other arbitrary processor side effects. In practice, all of the work I can find ignores this issue - which is probably fine in practice, but leaves at least a conceptual hole to be aware of.
 
+Applications
+------------
+
+Before we dive into the meat of how we can avoid or render harmless unintended instructions, let's take a moment and cover a few use cases.  This is helpful in framing our thoughts if nothing else.
+
+Reliable Disassembly
+  For reverse engineering, debugging, and exploit analysis it is common to need to disassemble binaries.  For this use case, awareness of the existance of unintended instructions is the primary goal.  To my knowledge, there are no tools which do a good job of presenting the parallel execution streams.  Instead, the typical flow requires the human to iterate through attempting disassembly at different offsets.
+
+Sandboxing
+  In the realm of lightweight (i.e. user mode) sandboxing techniques, it's common to need to disallow particular instructions from occuring inside the sandboxed code.  Examples of opcodes which might be disallowed include: syscalls, user mode interrupts, pkey manipulation, segment state manipulation, or setting the direction flag.  We'll return to this application later in more depth.
+
+Exploit Mitigation (e.g. defense in depth measures)
+  For return oriented programming (ROP) style attacks, unintended instructions are frequently used to form "gadgets" which are in turned chained together into desired execution by the attacker.  One way to mitigate the damage of such attacks is to reduce the number of available gadgets.  I list this separately from sanboxing to emphasize that mitigation may take the form of a simple *reduction* in the number of available gadgets as opposed to an outright elimination thereof.  Beyond ret instructions, mitigation are often interested in reducing the number of, and maybe whitelisting occurrences of many of the same instruction families as come up when sandboxing.  (For the same reasons!)
+
+Performance Optimization
+  A particular form of sandboxing which is worth highlighting is to use sandboxing to optimize the execution of untrusted code.  The key difference with other sandboxing techniques is that a fallback safe execution mechanism is assumed to exist, but that mechanism implies overhead which can be avoided in the common case.  Examples might include optimized JNI dispatch for a JVM, a trap-and-step system (see below), or a user provided optimized binaries for a query engine.  The key difference in this use case is that failing to fully sandbox a piece of code is an acceptable (if not ideal) result as the slow path can always be taken.
+  
+I do want to highlight that the lines between these categories are somewhat blurry and subject to interpretation.  Is a system which attempts to sandbox user code but fails to account for the undocumented instruction issue (described above) or the spectre family of side channel attacks a sandbox or a mitigation?  I don't see much value in answering that question.  This writeup focuses on the commonalities between them, not the distinctions.  I view them more as a spectrum from weakest mitigation to strongest.  It is important to acknowledge that our perception of strength changes as new issues are discovered.  
+
+Instruction Families of Interest
+--------------------------------
+
+
+Approaches
+----------
