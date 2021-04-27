@@ -79,3 +79,41 @@ For the reachability based approaches, we'll briefly discuss two options.
 NACL...
 
 CET...
+
+
+Rewrite Techinques
+------------------
+
+Instruction Boundary
+====================
+
+When the unintended instruction crosses the boundary between two or more intended instructions, the sequence can be broken by inserting padding bytes between the two intended instructions.  Depending on the instruction class being eliminated, redundant prefix bytes, a single byte ``nop`` instruction (``0x90``), or a semantic nop such as "movl %eax, %eax".  The selection of the padding is controlled by whether the bytes in the padding instruction can form a valid suffix (or prefix) with the preceeding (following) bytes forming another problematic uninteded instruction.  Depending on the class of problematic instruction, the selected padding sequence must differ.
+
+From a performance perspective, prefix bytes are preferred over single byte nops which are preferred over other instructions.
+
+Instruction Replacement
+=======================
+
+(pre) Alignment Sled
+====================
+
+An alignment sled is a string of bytes which cause all possibly disassembly strams to align to a single stream.  A trivial instance of such a sequence is a single byte nop repeated 15 times.  The G-Free paper claims that a 9 byte sequence is sufficient, and smaller sequences are likely possible in manner specific cases (but not in general).
+
+The idea behind an alignment sled is a bit subtle.  Such a sled is placed *before* the intended instruction which contains the start of the unintended instruction of interest.  Note that the unintended instruction itself is not removed.  Instead, the alignment ensures that any misaligned sequence starting *before* the intended instruction containing the unintended start can't reach said instruction.  It does not prevent the attacked from branching directly to the start of the unintended instruction or to any byte between the start of the containing intended instruction and the start of the targetted unintended instruction.
+
+As a result, an pre aligmment sled is only useful when a) the targetted unintended instruction has no side effects other than redirecting control flow, and b) the disassembly of all sequences starting with offsets after the bengining of the containing intended instruction which contains the targetted instruction must be innocious.  (i.e not form an interesting gadget)
+
+The idea of pre alignment sleds was introduced (to me) in the G-Free paper.
+
+(post) Alignment and Check
+==========================
+
+This is essentially the inverse of the pre-alignment sled idea.  Rather than placing an alignment sled *before* a targetted instruction, we place it *after* the last intended instruction which contains a suffix of the targetted unintended one, and then follow the sled with an instruction specific check sequence.  Note that this requires the targetted unintended instruction to a) fallthrough (instead of transfering control), and b) have a side effect which can be determinstically detected.
+
+The length of the alignment sled can be reduced in many cases as we only need to unify the instruction stream containing the targetted unintended instruction and the intended instruction stream.  A particularly interesting special case is when the unintended instruction makes up a suffix of the intended one.  Such cases can commonly arrise when unintended instructions are embedded in immediates or relative displacements.
+
+I haven't seen this approach used previously in the literature.  
+
+
+
+
