@@ -91,8 +91,38 @@ When the unintended instruction crosses the boundary between two or more intende
 
 From a performance perspective, prefix bytes are preferred over single byte nops which are preferred over other instructions.
 
-Instruction Replacement
-=======================
+Instruction Rewriting
+=====================
+
+This is by far the most complicated case.  I'll refer readers interested in the details to the Erim and G-Free papers, and restrict myself to some commentary here.
+
+Completeness
+++++++++++++
+
+I find it difficult to convince myself of the completeness of either papers rewriting rules.  They seem to be heavily dependent on a complete taxonomy of the x86 decode rules, and prior experience makes me very hesitant about that.  As a particular example, neither paper seems to consider the case where a prefix byte forms part of an unintended instruction.  Particularly for VEX or EVEX, this seems to be a questionable assumption which would need substaintial justification.
+
+Register Scavenging
++++++++++++++++++++
+
+Each of the techniques mentioned sometimes need to reassign registers.  This is extremely hard to do in general as there may not be a register available for scavenging.  Both of the techniques which describe this use a post-compiler rewriting pass and fall back to stack spilling (which is ABI breaking!) in the worst case.
+
+One point I don't see either paper make is that we can often scavenge a register by being willing to rematerialize a computation.  As an example, if the frame size is a constant but the code is preserving the frame pointer, RBP can be reliably scavenged and rematerialized after the local rewrite.  (Assuming the frame size doesn't itself form a problematic immediate at least.)
+
+It's tempting to make this the compilers (specifically register allocation) responsibility, but since it requires knowledge of the encodings it would require breaking the compiler vs assembly abstraction.  We might be able to trick the compiler by adjusting instruction costing, but it's not clear this would behave well in the existing register allocation infrastructure.
+
+Another approach would be to reserve a free register (i.e. guarantee scavenging could succeed), but that sounds pretty expensive performance wise.  Maybe we have the register allocator treat potentially problematic instructions as if they clobbered an extra register?  This would force a free register with at least much more localized damage.  It would require breaking the compiler/assembler abstraction a bit though.
+
+Displacement Handling
++++++++++++++++++++++
+
+As noted in the papers, we can insert nops to perturb displacement bytes which happen to encode unintended instructions.  Given little endian encoding, we can adjust the first byte by adding a single nop either before or after the containing intended instruction.  (If matching a set of adjacent encodings, we might need more than one.)
+
+The other bytes are trickier.  Adjusting the other bytes with padding quickly gets really expensive code wise.  We have two main techniques open to us:
+
+* If the unintended instruction ends at the end of the intended instruction's displacement field, and we can legally use a post-align and check pattern, we can simply add a post-check.
+* If we can scavenge a register, we can use an LEA to form a portion of the address, and then use a smaller offset on the instruction.
+
+Note that none of the three techniques mentioned can *always* produce a small rewrite.  The closest is the padding trick mentioned, but personally having to insert 10s of MBs of nop padding doesn't feel like a robust solution to me.
 
 Alignment Sleds
 ===============
