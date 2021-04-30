@@ -76,10 +76,11 @@ The challenge of the trap-and-check is that it is very hard to implement efficie
 
 For the reachability based approaches, we'll briefly discuss two options.
 
-NACL...
+"Native client: A sandbox for portable, untrusted x86 native code" is one of most robust approaches I've seen.  NaCL prevents the execution of unintended instructions by ensuring that all branch targets are 32 byte aligned and that no instruction crosses a 32 byte boundary.  NaCL's instruction bundling support is already implemented in llvm's assembler.
 
-CET...
+The main challenge with NaCL is the performance overhead of return protection.  A return combines three operations: a load of return address from the stack, an adjustment of the stack pointer, and an indirect branch.  The problem for efficient instrumentation is that in a concurrent environment, we need to instrument after the load, but before the branch.  This can't be done.  Instead, we have to use an alternate instruction sequence.  The primary effect of doing so is that return prediction is effectively disabled.  I don't have firm numbers, but my impression is that the actual bundling is comparatively inexpensive.
 
+Intel's upcoming Control Flow Enforcement Technology (CET) technology is highly relevant in this discussion.  It's specifically focused on reducing the number of gadgets available for ROP style attacks.  CET contains two key pieces: a branch terminator instruction and a separate hardware managed return stack.  CET is certainly an interesting step forward, but it isn't a full solution.  ENDBR64 (the new branch terminator instruction) can itself occur in unintended instructions!  As a result, while CET does reduce the number of available gadgets greatly, it does not eliminate them entirely.  We'd still need some mechanism of handling uintended ENDBRs to be a complete sandboxing solution.
 
 Rewrite Techniques
 ------------------
@@ -182,3 +183,13 @@ Another way to achieve the same for ``wrpkru`` would be to write all ones to ``e
 As you'll notice, the reasoning here is highly specific to particular unintended instruction being targetted for mitigation.
 
 
+Appendex: The Mentioned Papers
+------------------------------
+
+I meantion several of the papers here above by their short name (e.g. "Erim", "G-Free", "Hodor").  This section gives an overview of each and the complete citation so that you can find them if desired.
+
+"G-Free: defeating return-oriented programming through gadget-less binaries" describes a assembly rewriting scheme targetted at eliminating unintended return and call opcodes from a binary.  Their implementation was an assembly preprocessor.  This can be considered somewhat of an extreme case for instruction rewriting as their are multiple single byte return instructions, and multiple small (2-3 byte) call sequences.  This results in a focus on single instruction rewriting.
+
+"Erim: Secure and efficient in-process isolation with memory protection keys" describes an approach for pkey related instructions using a post assembler binary rewriting step.  Several of the ideas discussed below in terms of rewriting strategies come from this paper.
+
+"Hodor: Intra-Process Isolation for  High-Throughput Data Plane Libraries" is another take on a pkey based sandbox; this time using trap-and-check.  Worth noting is that Intel only supports 4 hardware debug registers, so programs which execute code with more than 4 unintended pkru instructions must take a much slower path.  
