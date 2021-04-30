@@ -43,12 +43,11 @@ I really don't think that extending IRCE is the right path
             specific sub-case which is both tractable and profitable.
 
 
-In this example, forming the full pre/main/post loop structure of
-      IRCE is overkill.  Instead, we could simply restrict the loop
-      bounds in the following manner:
+In this example, forming the full pre/main/post loop structure of IRCE is overkill.  Instead, we could simply restrict the loop bounds in the following manner:
 
+.. code::
 
-    loop.ph:
+loop.ph:
   ;; Warning: psuedo code, might have edge conditions wrong
   %c = icmp sgt %iv, %n
   %min = umax(%n, %a)
@@ -70,21 +69,14 @@ loop:
 exit:
   ret void
 }
-    I'm not quite sure what to call this transform, but it's not
-      IRCE.  If this example is actually general enough to cover your
-      use cases, it's going to be a lot easier to judge profitability on
-      than the general form of iteration set splitting.  
 
-    
+I'm not quite sure what to call this transform, but it's not IRCE.  If this example is actually general enough to cover your use cases, it's going to be a lot easier to judge profitability on than the general form of iteration set splitting.  
 
+Another way to frame this special case might be to recognize the conditional block can be inverted into an early exit.  (Reasoning: %iv is strictly increasing, condition is monotonic, path if not taken has no observable effect)  Consider:
 
-    Another way to frame this special case might be to recognize the
-      conditional block can be inverted into an early exit.  (Reasoning:
-      %iv is strictly increasing, condition is monotonic, path if not
-      taken has no observable effect)  Consider:
+.. code::
 
-
-    loop.ph:
+loop.ph:
   br label %loop
 
 loop:
@@ -106,6 +98,4 @@ exit:
 }
 
 
-    Once that's done, the multiple exit vectorization work should
-      vectorize this loop. Thinking about it, I really like this
-      variant.  
+Once that's done, the multiple exit vectorization work should vectorize this loop. Thinking about it, I really like this variant.  
