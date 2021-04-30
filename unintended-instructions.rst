@@ -115,11 +115,11 @@ Another approach would be to reserve a free register (i.e. guarantee scavenging 
 Displacement Handling
 +++++++++++++++++++++
 
-As noted in the papers, we can insert nops to perturb displacement bytes which happen to encode unintended instructions.  Given little endian encoding, we can adjust the first byte by adding a single nop either before or after the containing intended instruction.  (If matching a set of adjacent encodings, we might need more than one.)
+As noted in the papers, we can insert nops to perturb displacement bytes which happen to encode unintended instructions.  Given little endian encoding, we can adjust the final byte by adding a single nop either before or after the containing intended instruction.  (If matching a set of adjacent encodings, we might need more than one.)
 
 The other bytes are trickier.  Adjusting the other bytes with padding quickly gets really expensive code wise.  We have two main techniques open to us:
 
-* If the unintended instruction ends at the end of the intended instruction's displacement field, and we can legally use a post-align and check pattern, we can simply add a post-check.
+* If the unintended instruction ends at the end of the intended instruction's displacement field, and we can legally use a post-align and check pattern, we can simply add a post-check.  (This overlaps with the nop case above, and is most useful when there are either other bytes which also need changed, or multiple problematic encodings for the last byte.)
 * If we can scavenge a register, we can use an LEA to form a portion of the address, and then use a smaller offset on the instruction.
 
 Note that none of the three techniques mentioned can *always* produce a small rewrite.  The closest is the padding trick mentioned, but personally having to insert 10s of MBs of nop padding doesn't feel like a robust solution to me.
@@ -161,7 +161,7 @@ I haven't seen this approach used previously in the literature.
 Pre Setup/Post Checking
 +++++++++++++++++++++++
 
-A variant of the post align and check technique which can accelerate the check sequence is to scavenge a register whose value is consumed by the unintended instruction, pin it to a known value in the intended stream, and then check that value afterwards.  The idea is that the unintended instruction must fall down into that check, and if the value matches the expected value, we can reason about the path taken. Let me given a concrete example in terms of ``wrpkru`` to make this easier to follow.
+A variant of the post align and check technique which can accelerate the check sequence is to scavenge a register whose value is consumed by the unintended instruction, pin it to a known value in the intended stream, and then check that value after the post-align sequence.  The idea is that the unintended instruction must fall down into that check, and if the value matches the expected value, we can reason about the path taken. Let me given a concrete example in terms of ``wrpkru`` to make this easier to follow.
 
 Our intended instruction will be ``or eax, -0x10fef006`` which encodes ``wrpkru`` as it's suffix.  If we can scavenge either ECX or EDX, we can set them to a non-zero value.  ``wrkpru`` will fault if either register is anything other than zero.  After the intended instruction, we can check to see if our scavenged register is non-zero.  If it is, we know we'd only reached the check through the intended instruction stream.
 
