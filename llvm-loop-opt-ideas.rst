@@ -22,53 +22,63 @@ Internal Control Flow
 
 A couple of general comments.
 
+I really don't think that extending IRCE is the right path forward here. IRCE has some serious design defects, and I'm honestly quite nervous about it's correctness. I think that iteration set splitting (the basic transform IRCE uses) is absolutely something we should implement for the main pipeline, but I'd approach it as building new infrastructure to replace IRCE, not as getting IRCE on by default. In particular, I suspect the value comes primarily from a cost model driven approach to splitting, not IRCE's unconditional one.
 
-I really don't think that extending IRCE is the right path
-            forward here. IRCE has some serious design defects, and I'm
-            honestly quite nervous about it's correctness. I think that
-            iteration set splitting (the basic transform IRCE uses) is
-            absolutely something we should implement for the main
-            pipeline, but I'd approach it as building new infrastructure
-            to replace IRCE, not as getting IRCE on by default. In
-            particular, I suspect the value comes primarily from a cost
-            model driven approach to splitting, not IRCE's unconditional
-            one.
+Second, I advise being very cautious about going directly for the general case here. The general case for this is *really really hard*. If it wasn't, we'd already have robust solutions. If you can describe your motivating examples in a bit more depth (maybe offline), we can see if we can find a specific sub-case which is both tractable and profitable.
 
+Example under discussion:
 
-          Second, I advise being very cautious about going directly
-            for the general case here. The general case for this is
-            *really really hard*. If it wasn't, we'd already have robust
-            solutions. If you can describe your motivating examples in a
-            bit more depth (maybe offline), we can see if we can find a
-            specific sub-case which is both tractable and profitable.
+.. code::
+
+   loop.ph:
+     br label %loop
+
+   loop:
+     %iv = phi i64 [ %inc, %for.inc ], [ 1, %loop.ph ]
+     %cmp = icmp slt i64 %iv, %a
+     br i1 %cmp, label %if.then.2, label %for.inc
+
+   if.then.2:
+     %src.arrayidx = getelementptr inbounds i64, i64* %src, i64 %iv 
+     %val = load i64, i64* %src.arrayidx
+     %dst.arrayidx = getelementptr inbounds i64, i64* %dst, i64 %iv 
+     store i64 %val, i64* %dst.arrayidx
+     br label %for.inc
+
+   for.inc:
+     %inc = add nuw nsw i64 %iv, 1
+     %cond = icmp eq i64 %inc, %n
+     br i1 %cond, label %exit, label %loop
+
+   exit:
+     ret void
 
 
 In this example, forming the full pre/main/post loop structure of IRCE is overkill.  Instead, we could simply restrict the loop bounds in the following manner:
 
 .. code::
 
-loop.ph:
-  ;; Warning: psuedo code, might have edge conditions wrong
-  %c = icmp sgt %iv, %n
-  %min = umax(%n, %a)
-  br i1 %c, label %exit, label %loop.ph
+   loop.ph:
+     ;; Warning: psuedo code, might have edge conditions wrong
+     %c = icmp sgt %iv, %n
+     %min = umax(%n, %a)
+     br i1 %c, label %exit, label %loop.ph
 
-loop.ph.split:
-  br label %loop
+   loop.ph.split:
+     br label %loop
 
-loop:
-  %iv = phi i64 [ %inc, %loop ], [ 1, %loop.ph ]
-  %src.arrayidx = getelementptr inbounds i64, i64* %src, i64 %iv 
-  %val = load i64, i64* %src.arrayidx
-  %dst.arrayidx = getelementptr inbounds i64, i64* %dst, i64 %iv 
-  store i64 %val, i64* %dst.arrayidx
-  %inc = add nuw nsw i64 %iv, 1
-  %cond = icmp eq i64 %inc, %min
-  br i1 %cond, label %exit, label %loop
+   loop:
+     %iv = phi i64 [ %inc, %loop ], [ 1, %loop.ph ]
+     %src.arrayidx = getelementptr inbounds i64, i64* %src, i64 %iv 
+     %val = load i64, i64* %src.arrayidx
+     %dst.arrayidx = getelementptr inbounds i64, i64* %dst, i64 %iv 
+     store i64 %val, i64* %dst.arrayidx
+     %inc = add nuw nsw i64 %iv, 1
+     %cond = icmp eq i64 %inc, %min
+     br i1 %cond, label %exit, label %loop
 
-exit:
-  ret void
-}
+   exit:
+     ret void
 
 I'm not quite sure what to call this transform, but it's not IRCE.  If this example is actually general enough to cover your use cases, it's going to be a lot easier to judge profitability on than the general form of iteration set splitting.  
 
@@ -76,26 +86,25 @@ Another way to frame this special case might be to recognize the conditional blo
 
 .. code::
 
-loop.ph:
-  br label %loop
+   loop.ph:
+     br label %loop
 
-loop:
-  %iv = phi i64 [ %inc, %for.inc ], [ 1, %loop.ph ]
-  %cmp = icmp sge i64 %iv, %a
-  br i1 %cmp, label %exit, label %for.inc
+   loop:
+     %iv = phi i64 [ %inc, %for.inc ], [ 1, %loop.ph ]
+     %cmp = icmp sge i64 %iv, %a
+     br i1 %cmp, label %exit, label %for.inc
 
-for.inc:
-  %src.arrayidx = getelementptr inbounds i64, i64* %src, i64 %iv 
-  %val = load i64, i64* %src.arrayidx
-  %dst.arrayidx = getelementptr inbounds i64, i64* %dst, i64 %iv 
-  store i64 %val, i64* %dst.arrayidx
-  %inc = add nuw nsw i64 %iv, 1
-  %cond = icmp eq i64 %inc, %n
-  br i1 %cond, label %exit, label %loop
+   for.inc:
+     %src.arrayidx = getelementptr inbounds i64, i64* %src, i64 %iv 
+     %val = load i64, i64* %src.arrayidx
+     %dst.arrayidx = getelementptr inbounds i64, i64* %dst, i64 %iv 
+     store i64 %val, i64* %dst.arrayidx
+     %inc = add nuw nsw i64 %iv, 1
+     %cond = icmp eq i64 %inc, %n
+     br i1 %cond, label %exit, label %loop
 
-exit:
-  ret void
-}
-
+   exit:
+     ret void
+   
 
 Once that's done, the multiple exit vectorization work should vectorize this loop. Thinking about it, I really like this variant.  
