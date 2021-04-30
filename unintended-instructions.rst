@@ -112,8 +112,10 @@ It's tempting to make this the compilers (specifically register allocation) resp
 
 Another approach would be to reserve a free register (i.e. guarantee scavenging could succeed), but that sounds pretty expensive performance wise.  Maybe we have the register allocator treat potentially problematic instructions as if they clobbered an extra register?  This would force a free register with at least much more localized damage.  It would require breaking the compiler/assembler abstraction a bit though.
 
-Displacement Handling
-+++++++++++++++++++++
+Branch Displacement Handling
+++++++++++++++++++++++++++++
+
+Relative displacements are a common important case since many of our unintended instructions happen to encode small integer constants, and short branches are quite common.
 
 As noted in the papers, we can insert nops to perturb displacement bytes which happen to encode unintended instructions.  Given little endian encoding, we can adjust the final byte by adding a single nop either before or after the containing intended instruction.  (If matching a set of adjacent encodings, we might need more than one.)
 
@@ -123,6 +125,16 @@ The other bytes are trickier.  Adjusting the other bytes with padding quickly ge
 * If we can scavenge a register, we can use an LEA to form a portion of the address, and then use a smaller offset on the instruction.
 
 Note that none of the three techniques mentioned can *always* produce a small rewrite.  The closest is the padding trick mentioned, but personally having to insert 10s of MBs of nop padding doesn't feel like a robust solution to me.
+
+Immediate Handling
+++++++++++++++++++
+
+For immediates, our main options are:
+
+* Use the post-align-and-check trick if the immediate forms a suffix of the containing instruction.
+* Scavenge a register, and use the register form of the instruction.  Immediate can be materialized into the register in as many steps as needed to avoid encoding an unintended instruction in the byte stream.
+* For commutative operations, we can split a single instruction into two each which performs part of the operation.  (e.g. ``or eax, -0x10fef100`` can become the sequence ``or eax, -0x10000000; or eax, -0x00fef100``)
+
 
 Alignment Sleds
 ===============
