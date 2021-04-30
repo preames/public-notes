@@ -148,7 +148,7 @@ Given the intended instruction ``rolb %bl`` which encodes as ``d0 c3``, we have 
 Post Alignment and Check
 ++++++++++++++++++++++++
 
-This is essentially the inverse of the pre-alignment sled idea.  Rather than placing an alignment sled *before* a targeted instruction, we place it *after* the last containing intended instruction, and then follow the sled with an instruction specific check sequence.
+This is essentially the inverse of the pre-alignment sled idea.  Rather than placing an alignment sled *before* a targeted instruction, we place it *after* the containing intended instruction, and then follow the sled with an instruction specific check sequence.
 
 Note that this requires the targeted unintended instruction to a) fallthrough (instead of transferring control), and b) have a side effect which can be deterministically detected.  It also requires the disassembly and inspection of the misaligned stream for the same conditions.  It would be problematic for a unintended instruction to be followed by an unintended branch before the alignment sled.
 
@@ -156,8 +156,17 @@ The length of the alignment sled can be reduced in many cases as we only need to
 
 As an example, consider the instruction ``or eax, 0x29ae0ffa`` which encodes as ``0dfa0fae29``.  The suffix of this encoding is ``0fae29`` which is ``xrstor [rcx]``.  If we're looking to use PKEY for sanboxing purposes, we can simply insert a check sequence to confirm the expected value is still in the pkru register at this point.
 
-I haven't seen this approach used previously in the literature.  
+I haven't seen this approach used previously in the literature.
 
+Pre Setup/Post Checking
++++++++++++++++++++++++
 
+A variant of the post align and check technique which can accelerate the check sequence is to scavenge a register whose value is consumed by the unintended instruction, pin it to a known value in the intended stream, and then check that value afterwards.  The idea is that the unintended instruction must fall down into that check, and if the value matches the expected value, we can reason about the path taken. Let me given a concrete example in terms of ``wrpkru`` to make this easier to follow.
+
+Our intended instruction will be ``or eax, -0x10fef006`` which encodes ``wrpkru`` as it's suffix.  If we can scavenge either ECX or EDX, we can set them to a non-zero value.  ``wrkpru`` will fault if either register is anything other than zero.  After the intended instruction, we can check to see if our scavenged register is non-zero.  If it is, we know we'd only reached the check through the intended instruction stream.
+
+Another way to achieve the same for ``wrpkru`` would be to write all ones to ``eax`` before the intended instruction.  If we reach the post-check with the value still in ``eax``, we know that either a) the intended path was followed, or b) the unintend path disabled access to all pkey regions.  (This doesn't work for our example because ``eax`` is not free.)
+
+As you'll notice, the reasoning here is highly specific to particular unintended instruction being targetted for mitigation.
 
 
