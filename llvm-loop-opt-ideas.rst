@@ -15,6 +15,30 @@ See also `my proposal <https://lists.llvm.org/pipermail/llvm-dev/2019-September/
 
 Note that when I talk about multiple exits, I am generally only talking about the case where each exit dominates the latch block of the loop.  The case where an exit is conditional and doesn't dominate the latch is much rarer and harder to easily handle.
 
+Uniform Lanes
+-------------
+
+When unrolling (or vectorizing), it's not uncommon to encounter expressions which are uniform (unchanging) across 2 or more contigous iterations of the loop.  This computation does not need to be repeated, and can thus discount costing in the unroll cost model to allow us to unroll larger loops than would otherwise be profitable.
+
+Canonical examples:
+
+.. code::
+
+   for (int i = 0; i < N; i++) {
+     // uniform across 8 iterations at a time
+     a = i / 8;
+     
+     // If unrolled by 8, consists of a fixed base (per unrolled iteration) 
+     // plus a loop invariant term
+     b = i % 8.
+     
+     // xor recurrences repeat between two values (and thus alternating lanes are uniform)
+     // (Beyond unrolling, peeling by two also is profitable for this case since
+     //  the terms of the recurrence become entirely invariant in the loop.)
+     c = c ^ 0xFF
+   }
+
+I'd started work in this (https://reviews.llvm.org/D91481, https://reviews.llvm.org/D91451), but am largely no longer work on this if anyone wants to pick it up.  
 
 Internal Control Flow 
 ---------------------
