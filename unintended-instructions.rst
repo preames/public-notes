@@ -99,7 +99,7 @@ This is by far the most complicated case.  I'll refer readers interested in the 
 Completeness
 ++++++++++++
 
-I find it difficult to convince myself of the completeness of either papers rewriting rules.  They seem to be heavily dependent on a complete taxonomy of the x86 decode rules, and prior experience makes me very hesitant about that.  As a particular example, neither paper seems to consider the case where a prefix byte forms part of an unintended instruction.  Particularly for VEX or EVEX, this seems to be a questionable assumption which would need substaintial justification.
+I find it difficult to convince myself of the completeness of either papers rewriting rules.  They seem to be heavily dependent on a complete taxonomy of the x86 decode rules, and prior experience makes me very hesitant about that.  As a particular example, neither paper seems to consider the case where a prefix byte forms part of an unintended instruction.  Particularly for VEX or EVEX, this seems to be a questionable assumption which would need justification.
 
 Register Scavenging
 +++++++++++++++++++
@@ -129,21 +129,21 @@ Alignment Sleds
 
 An alignment sled is a string of bytes which cause all possibly disassembly streams to align to a single stream.  A trivial instance of such a sequence is a single byte nop repeated 15 times.  The G-Free paper claims that a 9 byte sequence is sufficient, and smaller sequences are likely possible in manner specific cases (but not in general).
 
-There are two forms of alignment sleds distinguished by their placement before or after the targetted unintended instruction.  Each has restrictions on when it can be legally used.
+There are two forms of alignment sleds distinguished by their placement before or after the containing intended instruction.  (We'll assume here that an unintended instruction crossing multiple intended instructions has already been handled, so for this discussion we'll assume exactly one containing intended instruction.)  Each has restrictions on when it can be legally used.
 
 Pre Align Sled
 ++++++++++++++
 
-The idea behind an pre-align sled is a bit subtle.  Such a sled is placed *before* the intended instruction which contains the start of the unintended instruction of interest.  Note that the unintended instruction itself is not removed.  Instead, the alignment ensures that any misaligned sequence starting *before* the intended instruction containing the unintended start can't reach said instruction.  It does not prevent the attacked from branching directly to the start of the unintended instruction or to any byte between the start of the containing intended instruction and the start of the targeted unintended instruction.
+The idea behind an pre-align sled is a bit subtle.  Such a sled is placed *before* the containing instruction.  Note that the unintended instruction itself is not removed.  Instead, the alignment ensures that any misaligned sequence starting *before* the container intended instruction can't reach said instruction.  It does not prevent the attacker from branching directly to the start of the unintended instruction or to any byte between the start of the containing intended instruction and the start of the targeted unintended instruction.
 
-As a result, an pre alignment sled is only useful when a) the targeted unintended instruction has no side effects other than redirecting control flow, and b) the disassembly of all sequences starting with offsets after the beginning of the containing intended instruction which contains the targeted instruction are innocuous.  (i.e. do not form an interesting gadget)
+As a result, an pre alignment sled is only useful when a) the targeted unintended instruction has no side effects other than redirecting control flow, and b) the disassembly of all sequences starting with offsets after the beginning of the containing intended instruction are innocuous.  (i.e. do not form an interesting gadget)
 
 The idea of pre alignment sleds was introduced (to me) in the G-Free paper.
 
 Post Alignment and Check
 ++++++++++++++++++++++++
 
-This is essentially the inverse of the pre-alignment sled idea.  Rather than placing an alignment sled *before* a targeted instruction, we place it *after* the last intended instruction which contains a suffix of the targeted unintended one, and then follow the sled with an instruction specific check sequence.
+This is essentially the inverse of the pre-alignment sled idea.  Rather than placing an alignment sled *before* a targeted instruction, we place it *after* the last containing intended instruction, and then follow the sled with an instruction specific check sequence.
 
 Note that this requires the targeted unintended instruction to a) fallthrough (instead of transferring control), and b) have a side effect which can be deterministically detected.  It also requires the disassembly and inspection of the misaligned stream for the same conditions.  It would be problematic for a unintended instruction to be followed by an unintended branch before the alignment sled.
 
