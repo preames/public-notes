@@ -134,11 +134,16 @@ There are two forms of alignment sleds distinguished by their placement before o
 Pre Align Sled
 ++++++++++++++
 
-The idea behind an pre-align sled is a bit subtle.  Such a sled is placed *before* the containing instruction.  Note that the unintended instruction itself is not removed.  Instead, the alignment ensures that any misaligned sequence starting *before* the container intended instruction can't reach said instruction.  It does not prevent the attacker from branching directly to the start of the unintended instruction or to any byte between the start of the containing intended instruction and the start of the targeted unintended instruction.
+The idea behind an pre-align sled is a bit subtle.  The goal of a pre-align sled is to eliminate gadgets ending with the unintented instruction, not the removal of the unintended instruction itself.
 
-As a result, an pre alignment sled is only useful when a) the targeted unintended instruction has no side effects other than redirecting control flow, and b) the disassembly of all sequences starting with offsets after the beginning of the containing intended instruction are innocuous.  (i.e. do not form an interesting gadget)
+Such a sled is placed *before* the containing instruction.  Note that the unintended instruction itself is not removed.  Instead, the alignment ensures that any misaligned sequence starting *before* the container intended instruction can't reach said instruction.  It does not prevent the attacker from branching directly to the start of the unintended instruction or to any byte between the start of the containing intended instruction and the start of the targeted unintended instruction.  
 
-The idea of pre alignment sleds was introduced (to me) in the G-Free paper.
+As a result, an pre alignment sled is only useful when a) the targeted unintended instruction can be allowed to execute (but not suffix a gadget), and b) the disassembly of all sequences starting with offsets after the beginning of the containing intended instruction are innocuous.  (i.e. do not form an interesting gadget)
+
+The idea of pre alignment sleds was introduced (to me) in the G-Free paper.  I'll steal their example for illustration.
+
+Given the intended instruction ``rolb %bl`` which encodes as ``d0 c3``, we have an unintended ret instruction in the second byte.  We can place an alignment sled before this (``90...90`` or ``nop;...;nop;``).  In this case, we have eliminated any gadget which exists before the unintended return, but we have *not* eliminated the actual return.
+
 
 Post Alignment and Check
 ++++++++++++++++++++++++
@@ -148,6 +153,8 @@ This is essentially the inverse of the pre-alignment sled idea.  Rather than pla
 Note that this requires the targeted unintended instruction to a) fallthrough (instead of transferring control), and b) have a side effect which can be deterministically detected.  It also requires the disassembly and inspection of the misaligned stream for the same conditions.  It would be problematic for a unintended instruction to be followed by an unintended branch before the alignment sled.
 
 The length of the alignment sled can be reduced in many cases as we only need to unify the instruction stream containing the targeted unintended instruction and the intended instruction stream.  A particularly interesting special case is when the unintended instruction makes up a suffix of the intended one.  Such cases can commonly arise when unintended instructions are embedded in immediates or relative displacements.
+
+As an example, consider the instruction ``or eax, 0x29ae0ffa`` which encodes as ``0dfa0fae29``.  The suffix of this encoding is ``0fae29`` which is ``xrstor [rcx]``.  If we're looking to use PKEY for sanboxing purposes, we can simply insert a check sequence to confirm the expected value is still in the pkru register at this point.
 
 I haven't seen this approach used previously in the literature.  
 
