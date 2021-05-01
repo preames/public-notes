@@ -100,7 +100,9 @@ This is by far the most complicated case.  I'll refer readers interested in the 
 Completeness
 ++++++++++++
 
-I find it difficult to convince myself of the completeness of either papers rewriting rules.  They seem to be heavily dependent on a complete taxonomy of the x86 decode rules, and prior experience makes me very hesitant about that.  As a particular example, neither paper seems to consider the case where a prefix byte forms part of an unintended instruction.  Particularly for VEX or EVEX, this seems to be a questionable assumption which would need justification.
+I find it difficult to convince myself of the completeness of either papers rewriting rules.  They seem to be heavily dependent on a complete taxonomy of the x86 decode rules, and prior experience makes me very hesitant about that.  It is far to easy to think you have full coverage while actually missing important cases.
+
+As a particular example, neither Erim or G-Free seems to consider the case where a prefix byte forms part of an unintended instruction.  From prior experience with x86, this seemed questionable.  A targetted fuzzer quickly found the example instruction ``vpalignr $239, (%rcx), %xmm0, %xmm8`` which encodes as ``c463790f01ef`` and thus embeds a ``wrpkru`` instruction in its suffix.  This example uses a three-byte VEX prefix to change the interpretation of the opcode field.
 
 Register Scavenging
 +++++++++++++++++++
@@ -134,7 +136,7 @@ For immediates, our main options are:
 
 * Use the post-align-and-check trick if the immediate forms a suffix of the containing instruction.
 * Scavenge a register, and use the register form of the instruction.  Immediate can be materialized into the register in as many steps as needed to avoid encoding an unintended instruction in the byte stream.
-* For commutative operations, we can split a single instruction into two each which performs part of the operation.  (e.g. ``or eax, -0x10fef100`` can become the sequence ``or eax, -0x10000000; or eax, -0x00fef100``)
+* For associative operations, we can split a single instruction into two each which performs part of the operation.  (e.g. ``or eax, -0x10fef100`` can become the sequence ``or eax, -0x10000000; or eax, -0x00fef100``)
 
 
 Alignment Sleds
