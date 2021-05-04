@@ -185,6 +185,86 @@ Another way to achieve the same for ``wrpkru`` would be to write all ones to ``e
 As you'll notice, the reasoning here is highly specific to particular unintended instruction being targetted for mitigation.
 
 
+What would ideal hardware look like?
+--------------------------------------------------
+
+This section is a wish list.  If anyone at Intel or AMD happens to be reading, this is for you.  :)
+
+If hardware/software co-design were practical in this space, I'd 
+focus on enabling a NaCL like design.  I personally think the "aligned 
+bundle of instructions" model is by far the most robust.  The challenge 
+we have to address is the overhead of return checking.  With that in 
+mind, my ideal hardware would be one of the following:
+
+* A processor flag which caused the least significant N bits in a 
+branch, call, or return destination to be ignored.  The processor could 
+round to any fixed bit pattern (the obvious one is zero) for those 
+bits.  This would allow near zero cost instruction bundling for reliable
+ decode, and might also have other applications.  It would let you e.g. 
+encode some metadata into the least significant bits of a function 
+pointer.  Ideally, N would be runtime configurable, but I'd also be 
+happy with any fixed value between 4 and 6.  (e.g. bundle sizes of 16 to
+ 64 bytes).  Having this for all of branch, call, and return would be 
+ideal, but the return is the critical one.  If needed, a new return 
+instruction variant which ignored the bottom bits would be acceptable.  
+Since this is wish list territory, I'll mention that a full word width 
+"ignored branch bits" mask would be awesome for other purposes; it would
+ e.g. allow encoding information into the high bits of function pointers
+ in addition to the use described here.
+* Alternatively, providing an instruction spelling which allows the 
+address to be checked between the pop from the stack and the branch of a
+ return would work.  The goal is to enable return prediction while allowing a separate 
+instruction sequence to be used to check the return address before 
+actually branching to it.  I can see several obvious ways to spell this; there may be others.  
+
+  * First, we could have an instruction which pops a value from the 
+stack with an explicit hint to the processor that that value is about to
+ be branched to.  This could be followed by a custom check sequence and 
+then a normal indirect branch.  
+  * An alternate spelling of the last idea which would achieve the 
+same effect would be a return instruction variant which accepted an 
+target address (in register) to return to.  The key point is that the 
+address branched to is expected, but not required, to the be the same as
+ pushed by the call instruction (in a nested manner.)  The return sequence would become ``pop; check_sequence; retindirect %rax;``
+  * Another alternative would be to provide a "memory lock before 
+return" instruction.  Single threaded code is easy to check by simply 
+testing the value on the stack before a normal return sequence.  This 
+isn't possible in multi threaded code due to race conditions.  This new 
+instruction - which is similar in spirit to transaction memory or a 
+linked load/store conditional - would "lock" the memory value read until
+ the next return instruction.  It could be specified to either a) ignore
+ concurrent writes, or b) fault on concurrent writes - either would be 
+fine.
+
+* Another possible approach would be to add a variant of ENDBR (the 
+newly introduced branch terminator instruction from Intel CET) with an 
+alignment restriction.  Such a ALIGNED_ENDBR would behave exactly like 
+an ENDBR if the start (or end) of the instruction was aligned to a 32 
+byte boundary, but be guaranteed to generate a fault if not aligned.  
+Such an instruction would greatly simplify unintended instruction 
+elimination as any unintended ALIGNED_ENDBR could be eliminated solely 
+by padding between intended instructions.  
+* If we're fixing CET, another wish list item would be to have a 
+variant of ENDBR for return termination.  That is, instead of requiring 
+the use of the separate hardware managed return stack, treat a return 
+exactly like an indirect branch and require a branch terminator 
+instruction.  (So, every call sequence would become ``callq foo; 
+endret;``.  Hardware return stacks are useful, but the fact the two 
+parts of CET can't be used independently greatly complicates 
+deployment.  An ENDRET could be used on any call within a single 
+library, providing limited protection while supporting deployment 
+independence.  (As with the ENDBR variant just discussed, the RETBR 
+variant could have an alignment restriction.)
+
+My personal preference would be the first variant; it seems simplest 
+and (given what little I know about hardware) easiest to implement 
+cheaply.  Any of these would be useful, and I suspect several could be 
+repurposed for other uses as well.  These could combine in interesting 
+ways as well.  For instance, if we had both an indirect return and the 
+"return ignores low bits" flag, we could optimize checked return 
+sequences for functions returning small integers.  
+
+
 Appendex: The Mentioned Papers
 ------------------------------
 
