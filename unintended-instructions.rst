@@ -80,7 +80,7 @@ For the reachability based approaches, we'll briefly discuss two options.
 
 The main challenge with NaCL is the performance overhead of return protection.  A return combines three operations: a load of return address from the stack, an adjustment of the stack pointer, and an indirect branch.  The problem for efficient instrumentation is that in a concurrent environment, we need to instrument after the load, but before the branch.  This can't be done.  Instead, we have to use an alternate instruction sequence.  The primary effect of doing so is that return prediction is effectively disabled.  I don't have firm numbers, but my impression is that the actual bundling is comparatively inexpensive.
 
-Intel's upcoming Control Flow Enforcement Technology (CET) technology is highly relevant in this discussion.  CET contains two key pieces: a branch terminator instruction and a separate hardware managed return stack.  CET is certainly an interesting step forward, but it isn't a full solution.  ENDBR64 (the new branch terminator instruction) can itself occur in unintended instructions!  As a result, while CET does reduce the number of available gadgets greatly, it does not eliminate them entirely.  We'd still need some mechanism of handling uintended ENDBRs to be a complete sandboxing solution.
+Intel's upcoming Control Flow Enforcement Technology (CET) technology is highly relevant in this discussion.  CET contains two key pieces: a branch terminator instruction and a separate hardware managed return stack.  CET is certainly an interesting step forward, but it isn't a full solution.  ENDBR64 (the new branch terminator instruction) can itself occur in unintended instructions!  As a result, while CET does reduce the number of available gadgets greatly, it does not eliminate them entirely.  We'd still need some mechanism of handling unintended ENDBRs to be a complete sandboxing solution.  
 
 Rewrite Techniques
 ------------------
@@ -184,6 +184,18 @@ Another way to achieve the same for ``wrpkru`` would be to write all ones to ``e
 
 As you'll notice, the reasoning here is highly specific to particular unintended instruction being targetted for mitigation.
 
+A deeper look at Intel CET
+--------------------------
+
+(This section is in the process of being written.)
+
+Intel CET consists of two parts: a hardware managed shadow stack for call return addresses, and a branch terminator instruction for indirect calls and branchs.  The later is called "Indirect Branch Tracking" (IBT), but as far as I can find, can not be separately enabled.  If that's true, that major limits the value of CET.  Why?  Because shadow stacks are much harder to deploy that IBT is.  
+
+Does anyone actual have a link to a formal specification for CET or IBT?  I can find various blog posts and discussion, but all the links to specifications appear to be dead, and the ENDBR instruction is not yet documented in the most recent ISA document I can find.  
+
+As mentioned above, IBT is not a complete solution.  Unintended ENDBR instructions can still appear in the binary.  Interestingly, there `appears to be work going on <https://reviews.llvm.org/D88194>`_ in upstream LLVM to reduce the frequency of said unintended ENDBR instructions already.  (Start with that patch for the context, but see the submitted change - linked in the last comment - for the actual implementation.)
+
+I don't currently know how common unintended ENDBRs in naturally occuring binaries.  That's definitely something to check into.  From a defense in depth perspective, it would also be interesting to know how many unintended no-track prefixed calls exist in the wild.  This would only be relevant once an initial comprimise had occured, but could have interesting implications for exploit difficulty.  
 
 What would ideal hardware look like?
 --------------------------------------------------
@@ -200,7 +212,7 @@ If hardware/software co-design were practical in this space, I'd focus on enabli
   * Another alternative would be to provide a "memory lock before return" instruction.  Single threaded code is easy to check by simply testing the value on the stack before a normal return sequence.  This isn't possible in multi threaded code due to race conditions.  This new instruction - which is similar in spirit to transaction memory or a linked load/store conditional - would "lock" the memory value read until the next return instruction.  It could be specified to either a) ignore concurrent writes, or b) fault on concurrent writes - either would be fine.
 
 * Another possible approach would be to add a variant of ENDBR (the newly introduced branch terminator instruction from Intel CET) with an alignment restriction.  Such a ALIGNED_ENDBR would behave exactly like an ENDBR if the start (or end) of the instruction was aligned to a 32 byte boundary, but be guaranteed to generate a fault if not aligned.  Such an instruction would greatly simplify unintended instruction elimination as any unintended ALIGNED_ENDBR could be eliminated solely by padding between intended instructions.  
-* If we're fixing CET, another wish list item would be to have a variant of ENDBR for return termination.  That is, instead of requiring the use of the separate hardware managed return stack, treat a return exactly like an indirect branch and require a branch terminator instruction.  (So, every call sequence would become ``callq foo; endret;``.  Hardware return stacks are useful, but the fact the two parts of CET can't be used independently greatly complicates deployment.  An ENDRET could be used on any call within a single library, providing limited protection while supporting deployment independence.  (As with the ENDBR variant just discussed, the RETBR variant could have an alignment restriction.)
+* If we're fixing CET, another wish list item would be to have a variant of ENDBR for return termination.  That is, instead of requiring the use of the separate hardware managed return stack, treat a return exactly like an indirect branch and require a branch terminator instruction.  (So, every call sequence would become ``callq foo; endret``.) An ENDRET could be used on any call within a single library, providing limited protection while supporting deployment independence.  (As with the ENDBR variant just discussed, the RETBR variant could have an alignment restriction.)
 
 My personal preference would be the first variant; it seems simplest and (given what little I know about hardware) easiest to implement cheaply.  Any of these would be useful, and I suspect several could be repurposed for other uses as well.  These could combine in interesting ways as well.  For instance, if we had both an indirect return and the "return ignores low bits" flag, we could optimize checked return sequences for functions returning small integers.  
 
