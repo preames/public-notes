@@ -187,13 +187,15 @@ As you'll notice, the reasoning here is highly specific to particular unintended
 A deeper look at Intel CET
 --------------------------
 
-(This section is in the process of being written.)
-
 Intel CET consists of two parts: a hardware managed shadow stack for call return addresses, and a branch terminator instruction for indirect calls and branchs.  The later is called "Indirect Branch Tracking" (IBT), but as far as I can find, can not be separately enabled.  If that's true, that major limits the value of CET.  Why?  Because shadow stacks are much harder to deploy that IBT is.  
 
 Does anyone actual have a link to a formal specification for CET or IBT?  I can find various blog posts and discussion, but all the links to specifications appear to be dead, and the ENDBR instruction is not yet documented in the most recent ISA document I can find.  
 
 As mentioned above, IBT is not a complete solution.  Unintended ENDBR instructions can still appear in the binary.  Interestingly, there `appears to be work going on <https://reviews.llvm.org/D88194>`_ in upstream LLVM to reduce the frequency of said unintended ENDBR instructions already.  (Start with that patch for the context, but see the submitted change - linked in the last comment - for the actual implementation.)
+
+Some quick targetted fuzzing shows that within a single containing instruction the immediate case appears to be the easiest to find.  The second and third most frequent appear to be displacements ``vmaskmovpd ymm7, ymm11, [rdx - 0x5e1f00d]`` and field overlap with only some of the problematic bytes in the immediate field (e.g. ``xor ebx, -0x6505e1f1`` which encodes as ``81f30f1efa9a``).
+
+In terms of instruction boundary cases, there are (at least) two instructions which encode out of a suffix of endbr.  Examples include: ``bdf3f30f1e`` (``mov ebp, 0x1e0ff3f3; cli``) and ``1cf30f1efa`` (``sbb al, -0xd; nop edx``).  These appear fairly easy to create and thus likely common.
 
 I don't currently know how common unintended ENDBRs in naturally occuring binaries.  That's definitely something to check into.  From a defense in depth perspective, it would also be interesting to know how many unintended no-track prefixed calls exist in the wild.  This would only be relevant once an initial comprimise had occured, but could have interesting implications for exploit difficulty.  
 
