@@ -13,7 +13,7 @@ The Unintended Instruction Problem
 
 X86 and X86-64 use a variable length instruction encoding.  There are some instructions which take just a byte, with others that can consume up to 15 bytes (the architectural limit).  This results in a situation where a valid instruction can start at any byte in the instruction stream.  The hardware does not enforce any alignment restrictions on branch targets, and thus each byte is potentially the target of some jump.
 
-When describing X86 assembly, it is common to give a single instruction listing.  However, since decoding can start at any offset, there's effectively 15 parallel instruction streams possible through any particular offset in a string of executable bytes - one intended one, and 14 unintended misaligned streams.  Many times these parallel streams will be pure garbage, but unfortunately, not always.  It is entirely possible to have valid instructions occur in the misaligned streams.  These are termed "unintended instructions".
+When describing X86 assembly, it is common to give a single instruction listing.  However, since decoding can start at any offset, there's effectively 15 parallel instruction streams possible through a string of executable bytes - one intended one, and 14 unintended misaligned streams.  Many times these parallel streams will be pure garbage, but unfortunately, not always.  It is entirely possible to have valid instructions occur in the misaligned streams.  These are termed "unintended instructions".
 
 Consider as an example, the byte sequence represented by the hex string "89 50 04 d0 c3".  The following listing shows how this decodes with offset = 0, and offset = 1.  Note that both are valid (but quite different) instruction sequences.  For this particular example, those are the only interesting offsets as all others produce a sub-sequence of one of the two listed.  In general, we might have to look at 15 different offsets to see all possible instruction sequences from the same byte string.
 
@@ -32,9 +32,10 @@ It is worth noting that since encodings are variable length, many unintended ins
 One last bit of complexity comes up with the interpretation of bytes in the (misaligned) stream which don't decode to any known instruction.  Unfortunately, the key part of that statement is the word "known".  Unfortunately, it's been well established in the literature that just because a byte sequence isn't *documented* as having meaning does not mean it will not have *effects*.  It turns out that real processor behavior can and does differ from the documentation.  For instance:
 
 * Various generations of Intel processors differ in their handling of redundant or duplicate prefix bytes on instructions.  As a result, without knowing the exact processor executing the byte stream, it's impossible to accurately decode such a case.  For this particular case, thankfully all known behaviors either ignore the redundant prefixes or generate an illegal instruction fault.
-* On certain VIA processors the byte sequence "0f3f" happens to transfer control to a highly privileged co-processor despite not being a documented valid instruction.  While this is an extreme example, it's not unreasonable to expect processors to have unexpected behavior when executing garbage bytes.  This has in fact been reasonable well documented (e.g. sandshifter)
+* On certain VIA processors the byte sequence ``0f3f`` will transfer control to a highly privileged co-processor despite not being a documented valid instruction.
+* While the last case is an extreme example, it's not unreasonable to expect processors to have unexpected behavior when executing garbage bytes.  This has in fact been reasonable well documented (e.g. sandsifter)
 
-As a result, depending on our threat model, we may need to take great care when handling garbage bytes appearing in a misaligned stream.  At a minimum, an appropriate paranoid engineer is advised *not* to assume that executing garbage bytes will deterministic fault. Allowing for fallthrough is probably enough, but in principle there's nothing preventing those unknown effects from including control flow or other arbitrary processor side effects. In practice, all of the work I can find ignores this issue - which is probably fine in practice, but leaves at least a conceptual hole to be aware of.
+As a result, depending on our threat model, we may need to take great care when handling garbage bytes appearing in a misaligned stream.  At a minimum, an appropriate paranoid engineer is advised *not* to assume that executing garbage bytes will deterministic fault. Allowing for fallthrough is probably enough, but in principle there's nothing preventing those unknown effects from including control flow or other arbitrary processor side effects.
 
 Applications
 ------------
@@ -48,10 +49,10 @@ Sandboxing
   In the realm of lightweight (i.e. user mode) sandboxing techniques, it's common to need to disallow particular instructions from occuring inside the sandboxed code.  Examples of opcodes which might be disallowed include: syscalls, user mode interrupts, pkey manipulation, segment state manipulation, or setting the direction flag.  We'll return to this application later in more depth.
 
 Exploit Mitigation (e.g. defense in depth measures)
-  For return oriented programming (ROP) style attacks, unintended instructions are frequently used to form "gadgets" which are in turned chained together into desired execution by the attacker.  One way to mitigate the damage of such attacks is to reduce the number of available gadgets.  I list this separately from sanboxing to emphasize that mitigation may take the form of a simple *reduction* in the number of available gadgets as opposed to an outright elimination thereof.  Beyond ret instructions, mitigation are often interested in reducing the number of, and maybe whitelisting occurrences of many of the same instruction families as come up when sandboxing.  (For the same reasons!)
+  For return oriented programming (ROP) style attacks, unintended instructions are frequently used to form "gadgets" which are in turned chained together into desired execution by the attacker.  One way to mitigate the damage of such attacks is to reduce the number of available gadgets.  I list this separately from sanboxing to emphasize that mitigation may take the form of a simple *reduction* in the number of available gadgets as opposed to an outright elimination thereof.  Beyond ret instructions, mitigation are often interested in reducing the number of, and maybe whitelisting occurrences of, many of the same instruction families as come up when sandboxing.  (For the same reasons!)
 
 Performance Optimization
-  A particular form of sandboxing which is worth highlighting is to use sandboxing to optimize the execution of untrusted code.  The key difference with other sandboxing techniques is that a fallback safe execution mechanism is assumed to exist, but that mechanism implies overhead which can be avoided in the common case.  Examples might include optimized JNI dispatch for a JVM, a trap-and-step system (see below), or a user provided optimized binaries for a query engine.  The key difference in this use case is that failing to fully sandbox a piece of code is an acceptable (if not ideal) result as the slow path can always be taken.
+  A particular form of sandboxing which is worth highlighting is to use sandboxing to optimize the execution of untrusted code.  The key difference with other sandboxing techniques is that a fallback safe execution mechanism is assumed to exist, but that mechanism implies overhead which can be avoided in the common case.  Examples might include optimized JNI dispatch for a JVM, a trap-and-step system (see below), or user provided optimized binaries for a query engine.  The key difference in this use case is that failing to fully sandbox a piece of code is an acceptable (if not ideal) result as the slow path can always be taken.
   
 I do want to highlight that the lines between these categories are somewhat blurry and subject to interpretation.  Is a system which attempts to sandbox user code but fails to account for the undocumented instruction issue (described above) or the spectre family of side channel attacks a sandbox or a mitigation?  I don't see much value in answering that question.  This writeup focuses on the commonalities between them, not the distinctions.  I view them more as a spectrum from weakest mitigation to strongest.  It is important to acknowledge that our perception of strength changes as new issues are discovered.  
 
@@ -61,7 +62,7 @@ Approaches
 There are three major family of approaches I'm aware of: trap-and-check, avoiding generation, and controlling reachability.  Let's go through each in turn.
 
 Trap-and-check
-  Works by identifying at load time all problematic byte sequences (whether intended or misaligned), and then using some combination of breakpoint-like mechanisms to trap on execution of code around the byte sequence of interest.  Mechanisms I'm aware of involve either hardware breakpoints, page protection tricks, or single stepping in an interrupt handler.  In all, some kind of fault handler is reasonable for insuring that unintended instructions aren't executed (e.g. the program counter never points to the stard of the unintended instruction and instead steps through the expected instruction stream.).
+  Works by identifying at load time all problematic byte sequences (whether intended or unintended), and then using some combination of breakpoint-like mechanisms to trap on execution of code around the byte sequence of interest.  Mechanisms I'm aware of involve either hardware breakpoints, page protection tricks, single stepping in an interrupt handler, or dynamic binary translation.  In all, some kind of fault handler is reasonable for insuring that unintended instructions aren't executed (e.g. the program counter never points to the start of the unintended instruction and instead steps through the expected instruction stream).
   The worst case performance of such systems tends to be poor (as trapping on the hot path can be extremely expensive), but perform at native speed when unintended instructions are not in the hot path.  They also tend to be operationally simpler as they don't require toolchain changes.
 
 Controlling reachability
@@ -72,35 +73,41 @@ Avoid generating unintended instructions
   
 I've listed these in the order of *seemingly* simplest to most complicated. Unfortunately, both of the former have hard to resolve challenges, so we'll end up spending most of our time talking about the third.
 
-The challenge of the trap-and-check is that it is very hard to implement efficiently for concurrent programs with large number of unintended instructions.  Use of hardware breakpoints handles small numbers (e.g. < 4) unintended instructions well, which is enough for some use cases.  When the number of unintended instruction exceeds the number of debug registers, concurrency turns out to be a core challenge.  The critical race involves one thread unprotecting a page to allow it to make progress in single-step mode and another then accessing the same page thus bypassing the check.  You end up essentially needing to ensure that if any thread must single step through a page that all threads are either single stepping or stalled.  It is worth noting that a toolchain which avoiding emitting most (but not all) unintended instructions would pair very well with a trap-and-check fallback.
+The challenge of the trap-and-check approach is that it is very hard to implement efficiently for concurrent programs with large number of unintended instructions.  Use of hardware breakpoints handles small numbers (e.g. < 4) of unintended instructions well - which is enough for some use cases.  When the number of unintended instruction exceeds the number of debug registers, concurrency turns out to be a core challenge.  The critical race involves one thread unprotecting a page to allow it to make progress in single-step mode and another then accessing the same page thus bypassing the check.  You end up essentially needing to ensure that if any thread must single step through a page that all threads are either single stepping or stalled.  It is worth noting that a toolchain which avoiding emitting most (but not all) unintended instructions would pair very well with a trap-and-check fallback.
+
+The other major approach available is dynamic binary translation.  The complexity of building such a system is mostly out of scope for this document.  I will briefly mention that the need to intercept execution at every possible offset in a page does complicate hijacking significantly.  It can be done (e.g. by patching the source with ``int3``), but the complexity vs performance tradeoff is challenging.
 
 For the reachability based approaches, we'll briefly discuss two options.
 
-"Native client: A sandbox for portable, untrusted x86 native code" is one of most robust approaches I've seen.  NaCL prevents the execution of unintended instructions by ensuring that all branch targets are 32 byte aligned and that no instruction crosses a 32 byte boundary.  NaCL's instruction bundling support is already implemented in llvm's assembler.
+"Native client: A sandbox for portable, untrusted x86 native code" is one of most robust approaches I've seen.  NaCL prevents the execution of unintended instructions by ensuring that all branch targets are 32 byte aligned and that no instruction crosses a 32 byte boundary.  NaCL's instruction bundling support is already implemented in LLVM's assembler, and bundling has very low runtime cost.
 
-The main challenge with NaCL is the performance overhead of return protection.  A return combines three operations: a load of return address from the stack, an adjustment of the stack pointer, and an indirect branch.  The problem for efficient instrumentation is that in a concurrent environment, we need to instrument after the load, but before the branch.  This can't be done.  Instead, we have to use an alternate instruction sequence.  The primary effect of doing so is that return prediction is effectively disabled.  I don't have firm numbers, but my impression is that the actual bundling is comparatively inexpensive.
+The main challenge with NaCL is the performance overhead of return protection.  A return combines three operations: a load of the return address from the stack, an adjustment of the stack pointer, and an indirect branch.  The problem for efficient instrumentation is that in a concurrent environment, we need to instrument after the load, but before the branch.  This can't be done.  Instead, we have to use an alternate instruction sequence.  The primary effect of doing so is that return prediction is effectively disabled.  This is rather expensive - though I haven't been able to locate good numbers on exactly how much so.
 
-Intel's upcoming Control Flow Enforcement Technology (CET) technology is highly relevant in this discussion.  CET contains two key pieces: a branch terminator instruction and a separate hardware managed return stack.  CET is certainly an interesting step forward, but it isn't a full solution.  ENDBR64 (the new branch terminator instruction) can itself occur in unintended instructions!  As a result, while CET does reduce the number of available gadgets greatly, it does not eliminate them entirely.  We'd still need some mechanism of handling unintended ENDBRs to be a complete sandboxing solution.  
+Intel's upcoming Control Flow Enforcement Technology (CET) technology is highly relevant in this discussion.  CET contains two key pieces: a branch terminator instruction and a separate hardware managed return stack.  CET is certainly an interesting step forward, but it isn't a full solution.  ENDBR64 (the new branch terminator instruction) can itself occur in unintended instructions!  As a result, while CET does reduce the number of available gadgets greatly, it does not eliminate them entirely.  We'd still need some mechanism of handling unintended ENDBRs to be a complete sandboxing solution.
+
+Towards the end of this document, we'll discuss CET in more detail.  The TLDR turns out to be that while CET is not complete, it is a rather good starting point for building a complete enough solution in practice.
 
 Rewrite Techniques
 ------------------
 
+In this section, we're discuss some of the tactics commonly used when rewriting assembly to avoid embedding unintended instructions.  These are described in terms of the assembly semantics, but this section is implementation neutral.  These could be implemented by a compiler, assembler, runtime binary rewritter, or even by a careful human in handwritten assembly.  Having a basic understanding of x86 instruction encoding is probably required for this to make sense.
+
 Instruction Boundary
 ====================
 
-When the unintended instruction crosses the boundary between two or more intended instructions, the sequence can be broken by inserting padding bytes between the two intended instructions.  Depending on the instruction class being eliminated, redundant prefix bytes, a single byte ``nop`` instruction (``0x90``), or a semantic nop such as ``movl %eax, %eax``.  The selection of the padding is controlled by whether the bytes in the padding instruction can form a valid suffix (or prefix) with the preceding (following) bytes forming another problematic unintended instruction.  Depending on the class of problematic instruction, the selected padding sequence must differ.
+When the unintended instruction crosses the boundary between two or more intended instructions, the sequence can be broken by inserting padding bytes between the two intended instructions.  Depending on the instruction class being eliminated, redundant prefix bytes, a single byte ``nop`` instruction (``0x90``), or a semantic nop such as ``movl %eax, %eax`` can be used.  The selection of the padding is controlled by whether the bytes in the padding instruction can form a valid suffix (or prefix) with the preceding (following) bytes forming another problematic unintended instruction.  Depending on the class of problematic instruction, the selected padding sequence must differ.
 
 From a performance perspective, prefix bytes are preferred over single byte nops which are preferred over other instructions.
 
 Instruction Rewriting
 =====================
 
-This is by far the most complicated case.  I'll refer readers interested in the details to the Erim and G-Free papers, and restrict myself to some commentary here.
+This is by far the most complicated case.  I'll refer readers interested in the details to the Erim and G-Free papers, and restrict myself to some commentary here.  This gets quite far into the weeds; most readers are probably best skimming through this unless implementing such a tool.
 
 Completeness
 ++++++++++++
 
-I find it difficult to convince myself of the completeness of either papers rewriting rules.  They seem to be heavily dependent on a complete taxonomy of the x86 decode rules, and prior experience makes me very hesitant about that.  It is far to easy to think you have full coverage while actually missing important cases.
+I find it difficult to convince myself of the completeness of either papers' rewriting rules.  They seem to be heavily dependent on a complete taxonomy of the x86 decode rules, and prior experience makes me very hesitant about that.  It is far to easy to think you have full coverage while actually missing important cases.
 
 As a particular example, neither Erim or G-Free seems to consider the case where a prefix byte forms part of an unintended instruction.  From prior experience with x86, this seemed questionable.  A targetted fuzzer quickly found the example instruction ``vpalignr $239, (%rcx), %xmm0, %xmm8`` which encodes as ``c463790f01ef`` and thus embeds a ``wrpkru`` instruction in its suffix.  This example uses a three-byte VEX prefix to change the interpretation of the opcode field.
 
@@ -115,10 +122,10 @@ It's tempting to make this the compilers (specifically register allocation) resp
 
 Another approach would be to reserve a free register (i.e. guarantee scavenging could succeed), but that sounds pretty expensive performance wise.  Maybe we have the register allocator treat potentially problematic instructions as if they clobbered an extra register?  This would force a free register with at least much more localized damage.  It would require breaking the compiler/assembler abstraction a bit though.
 
-Branch Displacement Handling
-++++++++++++++++++++++++++++
+Relative Displacement Handling
+++++++++++++++++++++++++++++++
 
-Relative displacements are a common important case since many of our unintended instructions happen to encode small integer constants, and short branches are quite common.
+Relative branches are a common important case since many of our unintended instructions happen to encode small integer constants, and short branches are quite common.  The techniques here can also be used for PC relative data loads (e.g. constant pools and such).
 
 As noted in the papers, we can insert nops to perturb displacement bytes which happen to encode unintended instructions.  Given little endian encoding, we can adjust the final byte by adding a single nop either before or after the containing intended instruction.  (If matching a set of adjacent encodings, we might need more than one.)
 
@@ -138,20 +145,21 @@ For immediates, our main options are:
 * Scavenge a register, and use the register form of the instruction.  Immediate can be materialized into the register in as many steps as needed to avoid encoding an unintended instruction in the byte stream.
 * For associative operations, we can split a single instruction into two each which performs part of the operation.  (e.g. ``or eax, -0x10fef100`` can become the sequence ``or eax, -0x10000000; or eax, -0x00fef100``)
 
+Non-PC relative displacements are analogous, and can be handle similiarly.
 
 Alignment Sleds
 ===============
 
-An alignment sled is a string of bytes which cause all possibly disassembly streams to align to a single stream.  A trivial instance of such a sequence is a single byte nop repeated 15 times.  The G-Free paper claims that a 9 byte sequence is sufficient, and smaller sequences are likely possible in manner specific cases (but not in general).
+An alignment sled is a string of bytes which cause all possibly disassembly streams to align to a single stream.  A trivial instance of such a sequence is a single byte nop repeated 15 times.  The G-Free paper claims that a 9 byte sequence is sufficient, and smaller sequences are likely possible in many specific cases (but not in general).  I have not checked their claim, and would want to fuzz extensively before trusting it.
 
 There are two forms of alignment sleds distinguished by their placement before or after the containing intended instruction.  (We'll assume here that an unintended instruction crossing multiple intended instructions has already been handled, so for this discussion we'll assume exactly one containing intended instruction.)  Each has restrictions on when it can be legally used.
 
 Pre Align Sled
 ++++++++++++++
 
-The idea behind an pre-align sled is a bit subtle.  The goal of a pre-align sled is to eliminate gadgets ending with the unintented instruction, not the removal of the unintended instruction itself.
+The idea behind an pre-align sled is a bit subtle.  The goal of a pre-align sled is to eliminate gadgets ending with a particular unintented instruction, not the removal of the unintended instruction itself.
 
-Such a sled is placed *before* the containing instruction.  Note that the unintended instruction itself is not removed.  Instead, the alignment ensures that any misaligned sequence starting *before* the container intended instruction can't reach said instruction.  It does not prevent the attacker from branching directly to the start of the unintended instruction or to any byte between the start of the containing intended instruction and the start of the targeted unintended instruction.  
+Such a sled is placed *before* the containing instruction.  Note that the unintended instruction itself is not removed.  Instead, the alignment ensures that any misaligned sequence starting *before* the container instruction can't reach said unintended instruction.  It does not prevent the attacker from branching directly to the start of the unintended instruction or to any byte between the start of the containing intended instruction and the start of the targeted unintended instruction.  
 
 As a result, an pre alignment sled is only useful when a) the targeted unintended instruction can be allowed to execute (but not suffix a gadget), and b) the disassembly of all sequences starting with offsets after the beginning of the containing intended instruction are innocuous.  (i.e. do not form an interesting gadget)
 
@@ -224,7 +232,7 @@ If hardware/software co-design were practical in this space, I'd focus on enabli
 * Alternatively, providing an instruction spelling which allows the address to be checked between the pop from the stack and the branch of a return would work.  The goal is to enable return prediction while allowing a separate instruction sequence to be used to check the return address before actually branching to it.  I can see several obvious ways to spell this; there may be others.  
 
   * First, we could have an instruction which pops a value from the stack with an explicit hint to the processor that that value is about to be branched to.  This could be followed by a custom check sequence and then a normal indirect branch.  
-  * An alternate spelling of the last idea which would achieve the same effect would be a return instruction variant which accepted an target address (in register) to return to.  The key point is that the address branched to is expected, but not required, to the be the same as pushed by the call instruction (in a nested manner.)  The return sequence would become ``pop; check_sequence; retindirect %rax;``
+  * An alternate spelling of the last idea which would achieve the same effect would be a return instruction variant which accepted an target address (in register) to return to.  The key point is that the address branched to is expected to the be the same as pushed by the call instruction (in a nested manner.)  The return sequence would become ``pop; check_sequence; retindirect %rax;``.  This is very similiar to the check performed with shadow stack, but separates the shadow stack management (or other chosen check) from the semantics of the return instruction.
   * Another alternative would be to provide a "memory lock before return" instruction.  Single threaded code is easy to check by simply testing the value on the stack before a normal return sequence.  This isn't possible in multi threaded code due to race conditions.  This new instruction - which is similar in spirit to transaction memory or a linked load/store conditional - would "lock" the memory value read until the next return instruction.  It could be specified to either a) ignore concurrent writes, or b) fault on concurrent writes - either would be fine.
 
 * Another possible approach would be to add a variant of ENDBR (the newly introduced branch terminator instruction from Intel CET) with an alignment restriction.  Such a ALIGNED_ENDBR would behave exactly like an ENDBR if the start (or end) of the instruction was aligned to a 32 byte boundary, but be guaranteed to generate a fault if not aligned.  Such an instruction would greatly simplify unintended instruction elimination as any unintended ALIGNED_ENDBR could be eliminated solely by padding between intended instructions.  
