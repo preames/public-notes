@@ -131,14 +131,15 @@ Relative Displacement Handling
 
 Relative branches are a common important case since many of our unintended instructions happen to encode small integer constants, and short branches are quite common.  The techniques here can also be used for PC relative data loads (e.g. constant pools and such).
 
-As noted in the papers, we can insert nops to perturb displacement bytes which happen to encode unintended instructions.  Given little endian encoding, we can adjust the final byte by adding a single nop either before or after the containing intended instruction.  (If matching a set of adjacent encodings, we might need more than one.)
+As noted in the papers, we can insert nops to perturb displacement bytes which happen to encode unintended instructions.  Given little endian encoding, we can adjust the first byte by adding a single nop either before or after the containing intended instruction.  (If matching a set of adjacent encodings, we might need more than one.)
 
-The other bytes are trickier.  Adjusting the other bytes with padding quickly gets really expensive code wise.  We have two main techniques open to us:
+The other bytes are trickier.  Adjusting the other bytes with padding quickly gets really expensive code wise.  We have three main techniques open to us:
 
 * If the unintended instruction ends at the end of the intended instruction's displacement field, and we can legally use a post-align and check pattern, we can simply add a post-check.  (This overlaps with the nop case above, and is most useful when there are either other bytes which also need changed, or multiple problematic encodings for the last byte.)
 * If we can scavenge a register, we can use an LEA to form a portion of the address, and then use a smaller offset on the instruction.
+* We can replace the instruction with a branch to a trampoline which then branches back to the actual target (for a branch), or performs the original instruction and then branches to the next instruction (for other pc relative addresses).  The new relative displacements are unlikely to still encode a problematic instruction.  In a compiler or assembler, this is a straightforward approach.  For a binary rewriting tool, see the note on instruction hijacking below.
 
-Note that none of the three techniques mentioned can *always* produce a small rewrite.  The closest is the padding trick mentioned, but personally having to insert 10s of MBs of nop padding doesn't feel like a robust solution to me.
+Note that none of the three techniques mentioned can *always* produce a small rewrite.  The closest is the trampoline approach, but that fails when either a) we can't find a place to put a trampoline, or b) all trampoline locations still encode an problematic unintended instruction.  Put them together, and we can probably consider this a solved sub-problem though.
 
 Immediate Handling
 ++++++++++++++++++
