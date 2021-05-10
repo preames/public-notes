@@ -27,13 +27,13 @@ Consider as an example, the byte sequence represented by the hex string "89 50 0
   0x00000001: 04d0          : add al, -0x30
   0x00000003: c3            : ret
 
-It is worth noting that since encodings are variable length, many unintended instruction sequences tend to eventually align to a boundary in the intended stream.  In practice, since X86 has many valid one byte instructions and one byte prefix bytes which are often not semantic, it is not uncommon to find a sequence of misaligned bytes which decode validly and yet end at a boundary in the original intended stream.  This results in a case where only the prefix of a sequence need be misaligned, and thus greatly increases the ease with which an attacker can exercise interesting control flow after executing their unintended instruction of interest.  (This was observed in a different context by `Debray 2003 (Section 3.1) <https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.302.2610&rep=rep1&type=pdf>`_.)
+It is worth noting that since encodings are variable length, many unintended instruction sequences tend to eventually align to a boundary in the intended stream.  In practice, since X86 has many valid one byte instructions and one byte prefix bytes which are often not semantic, it is not uncommon to find a sequence of misaligned bytes which decode validly and yet end at a boundary in the original intended stream.  This results in a case where only the prefix of a sequence need be misaligned, and thus greatly increases the ease with which an attacker can exercise interesting control flow after executing their unintended instruction of interest.  (This was observed in a different context by `"Obfuscation of Executable Code to Improve Resistance toStatic Disassembly" (Section 3.1) <https://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.302.2610&rep=rep1&type=pdf>`_.)
 
 One last bit of complexity comes up with the interpretation of bytes in the (misaligned) stream which don't decode to any known instruction.  Unfortunately, the key part of that statement is the word "known".  Unfortunately, it's been well established in the literature that just because a byte sequence isn't *documented* as having meaning does not mean it will not have *effects*.  It turns out that real processor behavior can and does differ from the documentation.  For instance:
 
 * Various generations of Intel processors differ in their handling of redundant or duplicate prefix bytes on instructions.  As a result, without knowing the exact processor executing the byte stream, it's impossible to accurately decode such a case.  For this particular case, thankfully all known behaviors either ignore the redundant prefixes or generate an illegal instruction fault.
 * On certain VIA processors the byte sequence ``0f3f`` will `transfer control to a highly privileged co-processor <https://i.blackhat.com/us-18/Thu-August-9/us-18-Domas-God-Mode-Unlocked-Hardware-Backdoors-In-x86-CPUs-wp.pdf>`_ despite not being a documented valid instruction.
-* While the last case is an extreme example, it's not unreasonable to expect processors to have unexpected behavior when executing garbage bytes.  Processors are full of undocument instructions, as has been well documented by tools like `sandsifter <https://github.com/xoreaxeaxeax/sandsifter>`_.  Another discomforting result from sandsifter is that AMD and Intel occasionally implement different semantics for the same instruction (e.g. size prefix on near call).  As a result, it is *impossible* to decode some instructions correctly without knowing which CPU the code is running on.
+* While the last case is an extreme example, it's not unreasonable to expect processors to have unexpected behavior when executing garbage bytes.  Processors are full of undocumented instructions, as has been well documented by tools like `sandsifter <https://github.com/xoreaxeaxeax/sandsifter>`_.  Another discomforting result from sandsifter is that AMD and Intel occasionally implement different semantics for the same instruction (e.g. size prefix on near call).  Another case worth noting is that as the ISA is extended, previously "garbage" bytes suddenly have meaning (e.g. AVX512 used encoding space which was previously empty).  As a result, it is *impossible* to decode some instructions correctly without knowing which CPU the code is running on.  
 
 As a result, depending on our threat model, we may need to take great care when handling garbage bytes appearing in a misaligned stream.  At a minimum, an appropriate paranoid engineer is advised *not* to assume that executing garbage bytes will deterministic fault. Allowing for fallthrough is probably enough, but in principle there's nothing preventing those unknown effects from including control flow or other arbitrary processor side effects.
 
@@ -46,7 +46,7 @@ Reliable Disassembly
   For reverse engineering, debugging, and exploit analysis it is common to need to disassemble binaries.  For this use case, awareness of the existance of unintended instructions is the primary goal.  To my knowledge, there are no tools which do a good job of presenting the parallel execution streams.  Instead, the typical flow requires the human to iterate through attempting disassembly at different offsets.
 
 Sandboxing
-  In the realm of lightweight (i.e. user mode) sandboxing techniques, it's common to need to disallow particular instructions from occuring inside the sandboxed code.  Examples of opcodes which might be disallowed include: syscalls, user mode interrupts, pkey manipulation, segment state manipulation, or setting the direction flag.  We'll return to this application later in more depth.
+  In the realm of lightweight (i.e. user mode) sandboxing techniques, it's common to need to disallow particular instructions from occuring inside the sandboxed code.  Examples of opcodes which might be disallowed include: syscalls, vmcalls, user mode interrupts, pkey manipulation, segment state manipulation, or setting the direction flag.  We'll return to this application later in more depth.
 
 Exploit Mitigation (e.g. defense in depth measures)
   For return oriented programming (ROP) style attacks, unintended instructions are frequently used to form "gadgets" which are in turned chained together into desired execution by the attacker.  One way to mitigate the damage of such attacks is to reduce the number of available gadgets.  I list this separately from sanboxing to emphasize that mitigation may take the form of a simple *reduction* in the number of available gadgets as opposed to an outright elimination thereof.  Beyond ret instructions, mitigations are often interested in reducing the number of, and maybe whitelisting occurrences of, many of the same instruction families as come up when sandboxing.  (For the same reasons!)
@@ -59,7 +59,7 @@ I do want to highlight that the lines between these categories are somewhat blur
 Approaches
 ----------
 
-There are three major family of approaches I'm aware of: trap-and-check, avoiding generation, and controlling reachability.  Let's go through each in turn.
+There are three major families of approaches I'm aware of: trap-and-check, avoiding generation, and controlling reachability.  Let's go through each in turn.
 
 Trap-and-check
   Works by identifying at load time all problematic byte sequences (whether intended or unintended), and then using some combination of breakpoint-like mechanisms to trap on execution of code around the byte sequence of interest.  Mechanisms I'm aware of involve either hardware breakpoints, page protection tricks, single stepping in an interrupt handler, or dynamic binary translation.  In all, some kind of fault handler is reasonable for insuring that unintended instructions aren't executed (e.g. the program counter never points to the start of the unintended instruction and instead steps through the expected instruction stream).
@@ -102,25 +102,29 @@ From a performance perspective, prefix bytes are preferred over single byte nops
 Instruction Rewriting
 =====================
 
-This is by far the most complicated case.  I'll refer readers interested in the details to the Erim and G-Free papers, and restrict myself to some commentary here.  This gets quite far into the weeds; most readers are probably best skimming through this unless implementing such a tool.
+This is by far the most complicated case.  I'll refer readers interested in the details to the Erim and G-Free papers, and restrict myself to some commentary here.  This gets quite far into the weeds; most readers are probably best off skimming through this unless implementing such a tool.
 
 Completeness
 ++++++++++++
 
 I find it difficult to convince myself of the completeness of either papers' rewriting rules.  They seem to be heavily dependent on a complete taxonomy of the x86 decode rules, and prior experience makes me very hesitant about that.  It is far to easy to think you have full coverage while actually missing important cases.
 
-As a particular example, neither Erim or G-Free seems to consider the case where a prefix byte forms part of an unintended instruction.  From prior experience with x86, this seemed questionable.  A targetted fuzzer quickly found the example instruction ``vpalignr $239, (%rcx), %xmm0, %xmm8`` which encodes as ``c463790f01ef`` and thus embeds a ``wrpkru`` instruction in its suffix.  This example uses a three-byte VEX prefix to change the interpretation of the opcode field.
+As a particular example, neither Erim or G-Free seems to consider the case where a prefix byte forms part of an unintended instruction.  From prior experience with x86, this seemed questionable.  A targeted fuzzer quickly found the example instruction ``vpalignr $239, (%rcx), %xmm0, %xmm8`` which encodes as ``c463790f01ef`` and thus embeds a ``wrpkru`` instruction in its suffix.  This example uses a three-byte VEX prefix to change the interpretation of the opcode field.
 
 Register Scavenging
 +++++++++++++++++++
 
 Each of the techniques mentioned sometimes need to reassign registers.  This is extremely hard to do in general as there may not be a register available for scavenging.  Both of the techniques which describe this use a post-compiler rewriting pass and fall back to stack spilling (which is ABI breaking!) in the worst case.
 
+  Aside: Why is spilling ABI breaking?  If a binary rewriting tool inserts a push/pop pair to free up a register, and does not adjust all of the metadata associated with a function (e.g. ``.ehframe``, ``.stacksize``, ``.dbg.*`` sections) various bits of runtime machinery (e.g. profilers, garbage collectors, exception unwinding) may be confused.  Whether this is technically an ABI issue or not I'll leave as an exercise to the reader; I consider it problematic regardless. 
+
 One point I don't see either paper make is that we can often scavenge a register by being willing to rematerialize a computation.  As an example, if the frame size is a constant but the code is preserving the frame pointer, RBP can be reliably scavenged and rematerialized after the local rewrite.  (Assuming the frame size doesn't itself form a problematic immediate at least.)
+
+Another idea brought up in offline discussion was to scavenge a general register by moving the contents into a free vector register (XMM, YMM, or ZMM).  This would work, but is still register scavenging to find the free vector register plus some new register manipulation code.  It will probably fail less in practice, but doesn't close the conceptual hole.
 
 It's tempting to make this the compilers (specifically register allocation) responsibility, but since it requires knowledge of the encodings it would require breaking the compiler vs assembly abstraction.  We might be able to trick the compiler by adjusting instruction costing, but it's not clear this would behave well in the existing register allocation infrastructure.
 
-Another approach would be to reserve a free register (i.e. guarantee scavenging could succeed), but that sounds pretty expensive performance wise.  Maybe we have the register allocator treat potentially problematic instructions as if they clobbered an extra register?  This would force a free register with at least much more localized damage.  It would require breaking the compiler/assembler abstraction a bit though.
+Another approach would be to reserve a free register (i.e. guarantee scavenging could succeed), but that sounds pretty expensive performance wise.  Maybe you could keep one vector register free instead?  Maybe we have the register allocator treat potentially problematic instructions as if they clobbered an extra register?  This would force a free register with at least much more localized damage.  It would require breaking the compiler/assembler abstraction a bit though.
 
 Relative Displacement Handling
 ++++++++++++++++++++++++++++++
@@ -146,6 +150,15 @@ For immediates, our main options are:
 * For associative operations, we can split a single instruction into two each which performs part of the operation.  (e.g. ``or eax, -0x10fef100`` can become the sequence ``or eax, -0x10000000; or eax, -0x00fef100``)
 
 Non-PC relative displacements are analogous, and can be handle similiarly.
+
+Binary Rewriting
+++++++++++++++++
+
+The topic of general binary rewriting techniques is out of scope for this writeup, but I did want to make one observation, and share a cool set of techniques which were mentioned in the twitter discussion.
+
+The observation is pretty simple.  Most, though not all, of our instructions of interest are at least four bytes in length.  In particular, all of ``endbr``, ``wrpkru`` and ``xrstore`` are all four byte instructions.  Being four bytes means that the smallest enclosing intended instruction must be at least five bytes - which is the size of a ``jmpq <rel-32>`` instruction.  This means that these can always be trivially patched to use a trampoline.
+
+On the cool technique side, someone on twitter pointed me to the paper `"Binary Rewriting without Control Flow Recovery" <https://www.comp.nus.edu.sg/~abhik/pdf/PLDI20.pdf>`_ (which builds on an idea introduced in `"Instruction Punning: Lightweight Instrumentation for X86-64" <https://dl.acm.org/doi/pdf/10.1145/3140587.3062344>`_, but is readable on its own), which demonstrates how to use existing bytes in the instruction stream to encode trampoline redirects.  This might be useful if you're trying to do binary rewriting for instructions such as ``ret`` or ``iret`` which are smaller than the size of a jump.  I was quite surprised by how much coverage they were able to get in practice.  This is a useful trick to know about when you'd otherwise have to fallback to using ``int3`` patching.
 
 Alignment Sleds
 ===============
@@ -190,7 +203,7 @@ Our intended instruction will be ``or eax, -0x10fef006`` which encodes ``wrpkru`
 
 Another way to achieve the same for ``wrpkru`` would be to write all ones to ``eax`` before the intended instruction.  If we reach the post-check with the value still in ``eax``, we know that either a) the intended path was followed, or b) the unintend path disabled access to all pkey regions.  (This doesn't work for our example because ``eax`` is not free.)
 
-As you'll notice, the reasoning here is highly specific to particular unintended instruction being targetted for mitigation.
+As you'll notice, the reasoning here is highly specific to particular unintended instruction being targeted for mitigation.
 
 A deeper look at Intel CET
 --------------------------
@@ -248,7 +261,7 @@ Appendex: The Mentioned Papers
 
 I meantion several of the papers here above by their short name (e.g. "Erim", "G-Free", "Hodor").  This section gives an overview of each and the complete citation so that you can find them if desired.
 
-"G-Free: defeating return-oriented programming through gadget-less binaries" describes a assembly rewriting scheme targetted at eliminating unintended return and call opcodes from a binary.  Their implementation was an assembly preprocessor.  This can be considered somewhat of an extreme case for instruction rewriting as their are multiple single byte return instructions, and multiple small (2-3 byte) call sequences.  This results in a focus on single instruction rewriting.
+"G-Free: defeating return-oriented programming through gadget-less binaries" describes a assembly rewriting scheme targeted at eliminating unintended return and call opcodes from a binary.  Their implementation was an assembly preprocessor.  This can be considered somewhat of an extreme case for instruction rewriting as their are multiple single byte return instructions, and multiple small (2-3 byte) call sequences.  This results in a focus on single instruction rewriting.
 
 "Erim: Secure and efficient in-process isolation with memory protection keys" describes an approach for pkey related instructions using a post assembler binary rewriting step.  Several of the ideas discussed below in terms of rewriting strategies come from this paper.
 
