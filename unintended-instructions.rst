@@ -35,7 +35,7 @@ One last bit of complexity comes up with the interpretation of bytes in the (mis
 * On certain VIA processors the byte sequence ``0f3f`` will `transfer control to a highly privileged co-processor <https://i.blackhat.com/us-18/Thu-August-9/us-18-Domas-God-Mode-Unlocked-Hardware-Backdoors-In-x86-CPUs-wp.pdf>`_ despite not being a documented valid instruction.
 * While the last case is an extreme example, it's not unreasonable to expect processors to have unexpected behavior when executing garbage bytes.  Processors are full of undocumented instructions, as has been well documented by tools like `sandsifter <https://github.com/xoreaxeaxeax/sandsifter>`_.  Another discomforting result from sandsifter is that AMD and Intel occasionally implement different semantics for the same instruction (e.g. size prefix on near call).  Another case worth noting is that as the ISA is extended, previously "garbage" bytes suddenly have meaning (e.g. AVX512 used encoding space which was previously empty).  As a result, it is *impossible* to decode some instructions correctly without knowing which CPU the code is running on.  
 
-As a result, depending on our threat model, we may need to take great care when handling garbage bytes appearing in a misaligned stream.  At a minimum, an appropriate paranoid engineer is advised *not* to assume that executing garbage bytes will deterministic fault. Allowing for fallthrough is probably enough, but in principle there's nothing preventing those unknown effects from including control flow or other arbitrary processor side effects.
+As a result, depending on our threat model, we may need to take great care when handling garbage bytes appearing in a misaligned stream.  At a minimum, an appropriate paranoid engineer is advised *not* to assume that executing garbage bytes will deterministically fault. Allowing for fallthrough is probably enough, but in principle there's nothing preventing those unknown effects from including control flow or other arbitrary processor side effects.
 
 Applications
 ------------
@@ -151,8 +151,8 @@ For immediates, our main options are:
 
 Non-PC relative displacements are analogous, and can be handle similiarly.
 
-Binary Rewriting
-++++++++++++++++
+Instruction Hijacking
++++++++++++++++++++++
 
 The topic of general binary rewriting techniques is out of scope for this writeup, but I did want to make one observation, and share a cool set of techniques which were mentioned in the twitter discussion.
 
@@ -266,3 +266,8 @@ I meantion several of the papers here above by their short name (e.g. "Erim", "G
 "Erim: Secure and efficient in-process isolation with memory protection keys" describes an approach for pkey related instructions using a post assembler binary rewriting step.  Several of the ideas discussed below in terms of rewriting strategies come from this paper.
 
 "Hodor: Intra-Process Isolation for  High-Throughput Data Plane Libraries" is another take on a pkey based sandbox; this time using trap-and-check.  Worth noting is that Intel only supports 4 hardware debug registers, so programs which execute code with more than 4 unintended pkru instructions must take a much slower path.  
+
+Credit
+------
+
+This writeup has benefited from feedback from various folks on twitter, and a bunch of offline discussion.  All remaining mistakes are, of course, my own.
