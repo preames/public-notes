@@ -267,7 +267,9 @@ I meantion several of the papers here above by their short name (e.g. "Erim", "G
 
 "Hodor: Intra-Process Isolation for  High-Throughput Data Plane Libraries" is another take on a pkey based sandbox; this time using trap-and-check.  Worth noting is that Intel only supports 4 hardware debug registers, so programs which execute code with more than 4 unintended pkru instructions must take a much slower path.  
 
-Credit
-------
+Credit & Further Discussion
+---------------------------
 
 This writeup has benefited from feedback from various folks on twitter, and a bunch of offline discussion.  All remaining mistakes are, of course, my own.
+
+If you want to discuss, or tell me I'm flat out wrong about something important, `Twitter <https://twitter.com/Philip_Reames/status/1390733209634181120>`_ is probably the easiest channel.
