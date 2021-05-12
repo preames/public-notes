@@ -20,6 +20,16 @@ Let me emphasize that LLVM is a single approval culture.  This means that once a
 
 One point which confuses a bunch of new contributors is that LLVM reviewers **expect that you have commit rights**.  Unless you **explicitly ask** someone to land your change on your behalf, reviewers will assume that you will do so after approval.  This comes from the fact that LLVM hands out commit rights much more freely than other open source projects.
 
+LGTMs w/Conditions
+------------------
+
+It's not uncommon to see phrasings such as "LGTM w/comments addressed" or "LGTM w/minor comments".  What this means is that once you've addressed the issues identified *as suggested by the reviewer*, you can consider the patch to have received an LGTM without the need for further review.
+
+This is frequently used by reviewers when the remaining issues with the patch are considered minor and straight forward.  If you as an author disagree with how any issue should be handled (e.g. a comment needs discussion), be aware that you don't have an LGTM without further discussion and an explicit re-LGTM by that reviewer (or someone else).
+
+If the difference in approach is minor, I strongly suggest taking the reviewer's suggestion, landing your patch, and then posting a follow up patch to switch to your preferred approach.  This will let all parties make progress, and avoids back and forth on already accepted reviews which has a tendancy to get lost.  
+
+
 What are "commit rights"?
 --------------------------
 
