@@ -3,9 +3,9 @@ LLVM Norms, Terminology, and Expecations
 -------------------------------------------------
 
 
-This page is a collection of things I find myself repeatedly needing to explain to new developers.  This is not official project documentation; it is my take on each issue.  Most of this is likely to agree broadly with what other long term contributors might say, but details in perspective may differ.
+This page is a collection of things I find myself repeatedly needing to explain to new developers.  This is not official project documentation; it is my take on each issue.  Most of this is likely to agree broadly with what other long term contributors might say, but details in perspective may differ.  This is a perpetual WIP - it is extended when I find myself repeating myself, and is in no way a complete guide.  
 
-Let me start by introducing myself in case you're not already familiar with my work in the project.  I am a long standing contributor to the LLVM project.  I've contributed heavily to the mid level optimizer, and to a lesser extend parts of the X86 backedge.  I was the technical lead for the Falcon JIT - an LLVM based just in time compiler for Java bytecode.  I've managed a team of LLVM contributors, and been responsible for maintaining a long live downstream distribution of LLVM.  As such, I have a fairly broad perspective on what it takes to participate in the upstream community successfully, while still shipping downstream product.
+Let me start by introducing myself in case you're not already familiar with my work in the project.  I am a long standing contributor to the LLVM project.  I've contributed heavily to the mid level optimizer, and to a lesser extend parts of the X86 backend.  I was the technical lead for the Falcon JIT - an LLVM based just in time compiler for Java bytecode.  I've managed a team of LLVM contributors, and been responsible for maintaining a long live downstream distribution of LLVM.  As such, I have a fairly broad perspective on what it takes to participate in the upstream community successfully, while still shipping downstream product.
 
 .. contents::
 
