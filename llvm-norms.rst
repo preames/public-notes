@@ -29,11 +29,25 @@ This is frequently used by reviewers when the remaining issues with the patch ar
 
 If the difference in approach is minor, I strongly suggest taking the reviewer's suggestion, landing your patch, and then posting a follow up patch to switch to your preferred approach.  This will let all parties make progress, and avoids back and forth on already accepted reviews which has a tendancy to get lost.  
 
+Another form of conditional LGTM which comes up regularly is the "LGTM, but wait for @name" or "LGTM, but wait a couple of days in case @name has further comments".  These two are interesting precisely because they are *different*, and that subtly is often lost on non-native speakers.  For the first, the reviewer is explicitly asking for a second LGTM.  As such, our general "single accept" policy does not apply, and this review is blocked on a second accept by @name.  The second is merely instructing you to wait a couple of days before landing so that @name has a chance to chime in if desired.  The former blocks commit; the latter does not.  
 
 What are "commit rights"?
 --------------------------
 
 LLVM grants commit rights much more freely than most other open source projects.  However, that's because the implied expectationss are very different.  In LLVM, having commit rights simply means that you are trusted to take the mechanical action of rebasing and landing an approved patch, and then respond promptly to post commit review.  It **does not** change any expectation around precommit review, or imply anything beyond a very basic level of trust.  
+
+Can I commit my change without review?
+--------------------------------------
+
+As a general rule, unless you have been told otherwise, no.  New contributors, in particular, should *never* commit a change without review.
+
+Beyond that initial state, we have in practice three levels of pre-commit rights.  
+
+First, you'll pretty quickly be asked by reviewers to "pre-commit this test", or "pre-commit this NFC".  That means that you can separate out a change which does that (and only that), and submit it without further review.  A key point is that this change *was reviewed* in the original review thread.  The trust being shown is minor, and mostly mechanical.
+
+Second, once you've been around for a while and have a sense of normal review flow, you'll reach the point where you have a good sense for what you'll be asked to pre-commit to reduce patch sizes during review.  Once you hit that point, checking in tests and NFCs without review (i.e. before posting the using change) is acceptable.  Reasonable judgement is expected, lean towards review.
+
+Third, established contributors will sometimes land "obvious" patches without review.  If you're new enough to the community to be reading this guide closely, this is not relevant for you (yet).  
 
 Silence means "No"
 ------------------
