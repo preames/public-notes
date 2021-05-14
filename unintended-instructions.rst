@@ -13,7 +13,9 @@ The Unintended Instruction Problem
 
 X86 and X86-64 use a variable length instruction encoding.  There are some instructions which take just a byte, with others that can consume up to 15 bytes (the architectural limit).  This results in a situation where a valid instruction can start at any byte in the instruction stream.  The hardware does not enforce any alignment restrictions on branch targets, and thus each byte is potentially the target of some jump.
 
-When describing X86 assembly, it is common to give a single instruction listing.  However, since decoding can start at any offset, there's effectively 15 parallel instruction streams possible through a string of executable bytes - one intended one, and 14 unintended misaligned streams.  Many times these parallel streams will be pure garbage, but unfortunately, not always.  It is entirely possible to have valid instructions occur in the misaligned streams.  These are termed "unintended instructions".
+When describing X86 assembly, it is common to give a single instruction listing.  However, since decoding can start at any offset, there's effectively 15 parallel instruction streams possible through a string of executable bytes - one intended one, and 14 unintended misaligned streams.  Many times these parallel streams will be pure garbage, but unfortunately, not always.  It is entirely possible to have valid instructions occur in the misaligned streams.  These are termed "unintended instructions" or "overlapping instructions".
+
+  **Aside**: In general, overlapping instruction encodings have a long history in code obfuscation, and `(extreme) size optimization <https://news.ycombinator.com/item?id=27114462>`_.  In that usage, the more general name "overlapping instructions" is probably more apt.  We'll use the "unintended" name here to emphasize that these instruction are not an intended part of the program.
 
 Consider as an example, the byte sequence represented by the hex string "89 50 04 d0 c3".  The following listing shows how this decodes with offset = 0, and offset = 1.  Note that both are valid (but quite different) instruction sequences.  For this particular example, those are the only interesting offsets as all others produce a sub-sequence of one of the two listed.  In general, we might have to look at 15 different offsets to see all possible instruction sequences from the same byte string.
 
@@ -271,6 +273,6 @@ I meantion several of the papers here above by their short name (e.g. "Erim", "G
 Credit & Further Discussion
 ---------------------------
 
-This writeup has benefited from feedback from various folks on twitter, and a bunch of offline discussion.  All remaining mistakes are, of course, my own.
+This writeup has benefited from feedback from various folks on twitter, a few comments on `hackernews <https://news.ycombinator.com/item?id=27095029>`_, and a bunch of offline discussion.  All remaining mistakes are, of course, my own.
 
 If you want to discuss, or tell me I'm flat out wrong about something important, `Twitter <https://twitter.com/Philip_Reames/status/1390733209634181120>`_ is probably the easiest channel.
