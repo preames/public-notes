@@ -168,21 +168,21 @@ An alignment sled is a string of bytes which cause all possibly disassembly stre
 
 There are two forms of alignment sleds distinguished by their placement before or after the containing intended instruction.  (We'll assume here that an unintended instruction crossing multiple intended instructions has already been handled, so for this discussion we'll assume exactly one containing intended instruction.)  Each has restrictions on when it can be legally used.
 
-Pre Align Sled
-++++++++++++++
+Pre-Alignment Sled
+++++++++++++++++++
 
-The idea behind an pre-align sled is a bit subtle.  The goal of a pre-align sled is to eliminate gadgets ending with a particular unintented instruction, not the removal of the unintended instruction itself.
+The idea behind an pre-alignment sled is a bit subtle.  The goal of a pre-align sled is to eliminate gadgets ending with a particular unintented instruction, not the removal of the unintended instruction itself.
 
 Such a sled is placed *before* the containing instruction.  Note that the unintended instruction itself is not removed.  Instead, the alignment ensures that any misaligned sequence starting *before* the container instruction can't reach said unintended instruction.  It does not prevent the attacker from branching directly to the start of the unintended instruction or to any byte between the start of the containing intended instruction and the start of the targeted unintended instruction.  
 
-As a result, an pre alignment sled is only useful when a) the targeted unintended instruction can be allowed to execute (but not suffix a gadget), and b) the disassembly of all sequences starting with offsets after the beginning of the containing intended instruction are innocuous.  (i.e. do not form an interesting gadget)
+As a result, an pre-alignment sled is only useful when a) the targeted unintended instruction can be allowed to execute (but not suffix a gadget), and b) the disassembly of all sequences starting with offsets after the beginning of the containing intended instruction are innocuous.  (i.e. do not form an interesting gadget)
 
-The idea of pre alignment sleds was introduced (to me) in the G-Free paper.  I'll steal their example for illustration.
+The idea of pre-alignment sleds was introduced (to me) in the G-Free paper.  I'll steal their example for illustration.
 
 Given the intended instruction ``rolb %bl`` which encodes as ``d0 c3``, we have an unintended ret instruction in the second byte.  We can place an alignment sled before this (``90...90`` or ``nop;...;nop;``).  In this case, we have eliminated any gadget which exists before the unintended return, but we have *not* eliminated the actual return.
 
 
-Post Alignment and Check
+Post-Alignment and Check
 ++++++++++++++++++++++++
 
 This is essentially the inverse of the pre-alignment sled idea.  Rather than placing an alignment sled *before* a targeted instruction, we place it *after* the containing intended instruction, and then follow the sled with an instruction specific check sequence.
@@ -191,14 +191,14 @@ Note that this requires the targeted unintended instruction to a) fallthrough (i
 
 The length of the alignment sled can be reduced in many cases as we only need to unify the instruction stream containing the targeted unintended instruction and the intended instruction stream.  A particularly interesting special case is when the unintended instruction makes up a suffix of the intended one.  Such cases can commonly arise when unintended instructions are embedded in immediates or relative displacements.
 
-As an example, consider the instruction ``or eax, 0x29ae0ffa`` which encodes as ``0dfa0fae29``.  The suffix of this encoding is ``0fae29`` which is ``xrstor [rcx]``.  If we're looking to use PKEY for sanboxing purposes, we can simply insert a check sequence to confirm the expected value is still in the pkru register at this point.
+As an example, consider the instruction ``or eax, 0x29ae0ffa`` which encodes as ``0dfa0fae29``.  The suffix of this encoding is ``0fae29`` which is ``xrstor [rcx]``.  If we're looking to use PKEY for sandboxing purposes, we can simply insert a check sequence to confirm the expected value is still in the pkru register at this point.
 
-I haven't seen this approach used previously in the literature.
+I haven't seen this approach used previously in the literature as a rewriting strategy, but it was pointed out me that the manually written callgates in the Erim paper (see Listing 1) use this approach.  That may very well be where I got the idea.
 
 Pre Setup/Post Checking
 +++++++++++++++++++++++
 
-A variant of the post align and check technique which can accelerate the check sequence is to scavenge a register whose value is consumed by the unintended instruction, pin it to a known value in the intended stream, and then check that value after the post-align sequence.  The idea is that the unintended instruction must fall down into that check, and if the value matches the expected value, we can reason about the path taken. Let me given a concrete example in terms of ``wrpkru`` to make this easier to follow.
+A variant of the post-align and check technique which can accelerate the check sequence is to scavenge a register whose value is consumed by the unintended instruction, pin it to a known value in the intended stream, and then check that value after the post-align sequence.  The idea is that the unintended instruction must fall down into that check, and if the value matches the expected value, we can reason about the path taken. Let me given a concrete example in terms of ``wrpkru`` to make this easier to follow.
 
 Our intended instruction will be ``or eax, -0x10fef006`` which encodes ``wrpkru`` as it's suffix.  If we can scavenge either ECX or EDX, we can set them to a non-zero value.  ``wrkpru`` will fault if either register is anything other than zero.  After the intended instruction, we can check to see if our scavenged register is non-zero.  If it is, we know we'd only reached the check through the intended instruction stream.
 
@@ -217,25 +217,31 @@ Intel CET consists of two parts: a hardware managed shadow stack for call return
 
 So let's take a look at the ease which which we can form unintended ENDBR instructions.  We'll use some targetting fuzzing to see what cases turn up, and combine that with information from the literature.
 
-For the cross boundary case, fuzzing quickly finds a couple examples of instructions which encode a suffix for a byte stream containing ENBR64.  Examples include: ``bdf3f30f1e`` (``mov ebp, 0x1e0ff3f3; cli``) and ``1cf30f1efa`` (``sbb al, -0xd; nop edx``).  Interestingly, Section 3.2 of `"Security Analysis of Processor Instruction Set Architecture for Enforcing Control-Flow Integrity" <https://cseweb.ucsd.edu/~dstefan/cse227-spring20/papers/shanbhogue:cet.pdf>`_ (an Intel written academic paper on CET) claims the only suffix instructions possible on x86_64 are ``cli``, ``sti``, and ``nop edx``.  From some targeted fuzzing run for about 48 hours, this claim appears to be plausible.  ``cli`` and ``sti`` are used to manipulate the interrupt flag and are incredibly rare in practice.  ``nop edx`` isn't one of the Intel recommended nops for performance, and is thus likely to be a) uncommon, and b) easily replaceable.
+For the cross boundary case, fuzzing quickly finds a couple examples of instructions which encode a suffix for a byte stream containing ENBR64.  Examples include: ``bdf3f30f1e`` (``mov ebp, 0x1e0ff3f3; cli``) and ``1cf30f1efa`` (``sbb al, -0xd; nop edx``).  Interestingly, Section 3.2 of `"Security Analysis of Processor Instruction Set Architecture for Enforcing Control-Flow Integrity" <https://cseweb.ucsd.edu/~dstefan/cse227-spring20/papers/shanbhogue:cet.pdf>`_ (an academic paper on CET written by Intel) claims the only suffix instructions possible on x86_64 are ``cli``, ``sti``, and ``nop edx``.  From some targeted fuzzing run for about 48 hours, this claim appears to be plausible.  ``cli`` and ``sti`` are used to manipulate the interrupt flag and are incredibly rare in practice.  ``nop edx`` isn't one of the Intel recommended nops for performance, and is thus likely to be a) uncommon, and b) easily replaceable.
 
 For the embedded case (e.g. when a single containing instruction contains the unintended ENDBR), some quick fuzzing shows the immediate case appears to be the easiest to find.  The second and third most frequent appear to be displacements (e.g. ``vmaskmovpd ymm7, ymm11, [rdx - 0x5e1f00d]``) and field overlap with only some of the problematic bytes in the immediate field (e.g. ``xor ebx, -0x6505e1f1`` which encodes as ``81f30f1efa9a``).
 
 * The full immediate case is handled by the changes `already landed in upstream LLVM <https://reviews.llvm.org/D89178>`_.
-* The partial immediate case could be handled in an analogous manner by simple materializing the constant into a register and using the reg/reg form.  This wouldn't need the not operation, but would trigger on many more constants (since one byte is free).  In a quick skim of the fuzzer output, I have not seen a two byte overlap with an immediate, but I also haven't looked overly carefully just yet.  I also haven't yet looked closely to see if there's a patern to the fields being used to form the initial bytes of the ENDBR.
+* The partial immediate case could be handled in an analogous manner by simple materializing the constant into a register and using the reg/reg form.  This wouldn't need the not operation, but would trigger on many more constants (since one byte is free).  In a quick skim of the fuzzer output, I have not seen a two byte overlap with an immediate, but I also haven't looked overly carefully just yet.  I also haven't yet looked closely to see if there's a pattern to the fields being used to form the initial bytes of the ENDBR.
 * For displacements in addressing, we could unfold the addressing mode.  As long as we did this before register allocation, register scavenging would not be a concern.  We have the same concerns about partial overlap as for immediates.
 * For relative branches and calls, we'd need to teach the assembler how to pad.  Given ENDBR is a four byte instruction with a single fixed encoding, we should always be able to pad with a single byte.
 * All of the above ignores problematic embeddings introduced by linker, and loader.  This may need explored further.
 
 At least from this angle, the problem of unintended ENDBRs appears a lot more tractable than I'd initially suspected.  The bytes chosen appear to make the binary rewriting more-or-less straight forward.  It would also be valuable to survey a corpus of real binaries for naturally occurring ENDBRs.  This would give us a much better since of frequency of occurrence for each sub-case.
   
-From a defense in depth perspective, it would also be interesting to know how many unintended no-track prefixed calls exist in the wild.  This would only be relevant once an initial compromise had occurred, but could have interesting implications for exploit difficulty.
+From a defense in depth perspective, it would also be interesting to know how many unintended no-track prefixed calls exist in the wild.  This would only be relevant once an initial control flow hijacking had occurred, but could have interesting implications for exploit difficulty.
 
 **Linker and Loader** Presumably someone is working on preventing unintended ENDBRs being introduced during linking or dynamic loading.  I have not yet explored this, but do see signs that the deployment story has been considered.
 
 **Deploying IBT** It's worth noting that a course grained CFI version can be constructed solely with IBT.  If each return instruction is replaced an indirect branch, and each call is followed by an ENDBR, we can use IBT alone to do both forward and backward edge CFI.  The catch is that this breaks the return prediction and is likely to negatively impact performance.  I mention this mostly because I expect Shadow Stacks to be slow to be fully deployed, and it seems useful to know there is an immediate state which is usable while waiting for Shadow Stacks to become widely available.
 
 **Hardware Availability** CET was first announced in 2016, but hardware was quite delayed.  CET is supported by Intel's Tigerlake architecture which started shipping in Jan 2021.  I have been told that AMD's mobile 5000 parts include CET, but I can't find anything which spells out their broader support plans.
+
+This `source <https://www.techrepublic.com/article/windows-10-security-how-the-shadow-stack-will-help-to-keep-the-hackers-at-bay/>`_ says:
+
+   "Intel confirmed to us that CET will be included in Tiger Lake CPUs this year, and in the next generation of Xeon for servers. AMD didn't give a date, but told us it will have the equivalent of CET soon."
+
+The "next generation of Xeon for servers" is probably Ice Lake SP - which `has been announced <https://www.anandtech.com/show/16594/intel-3rd-gen-xeon-scalable-review>`_ and should launch immanently.
 
 What would ideal hardware look like?
 --------------------------------------------------
