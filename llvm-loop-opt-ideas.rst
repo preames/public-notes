@@ -153,6 +153,41 @@ Today, there are three major options - with each used somewhere in the code.
 What if?
 ++++++++
 
+So, what might we do here?
+
+The basic idea is that we explicitly allow SCEVs to be non-canonical.  For the purpose of this discussion, let's focus on the flag use case.  There are potentially others for non-canonical SCEVs, but we'll ignore that for now.  Then, we support the ability to a) refine existing SCEVs, and b) revisit the instructions associated with dependent SCEVs and produce new more-canonical SCEVs.
+
+Let me expand on that last bit because it's subtle in an important way.
+
+SCEV internally maintains a map from `Value*` to `SCEV*` (i.e. the `ValueExprMap` structure).  Today, ever existing SCEV has a potentially many to one mapping from `Value*` to `SCEV*`.  We would extend that to a many-to-many relation with potentially _multiple_ SCEV nodes corresponding to each Value.  The first in that list would be the best currently known, and all others would be stale values (potentially used by some client until explicitly forgotten).
+
+Given this, we'd then have the option to handle a new wrap flag with the following procedure:
+
+.. code::
+
+  Mutate the SCEV whose fact we inferred.
+  for each Value* mapper to said SCEV {
+    add users to worklist
+  }
+  while worklist not empty {
+    if no existing SCEV for Value *V, ignore
+    reconstruct SCEV for Value *V
+      (note that at least one operand of the expression must have
+      either changed or been mutated)
+    if changed
+      add to mapping
+      add users of V to worklist
+  }
+
+The key detail here is that we're walking the user list of the Value, not of the SCEV.  The SCEV still doesn't have an explicit use list.  We're also not deleting old SCEV nodes.
+
+Current thinking
+++++++++++++++++
+
+After writing this up, I'm left with the impression this was a lot cleaner than I'd first expected.  I'd sat down to write this up as one of those crazy ideas for someday; I'm now wondering if someday should be now.
+
+    
+
 
 
 
