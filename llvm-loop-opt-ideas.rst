@@ -147,7 +147,7 @@ SCEV's handling of no-wrap flags (no-self-wrap, no-signed-wrap, and no-unsigned-
 Today, there are three major options - with each used somewhere in the code.
 
 * Move inference to construction time.  This has historical been the best option, but recent issues with compile time is really calling this into question.  In particular, it's hard to justify when we don't know whether the resulting fact will ever be useful for the caller.
-* Update the SCEV node in place, and then "forget" all dependent SCEVs.  This requires collaboriation with SCEV's user, and can only be done externally.
+* Update the SCEV node in place, and then "forget" all dependent SCEVs.  This requires collaboriation with SCEV's user, and can only be done externally.  It also requires all dependent SCEV's to rebuild from scratch which has been a compile time issue in recent patches.
 * Update the SCEV node in place, and then leave dependent SCEVs in an inprecise state.  (That is, if we recreated the same expression, we'd end up with a more canonicalized result.)  This results in potentially missed optimizations, and implementation complexity to work around the inprecision in a few spots.
 
 What if?
