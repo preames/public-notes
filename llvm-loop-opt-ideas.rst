@@ -181,6 +181,17 @@ Given this, we'd then have the option to handle a new wrap flag with the followi
 
 The key detail here is that we're walking the user list of the Value, not of the SCEV.  The SCEV still doesn't have an explicit use list.  We're also not deleting old SCEV nodes.
 
+If we want the invariant that getSCEV(V) always returns the most canonical form, then we need to apply the above algorithm eagerly on change.  If we're okay giving that up, then we can do this specifically on demand only, but that complicates the SCEV interface.  I'd start with the former until we're forced into the later.
+
+Risks
++++++
+
+SCEV* Keyed Maps
+  If there are maps keyed by SCEV* in client code, and the client expects map[getSCEV(V)] to return an expected result, the change of invariant might break client code.  I am not currently aware of such a structure, but also haven't auditted for it.
+
+Update time
+  The need to walk use lists may be expensive.  The existing forget interface gives an idea, but we might be able to accelerate this using a "pending update" lazy mechanism.  Haven't fully explored that.
+
 Current thinking
 ++++++++++++++++
 
