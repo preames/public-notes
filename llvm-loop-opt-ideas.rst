@@ -132,3 +132,30 @@ Another way to frame this special case might be to recognize the conditional blo
    
 
 Once that's done, the multiple exit vectorization work should vectorize this loop. Thinking about it, I really like this variant.  
+
+
+Should SCEV be an optimizeable IR?
+----------------------------------
+
+Background
+++++++++++
+
+SCEV canonicalizes at construction.  That is, if two SCEV's compute equivalent results, the goal is to have them evaluate to the same SCEV object.  Given two SCEVs, it's is safe to say that if S1 == S2 that the expressions are equal.  Note that it is not safe to infer the expressions are different if S1 != S2 as canonicalization is best effort, not guaranteed.
+
+SCEV's handling of no-wrap flags (no-self-wrap, no-signed-wrap, and no-unsigned-wrap) is complicated.  The key relevant detail is that wrap flags are sometimes computed *after* SCEV for the underlying expressions have been generated.  As such, there can be cases where SCEV (or a user of the SCEV analysis) learns a fact about the SCEV which could have led to a more canonical result if known at construction.  The basic question is what to do about that.
+
+Today, there are three major options - with each used somewhere in the code.
+
+* Move inference to construction time.  This has historical been the best option, but recent issues with compile time is really calling this into question.  In particular, it's hard to justify when we don't know whether the resulting fact will ever be useful for the caller.
+* Update the SCEV node in place, and then "forget" all dependent SCEVs.  This requires collaboriation with SCEV's user, and can only be done externally.
+* Update the SCEV node in place, and then leave dependent SCEVs in an inprecise state.  (That is, if we recreated the same expression, we'd end up with a more canonicalized result.)  This results in potentially missed optimizations, and implementation complexity to work around the inprecision in a few spots.
+
+What if?
+++++++++
+
+
+
+
+
+
+
