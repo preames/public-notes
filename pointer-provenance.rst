@@ -2,7 +2,7 @@
 Pointer Provenance in LLVM
 -------------------------------------------------
 
-**THIS IS AN IN PROGRESS DOCUMENT.  It hasn't yet been "published".**
+**THIS IS AN IN PROGRESS DOCUMENT.  It hasn't yet been "published".  At the moment, this is KNOWN to not work.**
 
 This write up is an attempt for me to wrap my head around the recent byte type discussion on llvm-dev.
 
@@ -60,9 +60,28 @@ There's a key implication of the second bullet.  Provenance is propogated throug
 
 This implies there are some corner cases we have to consider around "incorrectly" typed loads, and overlapping memory accesses.  At the moment, I don't see a reason why we can simply define the providance of any pointer load which doesn't exactly match a previous pointer store as being ``any``.  We do need to allow refining transformations which expose providance information (e.g. converting a integer store to a pointer one if the value being stored is a cast pointer), but I don't see that as being particular problematic.
 
+Let me try stating that again, this time a bit more formally.
 
+We're going to define a dynamic (e.g. execution or small step operational) semantics for pointer providance.  Every byte of a value will be mapped to some memory object or one of two special marker value ``poison`` or ``undef``.  Note that this is *every* value, not just *pointer values*.   
 
+Allocations define a new symbolic memory object.  GetElementPtrs generally propogate their base pointer's provinance to their result, but see the rule below for mismatched providence.
 
+Storing a pointer to memory conceptually creates an entry in a parallel memory which maps those bytes to the corresponding memory object.  Every time memory is stored over, that map is updated.  Additionally, the side memory remembers the bounds of the last store which touches each byte in memory.
 
+Loading a pointer reads the last written providance associated with the address.  If the bytes read were last written by two different stores, the resulting providance is ``poison``.
+
+Casting a pointer to an integer does *not* strip providance.  As a result, round tripping a pointer through an integer to pointer cast and back is a nop.  This is critical to keep the correspondance with the memory semantics.
+
+Integer constants are considered to have the providance of the memory object which happens to be at that address at runtime, or the special value ``undef`` if there is not such memory object.  
+
+Any operation (gep, or integer math) which consumes operands of two distinct providances returns a result with the providance``poison`` with the caveat that an ``undef`` providance can take on the value of any memory object chosen by the optimizer.  (This is analogous to ``undef`` semantics on concrete values, just extended to the providance type.)  Note that the result is *not* the ``poison`` value, it as a value with ``poison`` providance.  
+
+Memory operations with a memory operand with ``poison`` providence are undefined.  Comparison instructions with a pointer operand with ``poison`` providance return the value ``poison``. 
+
+Now, let's extend that to a static semantic.  The key thing we have to add is the marker value ``any`` as a possible providance.  ``any`` means simply that we don't (yet) know what the providance as, and must be conservative in our treatment.
+
+As is normal, the optimizer is free to implement refining transformations which make the program less undefined.  As a result, memory forwarding, CSE, etc.. all remain legal.
+
+**BUG**: CSE of two integer values with difference providance seems to not work.
 
 
