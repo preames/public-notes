@@ -4,7 +4,7 @@ Pointer Provenance in LLVM
 
 **THIS IS AN IN PROGRESS DOCUMENT.  It hasn't yet been "published".  At the moment, this is KNOWN to not work.**
 
-This write up is an attempt for me to wrap my head around the recent byte type discussion on llvm-dev.
+This write up is an attempt for me to wrap my head around the recent byte type discussion on llvm-dev.  This was me attempting to really wrap my head around `nhaehnie's blog post <https://nhaehnle.blogspot.com/2021/06/can-memcpy-be-implemented-in-llvm-ir.html>`_.  After working through the problem myself, I stumbled across the same CSE issue he mentions.  I haven't yet wrapped my head around why the CSE problem is restricted to integer types, but maybe I'd get there with time.  I'm out of time for the moment.
 
 .. contents::
 
