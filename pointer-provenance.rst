@@ -42,7 +42,27 @@ This comes up in the context of alias analysis because it's possible to have two
 
 Aside: If the runtime allows multi-mapping of memory pages, it's also possible to have two pointers which are inequal, but must alias.  This isn't well modeled today in LLVM, and is definitely out of scope for this discussion.
 
+Memory Objects
+--------------
+
+The LLVM memory model consists of indivially memory allocations which are (conceptually) infinitely far apart in memory.  In an actual execution environment, allocations might be near each other.  To reconcile this, it's important to note that comparing or subtracting two pointers from different allocations results in an undefined (i.e. ``poison``) result.  
+
 So what?
 ---------
+
+My understanding of the current pointer providence rules is the following:
+
+* A pointer is (conceptually) derived from some particular memory object.
+* We may or may not actually be able to determine which object that is.  Essentially this means there is an ``any`` state possible for pointer provenance.  
+* The optimizer is free to infer providance where it can.  BasicAA for instance, is essentially a complicated providance inference engine.
+
+There's a key implication of the second bullet.  Provenance is propogated through memory for pointer values.  We may not be able to determine it statically (or dynamically), but conceptually it exists.
+
+This implies there are some corner cases we have to consider around "incorrectly" typed loads, and overlapping memory accesses.  At the moment, I don't see a reason why we can simply define the providance of any pointer load which doesn't exactly match a previous pointer store as being ``any``.  We do need to allow refining transformations which expose providance information (e.g. converting a integer store to a pointer one if the value being stored is a cast pointer), but I don't see that as being particular problematic.
+
+
+
+
+
 
 
