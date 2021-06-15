@@ -2,7 +2,7 @@
 Pointer Provenance in LLVM
 -------------------------------------------------
 
-** THIS IS AN IN PROGRESS DOCUMENT.  It hasn't yet been "published". **
+**THIS IS AN IN PROGRESS DOCUMENT.  It hasn't yet been "published".**
 
 This write up is an attempt for me to wrap my head around the recent byte type discussion on llvm-dev.
 
@@ -34,7 +34,7 @@ The key detail which is relevant here is that pointer *values* can be legally co
 
 This comes up in the context of alias analysis because it's possible to have two pointers which are equal, but don't alias.  The classic example would be:
 
-... code::
+.. code::
 
   %v1 = malloc(8)
   %v2 = realloc(%v1, 8)
