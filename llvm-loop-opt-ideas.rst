@@ -16,7 +16,7 @@ See also `my proposal <https://lists.llvm.org/pipermail/llvm-dev/2019-September/
 Note that when I talk about multiple exits, I am generally only talking about the case where each exit dominates the latch block of the loop.  The case where an exit is conditional and doesn't dominate the latch is much rarer and harder to easily handle.
 
 Runtime Unrolling
-==================
++++++++++++++++++
 
 `D107381 <https://reviews.llvm.org/D107381>`_ takes the first steps towards supporting a more general form of multiple exit loops.  The following is a collection of notes/tasks I thought of when drafting it.
 
