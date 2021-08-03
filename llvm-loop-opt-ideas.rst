@@ -15,6 +15,16 @@ See also `my proposal <https://lists.llvm.org/pipermail/llvm-dev/2019-September/
 
 Note that when I talk about multiple exits, I am generally only talking about the case where each exit dominates the latch block of the loop.  The case where an exit is conditional and doesn't dominate the latch is much rarer and harder to easily handle.
 
+Runtime Unrolling
+==================
+
+`D107381 <https://reviews.llvm.org/D107381>`_ takes the first steps towards supporting a more general form of multiple exit loops.  The following is a collection of notes/tasks I thought of when drafting it.
+
+* Prolog support.  The above only handle epilogue case.  Not sure how much work if any needed here, mostly audit and test.
+* Should we prefer epilogue?  By using "required scalar epilogue" trick, we can eliminate *all* analyzeable exits from the main loop.  We can't do this in the prolog case.
+* Cost modeling is unclear, but maybe we should discount exits eliminateable with the above "required scalar epilogue" trick?
+* Interestingly, the code in runtime unrolling implements a generic iteration set splitting transform combined with heuristics to pick the split point.  Probably worth pulling that out for reuse and (frankly) simplify testing.  Time to write a simple iteration set splitting pass?  
+
 Uniform Lanes
 -------------
 
