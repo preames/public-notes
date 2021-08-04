@@ -230,9 +230,11 @@ Another approach to the above is to use additional predication as opposed to the
        ivec += PageSize - ivec % PageSize;
    }
 
-That code is very confusing, so let me try to explain what we're doing here.  We've added an addition predicate for the load to mask off any lanes past the end of the current page.  Then we advance the vector loop either by VF if we're not near a page, or to the start of the next page if we were.  The result here is a vector loop which naturally aligns to the page boundary on the first one it encounters.
+That code is very confusing, so let me try to explain what we're doing here.  We've added an addition predicate for the load to mask off any lanes past the end of the current page.  Then we advance the vector loop either by VF if we're not near a page boundary, or to the start of the next page if we were.  The result here is a vector loop which naturally aligns to the page boundary on the first one it encounters.
 
 This form reduces code complexity and code size, at the cost of additional predication.  It does nothing about the fraction of time spent running full vector widths as the number of accesses increase though.
+
+One LLVM specific note on this approach.  LLVM's dereferenceability reasoning is currently at the abstract memory object level, not the physical level.  Before implementing anything that leveraged page boundary information, we'd need to untangle some nasty problems around the definition of ptrtoint and assumes about the meaning of dereferenceability.
 
 **Exit Predication**
 
@@ -266,6 +268,6 @@ A careful reader will note that the vectorization above is only correct if i+VF-
    }
 
 
-If you restrict the function `f` above to the functions that SCEV can analyze trip counts for, this technique is basically the tail folding (e.g. predication) equivalent to the requires scalar epilogue approach implemented.  I'm unsure if the additional generality available in `f` functions which are not analyzeable by SCEV is interesting or not.
+If you restrict the function `f` above to the functions that SCEV can analyze trip counts for, this technique is basically the tail folding (e.g. predication) equivalent to the requires scalar epilogue approach implemented.  I'm unsure if the additional generality available in `f` functions which are not analyzeable by SCEV is interesting or not.  Maybe for IVs which do actually overflow?  The current SCEV logic is pretty limited in that case, but exploiting that in the vectorizer would also take a pretty major rewrite.
 
 An alternate description of this transform would phrase it as access sinking.  Conceptually, we're trying to sink all accesses into the latch block.  If we can do that, we can form a vector predicate for all the exit conditions which are not data dependent.  I believe the two formulations to be a dual, though the sinking form makes it much more obvious how non-latch dominating exits might be handled.  (Though profitability of that general case is a truely open question.)
