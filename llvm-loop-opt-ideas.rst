@@ -15,6 +15,17 @@ See also `my proposal <https://lists.llvm.org/pipermail/llvm-dev/2019-September/
 
 Note that when I talk about multiple exits, I am generally only talking about the case where each exit dominates the latch block of the loop.  The case where an exit is conditional and doesn't dominate the latch is much rarer and harder to easily handle.
 
+Cornercases
+===========
+
+Here's a brief overview of the cornercases which come up when extending an optimization from bottom tested loops to multiple exit loops:
+
+* Multiple distinct exit blocks.  This includes the mechanics of iterating either exiting blocks or exit blocks to ensure each exiting edge is covered.  Mostly, this is just updating existing code to do things like updating LCSSA for each exit block.
+* Multiple exiting blocks which share an exit block, but without LCSSA PHI nodes.  This requires getting the CFG right, but doesn't need to handle general LCSSA construction just yet.
+* Multiple exiting blocks which share an exit block with LCSSA PHI nodes. This cornercase generally requires reframing some of the per-exit logic in terms of per exiting edge logic.  There's often some subleties in there.
+
+I generally try to tackle the first two before the third.  Adding the appropriate bailout tends to be simple, and it lets me build a test corpus incrementally. 
+
 Runtime Unrolling
 +++++++++++++++++
 
