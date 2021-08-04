@@ -146,8 +146,8 @@ To highlight why this is hard, imagine that `a` is exactly one element long, and
      
 Let's enumerate some cases we could handle without solving the "general" problem.  All of these share a common flavor; we need to identify a precise runtime bound for a non-faulting access.  Once we have that, we can either:
 
-* Clamp the iteration space of the vectorized loop to the umin of the otherwise computable trip count and our safe region.  In this case, our vectorize loops run only up to 'a
-* Generate a predicate mask for each load which is independent of the loop CFG and depends solely on the static size information.
+* Clamp the iteration space of the vectorized loop to the umin of the otherwise computable trip count and our safe region.  In this case, our vectorize loops run only up to `a`
+* Generate a predicate mask for each load which is independent of the loop CFG and depends solely on the safe region information.
 
 Either way, we can ensure that either `a[1]` doesn't execute, or that if it does, hardware predication masks the fault.
 
@@ -163,23 +163,109 @@ Page Align Boundaries
 Speculation Safety
   The compiler already has extensive mechanism to prove speculation safety of memory accesses.  If we can prove either a) the original access stream doesn't fault in our desired iteration space for the vector loop or b) that a[i: i + VF-1] doesn't fault unless a[i] does, then we're good to vectorize.
 
-TODO - Page Boundary Generalized, and Exit Predication
-======================================================
-
-..
-
-  Open Topics
-  - non-static exit counts
-      predication - for instructions following exit - need blur operation
-  - tail folding (e.g. exit predication + tricky exit lane computation)
-
-    cases for data dependent exits
-    - page alignemnt via loop nest (vector->scalar->vector)
-    - page alignment via predication and dynamic stride
-    - exit predication (e.g. sink to backedge)
-
+The General Case
+================
   
+Let's move on to approaches to the general problem.  There are two options I know of:
+
+* Vectorize within a page, but not at the boundary.
+* Exit predication
+
+**Page Boundary Handling**
+
+Starting with the first, let's introduce a new simpler example:
+
+.. code::
+
+   loop {
+     if (cond(i)) break;
+     sum += a[i];
+   }
+
+If we know nothing about the bounds of the memory object `a`, and only know that `cond()` is vectorizeable without faulting,  we can still run the vector code if we're sufficiently far from a page boundary.  We can exploit this by forming one vector loop and one scalar loop, and branching between them based on distance from page boundary.  Here's an example of what that might look like:
+
+.. code::
+
+   // For simplicity, assume we're working with byte arrays so that
+   // ElementSize doesn't need to appear in these expressions.
+   loop {
+     // vector loop
+     while (i % PageSize < (PageSize - VF)) {
+       pred = cond(i, i+VF-1)
+       x = a[i, i+VF-1]
+       x = pred ? x : 0
+       sum = add_reduce(x)
+       if (!allof(pred))
+         goto actual_exit
+     }
+     iend = i + 2*VF;
+     while (i < iend) {
+       if (cond(i)) break;
+       sum += a[i];
+     }
+  }
+
+The challenge with this approach is a) the code complexity, b) the generated code size, and c) the fact that the portion of time in the vector loop drops sharply with the number of memory objects being accessed.  (The later comes from the fact that we must run the scalar loop if *any* access is close to page boundary, and as you add accesses, the probably of running the vector loop decreases with roughly ((PageSize-VF)/PageSize)^N.)
+
+I wrote the example above without the generally required scalar epilogue loop.  You can merge the two scalar loops which helps cut down the code size, at cost of further implementation complexity.
+
+Another approach to the above is to use additional predication as opposed to the scalar loop.  In that formulation, our vector loop looks something like the following:
+
+.. code::
+
+   // For simplicity, assume we're working with byte arrays so that
+   // ElementSize doesn't need to appear in these expressions.
+   loop {
+     pred1 = ivec % PageSize < (PageSize - VF)
+     pred2 = cond(i, i+VF-1)
+     pred = pred1 & pred2
+     x = a[i, i+VF-1] masked by pred1
+     x = pred ? x : 0
+     sum = add_reduce(x)
+     if (!allof(pred2))
+       goto actual_exit
+     if (allof(pred1))
+       ivec += VF;
+     else
+       ivec += PageSize - ivec % PageSize;
+   }
+
+That code is very confusing, so let me try to explain what we're doing here.  We've added an addition predicate for the load to mask off any lanes past the end of the current page.  Then we advance the vector loop either by VF if we're not near a page, or to the start of the next page if we were.  The result here is a vector loop which naturally aligns to the page boundary on the first one it encounters.
+
+This form reduces code complexity and code size, at the cost of additional predication.  It does nothing about the fraction of time spent running full vector widths as the number of accesses increase though.
+
+**Exit Predication**
+
+The second major alternative is form predicates directly from the exit conditions themselves.  It's really tempting to think these exit predicates are only needed by accesses below the original exit in program order, but this is not true.  If we go back to our previous range checked b[a[i]] example, we need a predicate for lane 1 of the load from a which depends on the result from a[0].  Obviously, that is not, in general, possible.
+
+Despite this impossibility result, the technique is frequently useful.  Consider the example:
+
+.. code::
+
+   loop {
+     if (f(i))
+       break;
+     sum = a[i];
+     i++;
+   }
+
+There's lots of cases where `f(i:i+VF-1)` is cheaply computable.  Take for example `f = x < N` where the vectorized form is simply `f(ivec) = ivec < splat(N)`.  Or wait, is it?
+
+A careful reader will note that the vectorization above is only correct if i+VF-1 is always greater than i - that is, i does not overflow in the vectorized loop.  To account for overflow, we'd have to compute each lane and then "smear" any zero lane through all following lanes.  The vectorized form looks roughly like this:
+
+.. code::
+
+   loop {
+     pred = f(i:i+vf-1)
+     pred = smear_right(pred)
+     x = a[i] masked by pred;
+     sum = add_reduce(pred ? x : 0)
+     i += VF;
+     if (!allof(pred))
+       break;
+   }
 
 
+If you restrict the function `f` above to the functions that SCEV can analyze trip counts for, this technique is basically the tail folding (e.g. predication) equivalent to the requires scalar epilogue approach implemented.  I'm unsure if the additional generality available in `f` functions which are not analyzeable by SCEV is interesting or not.
 
-
+An alternate description of this transform would phrase it as access sinking.  Conceptually, we're trying to sink all accesses into the latch block.  If we can do that, we can form a vector predicate for all the exit conditions which are not data dependent.  I believe the two formulations to be a dual, though the sinking form makes it much more obvious how non-latch dominating exits might be handled.  (Though profitability of that general case is a truely open question.)
