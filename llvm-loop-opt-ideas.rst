@@ -27,7 +27,7 @@ Here's a brief overview of the cornercases which come up when extending an optim
 I generally try to tackle the first two before the third.  Adding the appropriate bailout tends to be simple, and it lets me build a test corpus incrementally. 
 
 Runtime Unrolling
-+++++++++++++++++
+=================
 
 `D107381 <https://reviews.llvm.org/D107381>`_ takes the first steps towards supporting a more general form of multiple exit loops.  The following is a collection of notes/tasks I thought of when drafting it.
 
@@ -159,7 +159,7 @@ Should SCEV be an optimizeable IR?
 ----------------------------------
 
 Background
-++++++++++
+==========
 
 SCEV canonicalizes at construction.  That is, if two SCEV's compute equivalent results, the goal is to have them evaluate to the same SCEV object.  Given two SCEVs, it's is safe to say that if S1 == S2 that the expressions are equal.  Note that it is not safe to infer the expressions are different if S1 != S2 as canonicalization is best effort, not guaranteed.
 
@@ -172,7 +172,7 @@ Today, there are three major options - with each used somewhere in the code.
 * Update the SCEV node in place, and then leave dependent SCEVs in an inprecise state.  (That is, if we recreated the same expression, we'd end up with a more canonicalized result.)  This results in potentially missed optimizations, and implementation complexity to work around the inprecision in a few spots.
 
 What if?
-++++++++
+========
 
 So, what might we do here?
 
@@ -205,7 +205,7 @@ The key detail here is that we're walking the user list of the Value, not of the
 If we want the invariant that getSCEV(V) always returns the most canonical form, then we need to apply the above algorithm eagerly on change.  If we're okay giving that up, then we can do this specifically on demand only, but that complicates the SCEV interface.  I'd start with the former until we're forced into the later.
 
 Risks
-+++++
+=====
 
 SCEV* Keyed Maps
   If there are maps keyed by SCEV* in client code, and the client expects map[getSCEV(V)] to return an expected result, the change of invariant might break client code.  I am not currently aware of such a structure, but also haven't auditted for it.
@@ -214,7 +214,7 @@ Update time
   The need to walk use lists may be expensive.  The existing forget interface gives an idea, but we might be able to accelerate this using a "pending update" lazy mechanism.  Haven't fully explored that.
 
 Current thinking
-++++++++++++++++
+================
 
 After writing this up, I'm left with the impression this was a lot cleaner than I'd first expected.  I'd sat down to write this up as one of those crazy ideas for someday; I'm now wondering if someday should be now.
 
