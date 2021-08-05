@@ -89,11 +89,11 @@ In this example, we've created a four wide vector loop that runs sets of four it
 
 The key changes neeed to support this were:
 
-* Auditting the vectorizer source and fixing a number of places where the exit was assumed to also be the latch for historical reasons.
+* Auditing the vectorizer source and fixing a number of places where the exit was assumed to also be the latch for historical reasons.
 * Extending the existing 'requireScalarEpilogue' mechanism to *unconditionally* branch to the epilogue loop.
 * Adding "has a non-latch exit" as a reason to require a scalar epilogue.
 
-Worth noting is that this transform only works when we can compute a precise trip count for the original scalar loop.  Thankfully, SCEV has a bunch of infrastructure for that already and the vectorize gets to imply rely on it.  It is worth noting that SCEV is only able to analyze loop exits which dominate the latch.  As a result, the vectorizer is also limited to vectorizing loops where all exits dominate the latch.
+Worth noting is that this transform only works when we can compute a precise trip count for the original scalar loop.  Thankfully, SCEV has a bunch of infrastructure for that already and the vectorizer gets to implicitly rely on it.  It is worth noting that SCEV is only able to analyze loop exits which dominate the latch.  As a result, the vectorizer is also limited to vectorizing loops where all exits dominate the latch.
 
 The Mechanics of Multiple Exits
 -------------------------------
@@ -106,9 +106,9 @@ In this particular case, I did some prework in af7ef895d, handled everything exc
 Open Topics
 -----------
 
-This section would be titled "future work", but at the moment, I'm not planning to continue working in this area.  I acheived my primary objective, and don't have any incentive to push this further.
+This section would be titled "future work", but at the moment, I'm not planning to continue working in this area.  I achieved my primary objective, and don't have any incentive to push this further.
 
-Currently, only loops with entirely statically analyzeable exits are supported.  Analyzeable specifically means that SCEV's `getExitCount(L, ExitingBB)` returns a computable result.
+Currently, only loops with entirely statically analyzable exits are supported.  Analyzable specifically means that SCEV's `getExitCount(L, ExitingBB)` returns a computable result.
 
 Conditionally taken exiting blocks
 ==================================
@@ -126,12 +126,12 @@ Example:
          break;
    }
 
-It's worth noting that without the call to `bar()` in the above, SimplifyCFG will happily convert that loop exit into `if (cond() && cond2())` which is enough to let us analyze the upper bound of the exit assuming only `cond2()` is analyzeable, and the exact trip count if both conditionals are.  It's not clear how common examples with `bar()` actually are.
+It's worth noting that without the call to `bar()` in the above, SimplifyCFG will happily convert that loop exit into `if (cond() && cond2())` which is enough to let us analyze the upper bound of the exit assuming only `cond2()` is analyzable, and the exact trip count if both conditionals are.  It's not clear how common examples with `bar()` actually are.
 
 Data dependent exits
 ====================
 
-If we have exits which dominate the latch, but are not analyzeable, we can sometimes form predicates which allow us to vectorize (e.g. widen operations) anyways.  Example:
+If we have exits which dominate the latch, but are not analyzable, we can sometimes form predicates which allow us to vectorize (e.g. widen operations) anyways.  Example:
 
 .. code::
 
@@ -140,13 +140,14 @@ If we have exits which dominate the latch, but are not analyzeable, we can somet
      x = a[i];
      if (x < N) break;
      sum += b[x];
+     i++;
    }
 
 To highlight why this is hard, imagine that `a` is exactly one element long, and the range check fails on that first iteration.  Now align our one element `a` array such that `a[1]` would live on another page which would fault on access.
      
 Let's enumerate some cases we could handle without solving the "general" problem.  All of these share a common flavor; we need to identify a precise runtime bound for a non-faulting access.  Once we have that, we can either:
 
-* Clamp the iteration space of the vectorized loop to the umin of the otherwise computable trip count and our safe region.  In this case, our vectorize loops run only up to `a`
+* Clamp the iteration space of the vectorized loop to the umin of the otherwise computable trip count and our safe region.  In this case, our vectorized loops run only up to `a`.
 * Generate a predicate mask for each load which is independent of the loop CFG and depends solely on the safe region information.
 
 Either way, we can ensure that either `a[1]` doesn't execute, or that if it does, hardware predication masks the fault.
@@ -180,6 +181,7 @@ Starting with the first, let's introduce a new simpler example:
    loop {
      if (cond(i)) break;
      sum += a[i];
+     i++;
    }
 
 If we know nothing about the bounds of the memory object `a`, and only know that `cond()` is vectorizeable without faulting,  we can still run the vector code if we're sufficiently far from a page boundary.  We can exploit this by forming one vector loop and one scalar loop, and branching between them based on distance from page boundary.  Here's an example of what that might look like:
@@ -197,15 +199,17 @@ If we know nothing about the bounds of the memory object `a`, and only know that
        sum = add_reduce(x)
        if (!allof(pred))
          goto actual_exit
+       i += VF;
      }
      iend = i + 2*VF;
      while (i < iend) {
        if (cond(i)) break;
        sum += a[i];
+       i++;
      }
   }
 
-The challenge with this approach is a) the code complexity, b) the generated code size, and c) the fact that the portion of time in the vector loop drops sharply with the number of memory objects being accessed.  (The later comes from the fact that we must run the scalar loop if *any* access is close to page boundary, and as you add accesses, the probably of running the vector loop decreases with roughly ((PageSize-VF)/PageSize)^N.)
+The challenge with this approach is a) the code complexity, b) the generated code size, and c) the fact that the portion of time in the vector loop drops sharply with the number of memory objects being accessed.  (The latter comes from the fact that we must run the scalar loop if *any* access is close to page boundary, and as you add accesses, the probably of running the vector loop decreases with roughly ((PageSize-VF)/PageSize)^N.)
 
 I wrote the example above without the generally required scalar epilogue loop.  You can merge the two scalar loops which helps cut down the code size, at cost of further implementation complexity.
 
