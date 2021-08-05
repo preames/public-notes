@@ -103,6 +103,15 @@ As described over in my generic `multiple exit loop notes <https://github.com/pr
 In this particular case, I did some prework in af7ef895d, handled everything except shared exit blocks with LCSSA phis in e4df6a40dad, and finished the generalization in 9f61fbd.
 
 
+Why does this matter?
+---------------------
+
+A common question I get is why it matters that loop opts can handle non-bottom tested loops.  After all, for the sub-case of fully computable exits, can't we simply peel the last iteration and then apply the bottom tested form of the optimization to the simplified loop?
+
+The answer of course is "yes, we could", but we chose not to.  Profitability heuristics tend to be fairly specific per optimization, and we don't have a robust peel-last heuristic which peels if and only if we'd decide to optimize the simplified loop.  It's also worth noting that peeling the last iteration involves a runtime cost (in precomputing the trip count), and possibly codegen differences in the way the branches happen to get lowered.  Generally, we try not to canonicalize loop forms unless we reasonably believe that a) we can undo the transform if unprofitable, or b) the canonicalized form is "almost always" better.
+
+The other major argument for handling non-bottom tested loops is simply pass ordering.  Just because there exists some perfect pass ordering which achieves some result, does not in any way imply that the particular pass order chosen achieves said result on all examples.  (Well, unless you fixed point.  And we don't.)  Given we generally desire our optimizer to be reasonable robust, tackling non-bottom tested loops seems well worthwhile.
+
 Open Topics
 -----------
 
