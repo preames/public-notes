@@ -7,6 +7,47 @@ Periodic COVID Notes
 .. contents::
    :depth: 1
 
+Aug 13, 2021
+============
+
+As I write this, the Delta variant (a.k.a. the India variant, or B.1.617) is running rampant in the US.  Despite the widespread availability of vaccinations, we have not reached herd immunity, and from the current look of things, I am seriously doubting we ever will.  I am now assuming that COVID will be with us for the long haul. 
+
+**Delta & The Vaccines**
+
+Delta appears to be substantially worse than the original COVID-19 variant.  It's estimated to have an R0 `somewhere between 6 and 9 <https://www.washingtonpost.com/outlook/coronavirus-vaccine-booster-shots/2021/08/11/aefec5dc-fae0-11eb-9c0e-97e29906a970_story.html>`_, and a `higher, but still very uncertian <https://www.nytimes.com/2021/06/22/health/delta-variant-covid.html>`_, IFR.  That means it spreads as easily as chickenpox, but isn't quite as bad as measles.  Given what we know, `reasonable estimates <https://www.bloomberg.com/news/articles/2021-08-13/the-world-may-never-reach-herd-immunity-against-covid-19>`_ for vaccination rates required to reach herd immunity as north of 90% of the entire population.  Not the adult population; the _entire_ population. 
+
+The best data we have seems to indicate that the RNA based vaccines are moderately less effective against Delta than the previous variants.  Thankfully, they appear to still be strongly protective against severe cases, and outcomes such as hospitalization and death, but depending on which data source you look at, the protection against infection `may be under 50% <https://www.wsj.com/articles/pfizer-covid-19-vaccine-is-less-effective-against-delta-infections-but-still-prevents-serious-illness-israel-study-shows-11627059395>`_.  The J&J vaccine `appears even worse <https://www.wsj.com/articles/j-j-vaccine-highly-effective-against-delta-variant-in-south-african-trial-11628292645>`_.  Thankfully, trials of an extra Pfizer dose as a follow up to the J&J were recently completed (though I can't now find a link), and the results were encouraging.  At this point, I'd strongly recommend anyone who got a J&J first dose to locate an MRNA second dose.
+
+There's also solid evidence in support of a third RNA dose for high risk individuals.  At the moment, I'm not personally rushing out to locate a third shot, but if I was in a high risk group, I'd be seriously thinking about it.  As of Friday, the CDC is `recommending a third shot for high risk groups <https://www.cdc.gov/media/releases/2021/s0813-additional-mRNA-mrna-dose.html>`_.
+
+**Vaccination**
+
+First, if you are reading this and are unvaccinated, stop and got get vaccinated now.  The *only* reason not to would be if you have been told personally by *your* doctor not to.  You are putting yourself at risk, but honestly, I don't really care about that.  If you were only playing russian roulet with your own life, I'd not really care.  However, by not being vaccinated, you are also now putting the lives of everyone around you at risk as well.  That is simply irresponsible. 
+
+As of today, only something around 50% of the US population is vaccinated against COVID.  However, there are some serious caveats to even that number.
+
+* There is immense variation between states and counties.  This is pretty wildly covered, so I won't waste space here.
+* Kids under 12 are still not approved by the FDA.  At this point, I'm starting to seriously wonder about the delay.  What the heck is taking so long?  Given how much more several Delta appears to be for kids, this delay is extremely problematic. 
+* Those rate include both MRNA and J&J vaccines.  Given the new data on J&J effectiveness against Delta, that's starting to seem like a problem.
+
+Regardless, our overall vaccination rates are way too low.  And currently show no signs of increasing quickly enough to matter for near to mid-term planning purposes.  
+
+**Covid is Endemic and Likely to Remain So**
+
+Based on what we're seeing now with Delta, it looks very unlikely that COVID will ever be eliminated from the US population.  The required vaccination rates to have a chance of suppression appear impractical.  Worse, the virus continues to mutate.  We now have solid evidence that the virus can evolve resistance to vaccines, and wishing otherwise is looking increasingly futile. 
+
+On the personal front, I'm starting to live my life as if this is our new normal and likely to stay that way.  Thankfully, the MRNA vaccines do appear individual protective against severe outcomes.  I am personally returning to masking everywhere I go, and doing my best to avoid crowded places.  However, based on the reasoning that things are unlikely to get much better, I am not retreating from life.  I am traveling.  I am eating out.  I am simply doing so while taking every reasonable mitigation tactic I can.  I am socializing with friends who have been vaccinated.  (I will not knowingly socialize with any unvaccinated adult.  Mostly because of the implied stupidity and lack of care for my health involved.)
+
+On a public policy note, I'm now going to do something I haven't done in these writeups previously and dive right into the "politics".  I can't tell you how utterly *disgusted* I am that public health measures have become a political litmus tests. 
+
+We need to drive vaccination rates.  The carrot has been tried, it's time for the stick.  I fully support vaccine mandates.  My general rule of thumb is that any place which can require a measles vaccine (e.g. school, most workplaces, etc..) should require a COVID vaccine.  The common objection here is "freedom!" - which quite bluntly is utter bullshit.  Freedom of choice does *not* mean freedom from consequence.  You should be free to decline vaccination, that I completely agree with.  You should also be free to be unemployed, required to home school your kids, and unable to participate in public life.  Choices have consequences; deal with them.  Freedom is not free.
+
+On the matter of public schools, they must be kept open - at almost any cost.  We can and should take every practically effective mitigation measure - vaccine mandates for staff and kids over 12, masks, social distancing, improved airflow, etc..  At the end of the day though, keeping public schools open should be a core goal.  The cost to both our kids and society as a whole of another lost year - because let's be honest, online education last year was a disaster and most kids got nothing out of it - is unacceptable.  If you care about equity at all, getting schools open so that parents can work should be top of your list. 
+
+To be very explicit about the combination of the two previous points, any parent not willing to comply with school safety measures - masks and vaccines, etc.. - should be required to home school their kids.  We should provide online programs where practical to make this easier, but the responsibility and cost should lye with the families choosing not to participate.  Let's be clear, it is a choice.  If a family which chooses not to comply with requirements for public schooling can't provide an alternate education framework, well, under well settled law that's child neglect.  We should deal with it as such. 
+
+In practice, people will lie about vaccination status if we adopt the policies I've just advocated.  How should we deal with that?  One school of thought is to make it harder to lie (e.g. government issued vaccine passports, etc..).  There are some reasonable steps we can take here, but we run into some obvious data privacy and constitutionality issues pretty quickly.  Instead, I propose a simple alternative - liability.  An individual who lies about vaccination status should be fully liable for their conduct, both in matters of civil law and criminal law.  If your actions kill someone, that's manslaughter.  If you're actions put someone else in the hospital, their insurance should sue you for the costs of care, and they should be able to sue for monetary damage in line with any long term effects.  This is in line with our legal structure, so much so we may not even need any specific law to enable it. 
+           
 March 27, 2021
 ===============
 
