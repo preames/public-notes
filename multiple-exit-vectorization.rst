@@ -21,7 +21,7 @@ At it's heart, the loop vectorizer was built to handle cases like the following:
     } while (i < N);
   }
 
-This is lowered into a form of a for(int i = 0; i < N; i++) loop.  There are a couple of key things to notice:
+This is the lowered form of a `for(int i = 0; i < N; i++)` loop.  There are a couple of key things to notice:
 
 * It has a bottom tested exit condition.  This means that only the latch block exits the loop.
 * It has a loop guard before the loop which ensures the exit condition is true on initial entry to the loop.
@@ -110,17 +110,18 @@ A common question I get is why it matters that loop opts can handle non-bottom t
 
 The answer of course is "yes, we could", but we chose not to.  Profitability heuristics tend to be fairly specific per optimization, and we don't have a robust peel-last heuristic which peels if and only if we'd decide to optimize the simplified loop.  It's also worth noting that peeling the last iteration involves a runtime cost (in precomputing the trip count), and possibly codegen differences in the way the branches happen to get lowered.  Generally, we try not to canonicalize loop forms unless we reasonably believe that a) we can undo the transform if unprofitable, or b) the canonicalized form is "almost always" better.
 
-The other major argument for handling non-bottom tested loops is simply pass ordering.  Just because there exists some perfect pass ordering which achieves some result, does not in any way imply that the particular pass order chosen achieves said result on all examples.  (Well, unless you fixed point.  And we don't.)  Given we generally desire our optimizer to be reasonable robust, tackling non-bottom tested loops seems well worthwhile.
+The other major argument for handling non-bottom tested loops is simply pass ordering.  Just because there exists some perfect pass ordering which achieves some result, does not in any way imply that the particular pass order chosen achieves said result on all examples.  (Well, unless you iterate to a fixed point.  And we don't.)  Given we generally desire our optimizer to be reasonable robust, tackling non-bottom tested loops seems well worthwhile.
 
 Open Topics
 -----------
 
 This section would be titled "future work", but at the moment, I'm not planning to continue working in this area.  I achieved my primary objective, and don't have any incentive to push this further.
 
-Currently, only loops with entirely statically analyzable exits are supported.  Analyzable specifically means that SCEV's `getExitCount(L, ExitingBB)` returns a computable result.
 
 Conditionally taken exiting blocks
 ==================================
+
+Currently, only loops with entirely statically analyzable exits are supported.  Analyzable specifically means that SCEV's `getExitCount(L, ExitingBB)` returns a computable result.
 
 To support conditionally reached exit tests, we'll need to generalize SCEV's exit count logic.  This is unfortunately, a very subtle set of changes as it requires shifting how we reason about poison and overflow.  (In short, we can't assume an IV becoming poison implies the backedge isn't taken on that iteration.)
 
@@ -156,7 +157,7 @@ To highlight why this is hard, imagine that `a` is exactly one element long, and
      
 Let's enumerate some cases we could handle without solving the "general" problem.  All of these share a common flavor; we need to identify a precise runtime bound for a non-faulting access.  Once we have that, we can either:
 
-* Clamp the iteration space of the vectorized loop to the umin of the otherwise computable trip count and our safe region.  In this case, our vectorized loops run only up to `a`.
+* Clamp the iteration space of the vectorized loop to the umin of the otherwise computable trip count and our safe region.  In this case, our vectorized loops run only up to the length of `a`.
 * Generate a predicate mask for each load which is independent of the loop CFG and depends solely on the safe region information.
 
 Either way, we can ensure that either `a[1]` doesn't execute, or that if it does, hardware predication masks the fault.
@@ -167,7 +168,7 @@ Statically Known Array Sizes
 Dynamically Known Array Sizes
   We can generalize the former for any allocation whose size we can cheaply dynamically query.  If we can see the call to malloc(N), using N is easy.  Some allocation libraries provide a means to query the size of an allocation.
 
-Page Align Boundaries
+Page Alignment Boundaries
   If we know the page size, we can compute a safe region from the last guaranteed access rounded up to the nearest increment of page size.  For a properly aligned access stream, that's enough to prove safety of the vectorized form.  (See also approach below.)
 
 Speculation Safety
@@ -212,7 +213,7 @@ If we know nothing about the bounds of the memory object `a`, and only know that
      }
      iend = i + 2*VF;
      while (i < iend) {
-       if (cond(i)) break;
+       if (cond(i)) goto actual_exit;
        sum += a[i];
        i++;
      }
@@ -260,7 +261,7 @@ Despite this impossibility result, the technique is frequently useful.  Consider
    loop {
      if (f(i))
        break;
-     sum = a[i];
+     sum += a[i];
      i++;
    }
 
