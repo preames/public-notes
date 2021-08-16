@@ -219,10 +219,78 @@ Current thinking
 After writing this up, I'm left with the impression this was a lot cleaner than I'd first expected.  I'd sat down to write this up as one of those crazy ideas for someday; I'm now wondering if someday should be now.
 
     
+Unroll Heuristics
+-----------------
+
+In generic discussion of unrolling cost heuristics, I typically see two distinct families of reasoning.
+
+**Heuristic 1 - Direct Simplification**
+
+Unrolling a loop will sometimes enable elimination of computation.  For the purposes of this heuristic, latch cost is generally *not* relevant (that's covered in Heuristic 2).  The only catch is that even to simplify, we generally don't want to unroll enough to fall out of cache.
+
+A couple examples which probably should be unrolled:
+
+... code::
+
+  for (i in 0 to N) { 
+    a[i/2)++; 
+  }
+
+  for (i in 0 to N) { 
+    if (cant_analyze())
+      break;
+    g_a = 5;
+  }
+
+  for (i in 0 to N) {
+    if (f(i/2))
+      break;
+    a[i)++; 
+  }
+
+  for (i in 0 to N) {
+    if (i % 2 == 0)
+      a[i)++; 
+  }
 
 
+For each of these, we're balancing estimated dynamic cost vs static cost.  Note that the static cost doesn't necessarily increase.  On the first and last example, the static cost is unchanged.  
 
+The case with a unchanged static cost is arguably a canonicalization heuristic and is justifiably on it's own, but it's hard to clearly split from the balanced cost case.
 
+**Hueristic 2 - Branch Cost**
 
+The other major reason to unroll is to reduce the branch cost of the loop structure itself.  Here, it's important to have a mental model of the hardware as different processors have *radically* different branch costs.  The primary factors being traded off are:
 
+* Effective out of order width.  This is primarily a function of a) the number of branches, and b) their predictability.  Note that predictors can match non-trivial patterns which complicates reasoning about unrolling short loops substaintially.
+* Prediction resources.  Every predictable branch requires predictor state which can't be used elsewhere, and may behave differently in hot and cold code.  
+* Code size.  Primarily a question of whether hot code fits into the relevant cache structures (uop cache dominates, L1 is also worth considering).  Falling out of cache generally hurts badly.  There's both a per-loop local effect, and a program hot-code global effect.
+
+... code::
+
+  for (i in 0 to N) {
+    a[i] = i;
+  }
+
+Consider the loop above for a couple different scenarios.  We'll start with partial or runtime unrolling, and then move to full unrolling.
+
+* A simple in-order core or an out-of-order code without a good branch predictor.  Unrolling to smallest cache size likely beneficial due to reducing number of branches.
+* Out of order with dedicated loop predictor.  Likely *not* worthwhile to unroll single exit loops.  For multiple exit loops, reasoning for non-latch exits is same as following case without loop predictor.
+* Out of order w/o loop predictor.  For single exit loops, probably not worthwhile as we're still going to mispredict the last iteration (unless the unrolled trip count is small enough that we better fit the predictors pattern capability.)  For multiple exit loops, may be justified if total number of branches in the unrolled loop is equal or less than the original unrolled loop.
+
+Full unrolling is generally profitable anywhere partial unrolling by the same factor is, but may additionally be profitable when:
+
+* Out of order w/o loop predictor.  For *long* running loops, probably not worthwhile as branch mis-predict cost is ammortized away.  For short loops with *cosistent* trip counts, likely worthwhile to reduce mis-predict costs.  
+
+In general, on modern high performance out-of-order processors, unrolling is generally *not* a good default.  On simpler cores, it often *is* a good default.
+
+**Alternate Framings**
+
+There are three alternate views of the heuristics above which are sometimes helpful.
+
+First, the complexity of the branch cost heuristic is arguably just a (very) complicated cost model for the dynamic cost of the first heuristic.  You can integrate the two heuristics into one - at least for the local cost.
+
+Second, the local cost vs global cost axis is important.  It is generally *very* hard for compiler to reason about the global effect of an increase in code size or predictor resource use.  I don't know of any good answers here other than to be slightly conservative in the unrolling heuristic.  You might be able to use profile data to predict preloops or post-loops untaken in runtime unrolling, and thus consider them to have zero global cost, but I haven't see anyone do that successfully yet.
+
+Third, while we've discussed them in terms of unrolling, the same basic reasoning applies to a number of loop transforms such as peeling (first and last), and iteration set splitting.
 
