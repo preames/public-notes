@@ -446,4 +446,4 @@ An interesting case...
      ret i1 false
    }
 
-The first example, as expected, produces an incorrect SCEV expression for %c.  The second example, which is simply the first with blocks in different order, produces something I don't understand at all.  We seem to have gotten two *different* add scevs here.  That does fit my understanding of the code at all.
+The first example, as expected, produces an incorrect SCEV expression for %c.  The second example, which is simply the first with blocks in different order, produces something I don't understand at all.  We seem to have gotten two *different* add scevs here.  That doesn't fit my understanding of the code at all.
