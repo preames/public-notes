@@ -305,7 +305,7 @@ Aside: Please excuse the mix of psuedo code, this is my best attempt at making t
 First, the problem from the review
 ==================================
 
-... code:
+..code::
 
   %c = add i32 %a, %b
   if (%c would not overflow) {
@@ -348,7 +348,7 @@ Isn't this just CSE?
 
 Looking at the above, it seems like this problem is simply common sub-expression elimination.  Given that, let's explore how the CSE piece is handled.
 
-... code:
+.. code::
 
   define i1 @test(i32 %a, i32 %b, i1 %will_overflow) {
     %c = add i32 %a, %b
