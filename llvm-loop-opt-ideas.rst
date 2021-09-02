@@ -294,3 +294,107 @@ Second, the local cost vs global cost axis is important.  It is generally *very*
 
 Third, while we've discussed them in terms of unrolling, the same basic reasoning applies to a number of loop transforms such as peeling (first and last), and iteration set splitting.
 
+
+SCEV Wrap Flags
+---------------
+
+This section is inspired by the discussion on `D106852 <https://reviews.llvm.org/D106852>`_.  This review starts with a problem around AddRecs.  This is my attempt at getting my head around the problem in advance of participating in the review discussion.
+
+Aside: Please excuse the mix of psuedo code, this is my best attempt at making the examples readable.
+
+First, the problem from the review
+==================================
+
+... code:
+
+  %c = add i32 %a, %b
+  if (%c would not overflow) {
+    loop {
+      %iv = [%a, %preheader], [%iv.next, %loop]
+      body;
+      %iv.next = add i32 nuw %iv, %b
+      if (function_of_unrelated_iv) break;
+    }
+    return;
+  }
+  code_which_assumes_overflow()
+
+The basic structure of this example is a conditionally executed loop where %iv.next is known not to overflow on the first iteration based on control flow which gaurds the entry to the loop. 
+    
+Naively, SCEV should produce expressions which look roughly like the following:
+
+* %c = %a + %b
+* %iv = {%a, +, %b}<nuw>
+* %iv.next = {%a +nuw %b, +, %b}
+
+The problem is that SCEV doesn't include flags in object identity.  As a result, what SCEV actually produces is:
+
+* %c = %a +nuw %b
+* %iv = {%a, +, %b}<nuw>
+* %iv.next = {%a +nuw %b, +, %b}
+
+This happens because SCEV sees two add(%a,%b) functions and canonicalizes them to the same SCEV object.  (Warning: The example chosen for explaination is deliberately simplified and problably *does not* produce these broken SCEVs.  See the unreduced cases in `D106851 <https://reviews.llvm.org/D106851>`_ for something which demonstrates this in practice.)
+
+This is the problem that the review mentioned at the beginning describes.  The review proposes to fix it by dropping the nuw flag on the computation of the starting value of the %iv.next AddRec, and thus having the resulting SCEVs become:
+
+* %c = %a + %b
+* %iv = {%a, +, %b}<nuw>
+* %iv.next = {%a + %b, +, %b}
+
+This would seem to be correct in this case, but we'd loose optimization potential from knowing that %a + %b doesn't overflow in the context of the starting value for the %iv.next AddRec.
+
+Isn't this just CSE?
+====================
+
+Looking at the above, it seems like this problem is simply common sub-expression elimination.  Given that, let's explore how the CSE piece is handled.
+
+... code:
+
+  define i1 @test(i32 %a, i32 %b, i1 %will_overflow) {
+    %c = add i32 %a, %b
+    br i1 %will_overflow, label %exit1, label %exit2
+
+  exit1:
+    %ret1 = icmp ult i32 %c, %a
+    ret i1 %ret1
+
+  exit2:
+    %c2 = add nuw i32 %a, %b
+    %ret2 = icmp ult i32 %c2, %a
+    ret i1 %ret2
+  }
+
+  $ opt -enable-new-pm=0 -analyze -scalar-evolution flags.ll 
+  Printing analysis 'Scalar Evolution Analysis' for function 'test':
+  Classifying expressions for: @test
+    %c = add i32 %a, %b
+    -->  (%a + %b) U: full-set S: full-set
+    %c2 = add nuw i32 %a, %b
+    -->  (%a + %b) U: full-set S: full-set
+  Determining loop execution counts for: @test
+
+Interestingly, we still combined both adds into a single SCEV node, but we did so conservatively.  We stripped the flags from *both* expressions.  This is the classic solution uses for CSE elsewhere in the optimizer as well.
+
+So, all is good right?  Well, not so fast.  The problem is the above wasn't implement as merging the flags on CSE.  Instead, it was implemented via `getNoWrapFlagsFromUB` and `isSCEVExprNeverPoison`.
+
+`isSCEVExprNeverPoison` contains a bit of logic which is *extremely* subtle.  Specifically, it returns true for the following circumstance:
+
+* an *instruction* whose operands include some AddRec in some loop L
+* all other operands to the add are invariant in L
+* the add is guaranteed to execute on entry to L
+* we can prove that poison, if produced by the add, must reach an instruction which triggers full UB
+
+The basic idea behind this appears to be that by a) finding the defining loop for the instruction, and b) proving the defining instruction executes, we prove the flags must be correct for all uses of the SCEV.  After staring at this for a while, I believe this correct.
+
+Back to our original problem
+============================
+
+The key point of the digression through CSE is that the requirements for preserving the flags of an add dependent on three aspects: 1) the defining scope, 2) guaranteeing that an instruction must execute in that scope, and 3) establishing overflow must reach an instruction which triggers UB.
+
+The problem the original review is trying to tackle comes down to our choice to preserve flags on the %a + %b expression in the start of the addrec for %iv.next.  However, it's missing both the guaranteed to execute property, and the poison triggers-UB property.  So, I'm not sure it's a complete fix.
+
+There's also a separate concern which has been raised in the review about multiple operand add expressions, and the correctness of flag splitting, but I don't think we need to get to that to already have a problem.
+
+
+
+    
