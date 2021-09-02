@@ -305,7 +305,7 @@ Aside: Please excuse the mix of psuedo code, this is my best attempt at making t
 First, the problem from the review
 ==================================
 
-..code::
+.. code::
 
   %c = add i32 %a, %b
   if (%c would not overflow) {
