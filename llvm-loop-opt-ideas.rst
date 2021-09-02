@@ -395,6 +395,55 @@ The problem the original review is trying to tackle comes down to our choice to 
 
 There's also a separate concern which has been raised in the review about multiple operand add expressions, and the correctness of flag splitting, but I don't think we need to get to that to already have a problem.
 
+An interesting case...
+======================
 
+.. code::
 
-    
+   define i1 @test2_a(i32 %a, i32 %b, i1 %will_overflow) {
+   entry:
+     br i1 %will_overflow, label %exit1, label %loop
+
+   loop:
+     %iv = phi i32 [%a, %entry], [%iv.next, %loop]
+     ;; SCEV produces {(%a + %b)<nuw><nsw>,+,%b}<nuw><nsw><%loop>
+     %iv.next = add nuw nsw i32 %iv, %b
+     %trap = udiv i32 %a, %iv.next ;; Use to force poison -> UB
+     %ret2 = icmp ult i32 %iv.next, %a
+     ; Note: backedge is unreachable here
+     br i1 %ret2, label %loop, label %exit2
+
+   exit2:
+     ret i1 false
+
+   exit1:
+     ;; SCEV produces (%a + %b)<nuw><nsw>
+     %c = add i32 %a, %b
+     %ret1 = icmp ult i32 %c, %a
+     ret i1 false
+   }
+
+   define i1 @test2_b(i32 %a, i32 %b, i1 %will_overflow) {
+   entry:
+   br i1 %will_overflow, label %exit1, label %loop
+
+   exit1:
+     ;; SCEV produces (%a + %b)
+     %c = add i32 %a, %b
+     %ret1 = icmp ult i32 %c, %a
+     ret i1 false
+
+   loop:
+     %iv = phi i32 [%a, %entry], [%iv.next, %loop]
+     ;; SCEV produces {(%a + %b)<nuw><nsw>,+,%b}<nuw><nsw><%loop>
+     %iv.next = add nuw nsw i32 %iv, %b
+     %trap = udiv i32 %a, %iv.next
+     %ret2 = icmp ult i32 %iv.next, %a
+   ; Note: backedge is unreachable here
+   br i1 %ret2, label %loop, label %exit2
+
+   exit2:
+     ret i1 false
+   }
+
+The first example, as expected, produces an incorrect SCEV expression for %c.  The second example, which is simply the first with blocks in different order, produces something I don't understand at all.  We seem to have gotten two *different* add scevs here.  That does fit my understanding of the code at all.
