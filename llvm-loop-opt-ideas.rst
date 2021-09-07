@@ -447,3 +447,28 @@ An interesting case...
    }
 
 The first example, as expected, produces an incorrect SCEV expression for %c.  The second example, which is simply the first with blocks in different order, produces something I don't understand at all.  We seem to have gotten two *different* add scevs here.  That doesn't fit my understanding of the code at all.
+
+Where from here?
+================
+
+I don't know about anyone else, but I've hit the absolute limit on my ability to reason about this stuff.  I'm quite sure the existing code is wrong, but I don't really see simple ways to fix it without doing some significant simplification in the process.  In particular, the issue described here interacts with the mutation we do of SCEV flags via the setNoWrapFlags interface in ways I really don't claim to fully understand.
+
+I think I want to advocate for a strict "do what IR does" model.  What do I mean by that?
+
+* The end goal is to ensure that having a flag on a given SCEV node implies that same flag can legally be placed on any IR node (of the same type) mapped to that node.
+* This requires that we treat flags as part of object identity.  This allows there to be two different "add a, b" nodes corresponding to different IR instructions.  If we want to explicitly CSE the two nodes, we can, but only by taking the intersection of the flags available.
+* This requires a critical change to SCEVExpander.  Today, the expander assumes it can expand any arithmetic sequence outside the loop.  We've know for a while that this was not true in cornercases, but I think we have to directly tackle this either by a) preventing hoisting (e.g. via isSafeToExpandAt), or b) by dropping flags when expanding (e.g. do what LICM would do).
+* This requires that we remove mutation of flags on existing SCEV nodes (though, see note at bottom).  To do that, I see two major options:
+
+  * Add transforms to IndVarSimplify to tag the underlying IR where legal, and let SCEV compute flags as needed for the remaining cases.  The downside here is that we loose some memoization ability for SCEVs which don't directly correspond to IR nodes.  IMO, this really isn't that concerning.
+  * Implement RAUW functionality for SCEVs as `discussed above <https://github.com/preames/public-notes/blob/master/llvm-loop-opt-ideas.rst#id6>`_.
+
+Now that we've covered my proposal, let's go through a couple of things I consider non-options.  Each of these is tempting, but has, I think, a fatal flaw.
+
+**Flag Intersection**.  We could chose to intersect flags when reusing a SCEV node for a new context.  This is analogous to what the optimizer does when CSEing IR instructions.  This still requires us to somehow remove mutation of flags, but also introduces a visit order dependence which changes the output of SCEV.  Consider the case where we first visit an `zext(add nuw a, b)` node, and then later visit a `add a, b` node.  With that visit order, we could legally produce a `add (zext a), (zext b)` node for the first case.  However, if we visited in the second order, we could not.  This means that both analysis and transforms which depend on SCEVs analysis become visit order dependent.
+
+**Context Aware Intersection**.  This is the approach taken by the patch which started this discussion.  Essentially, whenever we compute flags for a new node, we consider the full legal scope of that node, and then do flag intersection as above.  The same fatal flaw applies, but we also have to audit all cases we construct a new SCEV with flags to ensure the flags are correct for the entire legal scope of the proposed node.  (Actually, we'd probably do this inside the construction logic, but details...)
+
+**Drop Context Aware Flags**.  Today, most of our flag inference isn't context dependent.  The major exception is our attempt to derive flags for an AddRec from the increment operation in the IR.  If we simply removed this entirely, we'd be left with only flags inferrable from the SCEV language itself (or base facts about SCEVUknowns, such as e.g. ranges).  We'd still have to remove mutation for context sensitive reasons (hm, see note below).  The fatal flaw on this one is that we loose ability to infer precise bounds on a whole bunch of loops.
+
+Finally, a closing note that doesn't majorly change anything above, but which is a useful subtlety to be aware of and which might confuse the reader.  I've been discussing the mutation of SCEVs as if all mutations where inherently context sensative.  This isn't actually true.  Some, maybe even most, of our mutations are derived from facts on the SCEV language itself.  Where we get ourselves into contextual reasoning is the use of asssumes and guards.  It might be worth giving some thought as to whether we can split these two categories in some way, and whether the context insensitive ones can be preserved.
