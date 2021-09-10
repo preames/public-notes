@@ -448,6 +448,8 @@ An interesting case...
 
 The first example, as expected, produces an incorrect SCEV expression for %c.  The second example, which is simply the first with blocks in different order, produces something I don't understand at all.  We seem to have gotten two *different* add scevs here.  That doesn't fit my understanding of the code at all.
 
+(Later edit - For the second, there is only one SCEV.  It's simply being mutated under us, and visit order of the printer pass leads to this deceptive result.  The SCEV for %c doesn't have flags at the point we visit %c.  However, after we visit %iv.next, we mutate the existing SCEV.  If we were to re-print the SCEV corresponding to %c after that point, we would see the (incorrect) nowrap flags.  This can be demonstrated by forcing computation of backedge taken counts in the printer before printing the SCEVs for each value.)
+
 Where from here?
 ================
 
@@ -472,3 +474,14 @@ Now that we've covered my proposal, let's go through a couple of things I consid
 **Drop Context Aware Flags**.  Today, most of our flag inference isn't context dependent.  The major exception is our attempt to derive flags for an AddRec from the increment operation in the IR.  If we simply removed this entirely, we'd be left with only flags inferrable from the SCEV language itself (or base facts about SCEVUknowns, such as e.g. ranges).  We'd still have to remove mutation for context sensitive reasons (hm, see note below).  The fatal flaw on this one is that we loose ability to infer precise bounds on a whole bunch of loops.
 
 Finally, a closing note that doesn't majorly change anything above, but which is a useful subtlety to be aware of and which might confuse the reader.  I've been discussing the mutation of SCEVs as if all mutations where inherently context sensative.  This isn't actually true.  Some, maybe even most, of our mutations are derived from facts on the SCEV language itself.  Where we get ourselves into contextual reasoning is the use of asssumes and guards.  It might be worth giving some thought as to whether we can split these two categories in some way, and whether the context insensitive ones can be preserved.
+
+Near Term Steps
+===============
+
+In `D109553 <https://reviews.llvm.org/D109553>`_, I've proposed a rather strict set of semantics for wrap flags on SCEVs.  In terms of the previous section, it's closest to the "drop context aware flags", but allows the notion of a defining scope for addrecs which allows us to keep most of our context aware flags in practice.
+
+The basic idea is we need to have some consistent semantics before we can start working towards a "better" set of semantics.  If this lands, then the original issue which triggered this whole explaination has an obvious fix - don't propagate the flags.  The only remaining question is how bad the optimization quality impact of that fix is.  My hope is that between `D106331 <https://reviews.llvm.org/D106331>`_, and maybe a bit of explicit reasoning about the defining scope of the add (say, for trivial loop nests or small functions), we can keep the optimization quality impact down to something reasonable.
+
+Once that's in, I'm leaning towards a variant the flag intersection idea above as our next stepping stone.  As I've wrapped my head more around the cases where we mutate existing SCEVs, I've realized that we already have visit order dependence and thus the major downside of that scheme is less introducing a new problem and more making an existing problem more common.  The variant I'm currently exploring splits the flags on a SCEV into two sets: definitional and contextual.  The definitional ones would be any flag implied by the defining scope (see D109553) or algebriac structure of the SCEV itself.  The contextual ones would be any flags implied by users of the SCEV, contextual guards, etc...  We'd do intersection on the contextual set only.  This is a fairly major change to SCEV, and I definitely want to be working from a firmer foundation before starting on that.  
+
+If we get to the point of splitting contextual and definition flags, then the incremental value of getting to the point where flags are tied to SCEV identity gets much smaller.  In particular, the optimization value only remains where there actually are two SCEVs with different (desired) contextual flags, as opposed to the current reality of needing to worry about the possibility of a second SCEV.  It's not clear this benefit is enough to justify the infrastructure required, but I'm defering deep consideration on that question until we've made a bit of progress down the road just sketched.
