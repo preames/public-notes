@@ -485,3 +485,25 @@ The basic idea is we need to have some consistent semantics before we can start 
 Once that's in, I'm leaning towards a variant the flag intersection idea above as our next stepping stone.  As I've wrapped my head more around the cases where we mutate existing SCEVs, I've realized that we already have visit order dependence and thus the major downside of that scheme is less introducing a new problem and more making an existing problem more common.  The variant I'm currently exploring splits the flags on a SCEV into two sets: definitional and contextual.  The definitional ones would be any flag implied by the defining scope (see D109553) or algebriac structure of the SCEV itself.  The contextual ones would be any flags implied by users of the SCEV, contextual guards, etc...  We'd do intersection on the contextual set only.  This is a fairly major change to SCEV, and I definitely want to be working from a firmer foundation before starting on that.  
 
 If we get to the point of splitting contextual and definition flags, then the incremental value of getting to the point where flags are tied to SCEV identity gets much smaller.  In particular, the optimization value only remains where there actually are two SCEVs with different (desired) contextual flags, as opposed to the current reality of needing to worry about the possibility of a second SCEV.  It's not clear this benefit is enough to justify the infrastructure required, but I'm defering deep consideration on that question until we've made a bit of progress down the road just sketched.
+
+
+Poison/Freeze Optimizations
+---------------------------
+
+This section is a list of unimplemented ideas for optimizations specific to the freeze instruction and/or related properties.  The goal is to unblock finally enabling freeze in unswitch.
+
+* A loop which is provably infinite (e.g. no static or abnormal exits), and not-mustprogress must execute UB on entry.  As such, we can strengthen loop-deletion to replace loop-header with unreachable (instead of "simply" killing backedge).
+* Can unswitch on condition under which loop is finite vs infinite (ex: zext(iv) == loop-invariant-rhs).  Not sure code size is worthwhile, might combine with loop deletion idea.  Mostly useful for languages w/mustprogress.
+* Dominating use unfrozen value implies non-poison.  Can't remove freeze without proving full undef (any undef bit not enough).  Could handle some cases with an propagatesFullUndef analysis, but not clear interesting enough to implement.  (Common cases such as "icmp eq %a, 0" don't work because %a could be "(%b | 0x1)")
+* Arguments to calloc, malloc, strcpy, etc.. are probably noundef
+* A dominating noundef use (e.g. a dominating call to calloc), is enough to prove a freeze is redundant.  Challenge is efficiency of use search.
+* A dominating freeze(x) == y (where y is not frozen), can be used to reduce number of freezes in program.
+* A freeze(x) == x, can be used to drop freeze as it doesn't prevent poison propagation.  (But what about partial undef?)  Can extend this notion to arbitrary value trees and which values are "shadowed".
+* Can drop freeze(udiv non-poison, y) as poison 'y' would have been UB already.  Only works when partial undef can be chosen as zero otherwise have to propagate frozen undef.
+* "returned" arguments which are noundef should propagate to return value.
+* On x86-64, we appear to be having problems folding either zext(freeze(x)) or freeze(zext(x)) into uses, and as a result are generating explicit moves of narrow register classes to extend.
+
+If deciding to implement any of these, please take care.  They are ideas, and have not been fully thought through.  There may be tricker unsoundness cases.  One particular class of problems to watch for is "bitwise undef" where only some of the bits are undef.  Many tempting optimizations become difficult when you have to prove all bits are undef.
+  
+
+
