@@ -595,7 +595,7 @@ Second, unswitching an arbitrarily complicate loop just to get a finite trip cou
 Third, how do we form the predicate needed for unswitching?  At least in many cases, it seems like the predicated scalar evolution infrastructure can already find these, but I haven't explored how powerful that is in general.
 
 Loop Chunking
--------------
+=============
 
 With the same primitives as unswitch, we could build a loop chunking formulation which wraps an inner finite loop in an outer potentially infite one.
 
