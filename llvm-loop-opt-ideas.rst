@@ -506,4 +506,118 @@ This section is a list of unimplemented ideas for optimizations specific to the 
 If deciding to implement any of these, please take care.  They are ideas, and have not been fully thought through.  There may be tricker unsoundness cases.  One particular class of problems to watch for is "bitwise undef" where only some of the bits are undef.  Many tempting optimizations become difficult when you have to prove all bits are undef.
   
 
+Potential Infinite Trip Counts
+------------------------------
 
+This section is a brief overview of some approaches for dealing with potential infinite trip counts, and some ideas on possible further work.
+
+First, the problem:
+
+.. code::
+
+   assume start < end
+   for (uint32_t i = start; i != end; i += step) {}
+
+It's tempting to say that the trip count of this loop is `(end-start)/step`.  However, this misses the case where e.g. start = 0, end = 1, and step = 2.  In that case, this loop is actually infinite.
+
+(Note: Throughout this section, I'm ignoring overflow in the trip count computation itself, and assuming start < end to simplify expressions.)
+
+Flags
+=====
+
+If we have an nsw or nuw on the increment, and can show that we execute an operation which promotes poison to full UB, we can assume that said IV does not wrap, and thus the loop can't be infinite.
+
+In the code, look for the use of ControlsExit and flag intersection in the trip count code.  Currently, we only apply this to single exit loops to avoid needing to reason about potential UB from one exit which is preceeded by some other non-UB exit on the same iteration.
+
+No Overflow
+===========
+
+For the cases where we have an inequality, we can try to prove that end is "far enough" away from the wrapping edge that the exit must be taken once between end and wrap.  This is effectively just inferring nsw/nuw, and thus reduces to the case above in terms of usage.
+
+Note that this doesn't help us at all for eq/ne exit tests.
+
+Modulo Reasoning
+================
+
+For eq/ne tests, we rely on being able to prove facts about the modulo of the distance and step. For instance, when step == 2, start = 0, and end is unknown, we have to prove end % 2 == 0 to return a trip count.
+
+In practice, we're not real good at proving said facts.  Particularly not when the facts come from a mixture of dominating loop guards and facts about expressions themselves.  There's probably some room to improve here, but this is also simply a hard problem to reason about.
+
+Interestingly, proving a modulo fact can be used to discharge inequality tests as well, but we appear not to do that today.  As an example:
+
+.. code::
+
+   for (uint8_t i = 0; i < end; i += 2) {}
+
+We can prove this loop finite by proving end % 2 == 0.  (Because the only value resulting in an finite loop is end == UINT8_MAX, and that fact does not hold for UINT8_MAX.)  Note this is a sufficient, but not neccessary condition in this case.
+
+It's not clear to me that pushing this line of reasoning for inequalities is useful.  It might also be that this is simply a way of proving distance from end, and thus collapses to a extension to the No Overflow cases above.  It's mostly worth highlighting to show the commonality with the equality cases which is, at first, very non-obvious.
+
+
+Mustprogress (e.g. infinite as UB!)
+===================================
+
+C++ provides a language level guarantee that loops can not be infinite unless there's some visible side effect.  If we can prove that such a side effect doesn't exist, and that this loop would be infinite if *this* exit is not taken, we can conclude that the exit must be taken.
+
+I recently extended this line of logic in https://reviews.llvm.org/D103991, and a few others.
+
+This approach does not work for any language which does not provide the mustprogress guarantee (and thus doesn't add the mustprogress attribute in IR.)
+
+Unswitching
+===========
+
+We could implement an unswitching transform which versions a finite loop and an infite loop provided we can form a runtime predicate for the condition that the loop is infite.  As an example:
+
+.. code::
+
+   // Before
+   assume start < end
+   for (int i = start; i != end; i += 2) {}
+
+   // After
+   assume start < end
+   if ((end-start) % 2 == 0) {
+     for (uint32_t i = start; i != end; i += 2) {}
+   } else {
+     for (uint32_t i = start; ; i += 2) {}
+   }
+
+There's a couple of subtle points here.
+
+First, we need a way to "remember" that the unswitched copy of the loop is finite.  I can see a couple ways of doing that, none perfect:
+
+* We could rely on our ability to prove the modulo fact from the dominating loop guard.  From recent experience working on runtime unrolling, this is a lot more fragile that it sounds.
+* We could add flags to the induction variable.  For the example given, this works because finite implies nuw on the increment, and nuw remembers the finite fact.  This doesn't work in general, because we may have IVs which actually do wrap in infinite loops.  (Though, do these come up in cases for which we can form the predicate?  TBC...)
+* We could rewrite the exit test into a form "obviously" finite.  This purturbs code structure and may interfer with other canonicalization heuristics.
+
+Second, unswitching an arbitrarily complicate loop just to get a finite trip count can cause major code size expansion with questionable value.
+
+Third, how do we form the predicate needed for unswitching?  At least in many cases, it seems like the predicated scalar evolution infrastructure can already find these, but I haven't explored how powerful that is in general.
+
+Loop Chunking
+-------------
+
+With the same primitives as unswitch, we could build a loop chunking formulation which wraps an inner finite loop in an outer potentially infite one.
+
+.. code::
+
+   // Before
+   assume start < end
+   for (int i = start; i != end; i += 2) {}
+
+   // After
+   assume start < end
+   uint32_t i = start;
+   do {
+     for (uint32_t j = 0; j != (end-start)/2; j++<nuw>, i += 2) {}
+   } while ((end-start) % 2 != 0)
+
+The structure of this is interesting as we have the finite loop while preserving the potentially infinite behavior with only a couple of phis, and one extra backbranch.  This causes a lot less code size increase than the unswitch idea.
+
+We do loose knowledge about the starting value of the finite loop's IVs.  In the example, these are purely symbolic, but if they'd been constants instead, that could be a real loss of information and push us down less capable symbolic reasoning paths.
+
+We also have a harder time remembering that the inner loop is finite; the IV can now overflow if the outer loop runs, so we're forced to do something like insert a dedicated loop counter. (As shown in the example.)
+
+Its worth noting that the predicate being formed for the backedge of the new outer loop will always be loop invariant in the outer loop.  Given that, our existing unswitch code can chose to unswitch this into the unswitched form if the cost model thinks it's worthwhile.
+
+I think this variant should be pretty easy to implement, and productionize.  (The one wild card is the need for the new IV and perf effects thereof.)  At the moment, I don't really have a strongly motivating example though.
