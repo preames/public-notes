@@ -27,3 +27,38 @@ Looking at ajacent loops, knowing that two stores overlap (i.e. a later loop clo
 
 This may combine in interesting ways with MemorySSA.  I have not looked at that closely.
 
+Focus on optimizing outparams
+-----------------------------
+
+The example below (originally written in the context of https://reviews.llvm.org/D109917), reveals some interesting missed LLVM optimizations.
+
+.. code::
+
+   int foo();
+
+   extern int test(int *out) __attribute__((noinline));
+   int test(int *out) {
+     *out = foo();
+     return foo();
+   }
+
+   int wrapper() {
+     int notdead;
+     if (test(&notdead))
+       return 0;
+   
+     int dead;
+     int tmp = test(&dead);
+     if (notdead)
+       return tmp;
+     return foo();
+   }
+
+Here's the ones I've noticed so far:
+
+* Failure to infer writeonly argument attribute.  I went ahead and posted https://reviews.llvm.org/D114963, but there's a bunch of follow up work needed.
+* Failure to sink the second call to dead (i.e. the motivating review above).
+* Failure to color allocas and reuse same alloca/variable for outparams to both calls.
+* Oppurtunity to promote outparam to struct return in dso local copy with shim.  (Not sure this is generally profitable through.)
+* Oppurtunity to reduce lifetime.start/end scope around 'notdead' alloca.  You can think of this as part of coloring, or as a separate canonicalization step.
+* Missed oppurtunity for tailcall optimization in final call to foo() in wrapper().  Similiar for final call to foo() in test()
