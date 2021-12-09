@@ -109,7 +109,7 @@ Completeness
 
 I find it difficult to convince myself of the completeness of either papers' rewriting rules.  They seem to be heavily dependent on a complete taxonomy of the x86 decode rules, and prior experience makes me very hesitant about that.  It is far to easy to think you have full coverage while actually missing important cases.
 
-As a particular example, neither Erim or G-Free seems to consider the case where a prefix byte forms part of an unintended instruction.  From prior experience with x86, this seemed questionable.  A targeted fuzzer quickly found the example instruction ``vpalignr $239, (%rcx), %xmm0, %xmm8`` which encodes as ``c463790f01ef`` and thus embeds a ``wrpkru`` instruction in its suffix.  This example uses a three-byte VEX prefix to change the interpretation of the opcode field.
+As a particular example, neither Erim or G-Free seems to consider the case where a prefix byte forms part of an unintended instruction.  From prior experience with x86, this seemed questionable.  A `targeted fuzzer <https://github.com/preames/inst-decode-search>`_ quickly found the example instruction ``vpalignr $239, (%rcx), %xmm0, %xmm8`` which encodes as ``c463790f01ef`` and thus embeds a ``wrpkru`` instruction in its suffix.  This example uses a three-byte VEX prefix to change the interpretation of the opcode field.
 
 Register Scavenging
 +++++++++++++++++++
@@ -215,7 +215,7 @@ Intel CET consists of two parts: a hardware managed shadow stack for call return
 
 **Unintended ENDBRs**  As mentioned above, IBT is not a complete solution.  Unintended ENDBR instructions can still appear in the binary.  Interestingly, there `appears to be work going on <https://reviews.llvm.org/D88194>`_ in upstream LLVM to reduce the frequency of said unintended ENDBR instructions already.  (Start with that patch for the context, but see the submitted change - linked in the last comment - for the actual implementation.)
 
-So let's take a look at the ease which which we can form unintended ENDBR instructions.  We'll use some targetting fuzzing to see what cases turn up, and combine that with information from the literature.
+So let's take a look at the ease which which we can form unintended ENDBR instructions.  We'll use some `targetting fuzzing <https://github.com/preames/inst-decode-search>`_ to see what cases turn up, and combine that with information from the literature.
 
 For the cross boundary case, fuzzing quickly finds a couple examples of instructions which encode a suffix for a byte stream containing ENBR64.  Examples include: ``bdf3f30f1e`` (``mov ebp, 0x1e0ff3f3; cli``) and ``1cf30f1efa`` (``sbb al, -0xd; nop edx``).  Interestingly, Section 3.2 of `"Security Analysis of Processor Instruction Set Architecture for Enforcing Control-Flow Integrity" <https://cseweb.ucsd.edu/~dstefan/cse227-spring20/papers/shanbhogue:cet.pdf>`_ (an academic paper on CET written by Intel) claims the only suffix instructions possible on x86_64 are ``cli``, ``sti``, and ``nop edx``.  From some targeted fuzzing run for about 48 hours, this claim appears to be plausible.  ``cli`` and ``sti`` are used to manipulate the interrupt flag and are incredibly rare in practice.  ``nop edx`` isn't one of the Intel recommended nops for performance, and is thus likely to be a) uncommon, and b) easily replaceable.
 
