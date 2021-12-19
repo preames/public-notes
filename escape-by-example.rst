@@ -74,6 +74,28 @@ Note that there's an interesting scheduling profitability question here when the
     }
   }
 
+Particularly interesting variants of this come from observing that calls to other functions can not interact with an unescaped object.
+
+.. code::
+   
+  void test() {
+    X* o = new X();
+    o->f = 5;
+    foo()
+    capture(o);
+  }
+  == is equavalent to ==>
+  
+  void test() {
+    X* o = new X();
+    foo()
+    o->f = 5;
+    capture(o);
+  }
+
+Another way to say the same is that an unescaped object can not alias a call to another function.
+
+
 Allocation Reuse
 ----------------
 
@@ -187,6 +209,23 @@ This is a variant of the former, but is often useful for discussion purposes.
     }
   }
 
+Another variant of the same..
+  
+.. code::
+
+  void test() {
+    X* o = new X();
+    may_throw_or_hang();
+    use(o);
+  }
+  == optimizes to ==>
+  
+  void test() {
+    may_throw_or_hang();
+    X* o = new X();
+    use(o);
+  }
+
 
 
 Inequality/NoAlias
@@ -264,7 +303,7 @@ Another variant...
 Allocation Coloring
 -------------------
 
-Written with non-overlapping liveranges to illustrate distinction from allocation reuse and merging.  Reuse and merging are strictly profitable, this one might not be based on relative frequencies.  It saves heap space/churn if both paths are taken, but at the cost of an unneeded allocation if neither is.  Arguably, reuse and merging are sub-categories of coloring.
+Written with non-overlapping live-ranges to illustrate distinction from allocation reuse and merging.  Reuse and merging are strictly profitable, this one might not be based on relative frequencies.  It saves heap space/churn if both paths are taken, but at the cost of an unneeded allocation if neither is.  Arguably, reuse and merging are sub-categories of coloring.
 
 .. code::
 
