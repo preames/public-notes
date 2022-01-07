@@ -464,4 +464,3 @@ As a variation of the last, we can also eliminate fences whose only effect is to
 Subtely, we can't use a publication_fence here.  Unlike an ordered store, a fence might also be fencing unrelated memory locations.  We need a fence between any store which preceeded the example function, and the first following observable memory operation.
 
 
-  
