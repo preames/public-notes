@@ -106,7 +106,8 @@ Listing separately to make clear this is not the same work as loop vectorization
 Performance (Minor)
 -------------------
 
-Maybe interesting cases from the LLVM issue tracker:
-*  Unaligned read followed by bswap generates suboptimal code #48314
+Interesting cases from the LLVM issue tracker:
+
+*  Unaligned read followed by bswap generates suboptimal code `#48314 <https://github.com/llvm/llvm-project/issues/48314>`_
 
    
