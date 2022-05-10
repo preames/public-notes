@@ -37,3 +37,14 @@ ISEL Fuzzing Disabled
 OSS Fuzz used to do fuzzing of various LLVM backends.  This helps to find recent regressions by finding examples which trigger crashes and assertion failures in newly introduced code.  However, due to a build configuration problem, this was recently disabled.  We need to renable this in general, but also add RISCV to the list of fuzzed targets.  
 
 See `discussion here <https://github.com/google/oss-fuzz/pull/7179#issuecomment-1092802635>`_ and linked pull requests on the OSS Fuzz repo.
+
+
+Performance
+-----------
+
+LLD - Linker Optimization and Relaxation
+========================================
+
+LLD does not currently implement either linker optimization (substituting one code sequence for a smaller/faster one when resolving relocations) or relaxation (shrinking code size exploiting smaller sequences found via optimization.)  Note that this is different from the functional issue described above, though the infrastructure to fix may end up being the same.
+
+
