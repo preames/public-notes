@@ -14,9 +14,9 @@ LLD doesn’t handle R_RISCV_ALIGN
 
 The align directive requires linker relaxation to be functionally correct.  Currently, unless -mrelax is specified explicitly LLVM's assembler does not emit these relocations.  GCC does, and as a result, object files compiled by GCC can not be linked by LLD.
 
-`maskray has a writeup <http://maskray.me/blog/2021-03-14-the-dark-side-of-riscv-linker-relaxation>_1 on the topic.
+'maskray has a writeup <http://maskray.me/blog/2021-03-14-the-dark-side-of-riscv-linker-relaxation>_' on the topic.
 
-gkm has a patch up `<https://reviews.llvm.org/D125036>_`.  This was split off an earlier patch which included both support for the functional fix and the broader topic of linker optimization and relaxation.  
+gkm has a patch up '<https://reviews.llvm.org/D125036>_'.  This was split off an earlier patch which included both support for the functional fix and the broader topic of linker optimization and relaxation.  
 
 llvm-objdump reports zero size for gcc generated binaries
 =========================================================
@@ -36,4 +36,4 @@ ISEL Fuzzing Disabled
 
 OSS Fuzz used to do fuzzing of various LLVM backends.  This helps to find recent regressions by finding examples which trigger crashes and assertion failures in newly introduced code.  However, due to a build configuration problem, this was recently disabled.  We need to renable this in general, but also add RISCV to the list of fuzzed targets.  
 
-See `discussion here <https://github.com/google/oss-fuzz/pull/7179#issuecomment-1092802635>_` and linked pull requests on the OSS Fuzz repo.
+See 'discussion here <https://github.com/google/oss-fuzz/pull/7179#issuecomment-1092802635>_' and linked pull requests on the OSS Fuzz repo.
