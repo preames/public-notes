@@ -106,8 +106,71 @@ Listing separately to make clear this is not the same work as loop vectorization
 Performance (Minor)
 -------------------
 
+Things in this category are thought to be worth implementing individually, but likely individually minor in their performance impact.  Eventually, everything here should be filed as a LLVM issue, but these are my rough notes for the moment.  
+
 Interesting cases from the LLVM issue tracker:
 
 *  Unaligned read followed by bswap generates suboptimal code `#48314 <https://github.com/llvm/llvm-project/issues/48314>`_
 
+   
+
+Schedule VSETVL outside non-tail folded loops
+=============================================
+
+For main/epilogue style fixed length vectorization, the SETVL instruction is invariant across loop iterations.  We can hoist it into the preheader of the loop.
+
+LSR Exit Test Formation
+========================
+
+Looking at a couple of examples, it looks like LSR is keeping around an extra induction variable just for performing the exit test.  We can probably fold it away, thus removing an increment from every iteration of simple vector loops.  
+
+LoopVectorizer generating duplicate broadcast shuffles
+======================================================
+
+This is being fixed by the backend, but we should probably tweak LV to avoid anyways.
+
+Duplicate IV for index vector
+=============================
+
+In a test which simply writes “i” to every element of a vector, we’re currently generating:
+
+ %vec.ind = phi <4 x i32> [ <i32 0, i32 1, i32 2, i32 3>, %vector.ph ], [ %vec.ind.next, %vector.body ]
+  %step.add = add <4 x i32> %vec.ind, <i32 4, i32 4, i32 4, i32 4>
+  …
+  %vec.ind.next = add <4 x i32> %vec.ind, <i32 8, i32 8, i32 8, i32 8>
+  %2 = icmp eq i64 %index.next, %n.vec
+  br i1 %2, label %middle.block, label %vector.body, !llvm.loop !8
+
+And assembly:
+
+    vadd.vi    v9, v8, 4
+    addi    a5, a3, -16
+    vse32.v    v8, (a5)
+    vse32.v    v9, (a3)
+    vadd.vi    v8, v8, 8
+    addi    a4, a4, -8
+    addi    a3, a3, 32
+    bnez    a4, .LBB0_4
+    beq    a1, a2, .LBB0_8
+
+We can do better here by exploiting the implicit broadcast of scalar arguments.  If we put the constant id vector into a vector register, and add the broadcasted scalar index we get the same result vector.
+
+Branch on inequality involving power of 2
+=========================================
+
+For the compare:
+  %c = icmp ult i64 %a, 8
+  br i1 %c, label %taken, label %untaken
+
+We currently emit:
+    li    a1, 7
+    bltu    a1, a0, .LBB0_2
+
+We could emit:
+    slli    a0, a0, 3
+    bnez    a0, .LBB1_2
+
+This lengthens the critical path by one, but reduces register pressure.  This is probably worthwhile.
+
+There are also many variations of this type of pattern if we decide this is worth spending time on.  
    
