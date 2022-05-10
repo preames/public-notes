@@ -47,4 +47,47 @@ LLD - Linker Optimization and Relaxation
 
 LLD does not currently implement either linker optimization (substituting one code sequence for a smaller/faster one when resolving relocations) or relaxation (shrinking code size exploiting smaller sequences found via optimization.)  Note that this is different from the functional issue described above, though the infrastructure to fix may end up being the same.
 
+Fixed Length Loop Vectorization
+===============================
 
+Fixed length vectorization is currently disabled by default, but can be enabled by explicitly configuring the min vector length at the command line.  Alternatively, you can now specifify the special value -1 to mean "do what the target cpu and extensions say" (e.g. take vector length from Zl128).  
+
+I have not yet heard of any functional issues here, but some may exist.  Given this is a fairly well exercised code path in the vectorizer, likely issues will be in codegen and the backend.
+
+From a performance standpoint, the status is unclear.  I've been told we need to improve the cost model, but don't currently have a set of reproducers to demonstrate where our cost model needs improvement.
+
+One particular point worth noting is that vectorizing long hot loops (with a classic vector loop + scalar epilogue) and vectorizing short loops (with vector epilogue or tail folding) will involve slightly different work and may be enabled at different times.
+
+For epilogue handling, there's an open question as to whether mask predication will be performant enough or whether we will need explicit vector length predication.  The later involves the VP intrinsics discussed later.
+
+Note that fixed length vectorization is likely to remain the default for -mtune configurations even once we have support for scalable.  Or at least, the decision to turn it off is a separate one from having support for scalable vectorization.
+
+Scalable Loop Vectorization
+===========================
+
+Scalable vectorization is mostly relevant for code which is compiled against a generic RISCV target.  Such code will be important, but is likely to be biased away from the hotest of vector kernels.  Given that, producing good quality code at minimal code size is likely to be relatively more important.
+
+Hot Loops
++++++++++
+
+ARM SVE has pioneered support in the loop vectorizer for runtime vector lengths in the main loop.  Starting with a vector body + scalar epilogue lowering may be a reasonable intermediate for scalable compilation.
+
+Short Loops
++++++++++++
+
+The goal here is to generate a single vector loop which uses either masking or vector lengths to handle the epilogue iterations.  This is a much longer term project.
+
+For explicit masking, we may be able to reuse existing infrastructure in the vectorizer.  The key question - which I don't think anyone actually knows yet - is whether the resulting code can be made sufficiently performant.  Of particular uncertainty is the importance (for hardware performance) of using vector length vs predication, and if vector length is strongly preferred whether vector length changes can be reliably pattern matched from mask predicated IR.
+
+For IR level vector lengths, the consensus approach appears to be to use the VP intrinsic infrastructure and there is a public repo which has some degree of prototyping.  I have not evaluated it in depth.
+
+At a minimum, here are the major tasks involved:
+* Teach the optimizer about basic properties of VP intrinsics (e.g. constant folding, known bits, instcombine, etc..)
+* Audit optimizer bailouts on scalable vectors and handle as uniformly as possible.  
+* Teach the cost models about VP intrinsics
+* Teach the vectorizer how to generate scalable vectorized loops (POC patches on phabricator, but very stale)
+
+SLP Vectorization
+=================
+
+Listing separately to make clear this is not the same work as loop vectorization.  I don't currently see a way to do variable length SLP vectorization, so this is likely to overlap with the fixed length loop vectorization to some degree.
