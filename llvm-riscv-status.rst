@@ -14,7 +14,7 @@ LLD doesn’t handle R_RISCV_ALIGN
 
 The align directive requires linker relaxation to be functionally correct.  Currently, unless -mrelax is specified explicitly LLVM's assembler does not emit these relocations.  GCC does, and as a result, object files compiled by GCC can not be linked by LLD.
 
-`maskray has a writeup <http://maskray.me/blog/2021-03-14-the-dark-side-of-riscv-linker-relaxation>`_ on the topic.
+`maskray has a writeup <http://maskray.me/blog/2021-03-14-the-dark-side-of-riscv-linker-relaxation>`_ on the topic.  See also `this llvm bug <https://github.com/llvm/llvm-project/issues/44181>`_.
 
 gkm has a patch up `<https://reviews.llvm.org/D125036>`_.  This was split off an earlier patch which included both support for the functional fix and the broader topic of linker optimization and relaxation.  
 
@@ -22,6 +22,16 @@ llvm-objdump reports zero size for gcc generated binaries
 =========================================================
 
 I have been told that llvm-objdump is reporting zero sizes and failing to disassemble certain gcc compiled object files.  No details available at this time, and issue has not been confirmed with a test case.
+
+Concerning items in LLVM issue tracker
+======================================
+
+Skiming through the issue tracker for "riscv", I see a couple of concerning looking items.
+
+*  [SelectionDAGISel] Mysteriously dropped chain on strict FP node. `#54617 <https://github.com/llvm/llvm-project/issues/54617>`_.  This appears to be a wrong code bug for strictfp which affects RISCV.
+*  [RISCV] Crash in -loop-vectorize pass (BasicTTIImplBase<llvm::RISCVTTIImpl>::getCommonMaskedMemoryOpCost) `#53599 <https://github.com/llvm/llvm-project/issues/53599>`_
+*  [RISCV] wrong vector register alloc in vector instruction `#50157 <https://github.com/llvm/llvm-project/issues/50157>`_.  Appears to be a miscompile of vgather intrinsic, and may hint at a larger lurking issue.
+
 
 Testing Infrastructure
 ----------------------
@@ -91,3 +101,12 @@ SLP Vectorization
 =================
 
 Listing separately to make clear this is not the same work as loop vectorization.  I don't currently see a way to do variable length SLP vectorization, so this is likely to overlap with the fixed length loop vectorization to some degree.
+
+
+Performance (Minor)
+-------------------
+
+Maybe interesting cases from the LLVM issue tracker:
+*  Unaligned read followed by bswap generates suboptimal code #48314
+
+   
