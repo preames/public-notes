@@ -23,6 +23,11 @@ llvm-objdump reports zero size for gcc generated binaries
 
 I have been told that llvm-objdump is reporting zero sizes and failing to disassemble certain gcc compiled object files.  No details available at this time, and issue has not been confirmed with a test case.
 
+Misaligned Frames w/scalable allocas
+====================================
+
+I've been told from a couple sources that frame setup is not correct in this case.  Fraser has some tests up for review (`<https://reviews.llvm.org/D125382>`_).
+
 Concerning items in LLVM issue tracker
 ======================================
 
