@@ -28,6 +28,22 @@ Misaligned Frames w/scalable allocas
 
 I've been told from a couple sources that frame setup is not correct in this case.  Fraser has some tests up for review (`<https://reviews.llvm.org/D125382>`_).
 
+LLD vs LD differences in ELF interpretation
+===========================================
+
+At a recent LLVM RISC-V sync-up, it was mentioned that LLD and LD disagree on interpretation of certain ELF fields.  As a result, using LLD to link gnu generated object files and LD to link LLVM generated ones was thought to be unreliable.
+
+No specifics currently known, so first step here is to find differences if any.  Adopting something similiar to the MSVC differential abi fuzzing that was done a few years back might be very worthwhile.
+
+LLDB Support
+============
+
+In tree, LLDB apparently does not fully work on RISCV.  Exact status unclear.  I've heard reports that with out of tree changes, using it for remote debugging does work, but I don't know where these changes are or progress on getting them upstream.
+
+Workaround: GDB appears to work well with LLVM generated code, and is widely used for this purpose.
+
+Debug info quality in the backend is unclear.  Would be good to do a systematic search for issues ala the Sony efforts from a few years ago.
+
 Concerning items in LLVM issue tracker
 ======================================
 
@@ -106,6 +122,11 @@ SLP Vectorization
 =================
 
 Listing separately to make clear this is not the same work as loop vectorization.  I don't currently see a way to do variable length SLP vectorization, so this is likely to overlap with the fixed length loop vectorization to some degree.
+
+Code Size
+=========
+
+There has been a general view that RISCV code size has significant room for improvement aired in recent LLVM RISC-V sync-up calls, but no specifics are currently known.
 
 
 Performance (Minor)
