@@ -202,3 +202,29 @@ This lengthens the critical path by one, but reduces register pressure.  This is
 
 There are also many variations of this type of pattern if we decide this is worth spending time on.  
    
+Optimizations for constant physregs (VLENB, X0)
+===============================================
+
+Noticed while investigating use of the PseodoReadVLENB intrinsic, and working on them as follow ons to `<https://reviews.llvm.org/D125552>`_, but these also apply to other constant registers.  At the moment, the two I can think of are X0, and VLENB but there might be others.
+
+Punch list (most have tests in test/CodeGen/RISCV/vlenb.ll but not all):
+
+* PeepholeOptimizer should eliminate redundant copies from constant physregs. (`<https://reviews.llvm.org/D125564`_)
+* PeepholeOptimizer should eliminate redundant copies from unmodified physregs.  Looking at the code structure, we appear to already do all the required def tracking for NA copies, and just need to merge some code paths and add some tests.
+* SelectionDAG does not appear to be CSEing READ_REGISTER from constant physreg.
+* MachineLICM can hoist a COPY from constant physreg since there are no possible clobbers.
+* Remat (during RegAllocGreedy) can trivially remat COPY from constant physreg.
+
+X0 specific punch list:
+
+* Regalloc should prefer constant physreg for unused defs.  (e.g. generalize 042a7a5f for e.g. volatile loads)  May be able to delete custom AArch64 handling too.
+
+VLEN specific punch list:
+
+* VLENB has a restricted range of possible values, port pseudo handling to generic property of physreg.
+* Once all above done, remove PseudoReadVLENB.
+
+
+Vaguely related follow on ideas:
+
+* A VSETVLI a0, x0 <vtype> whose implicit VL and VTYPE defines are dead essentially just computes a fixed function of VLENB.  We could consider replacing the VSETVLI with a CSR read and a shift.  (Unclear whether this is profitable on real hardware.)
