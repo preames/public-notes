@@ -52,7 +52,6 @@ Concerning items in LLVM issue tracker
 Skiming through the issue tracker for "riscv", I see a couple of concerning looking items.
 
 *  [SelectionDAGISel] Mysteriously dropped chain on strict FP node. `#54617 <https://github.com/llvm/llvm-project/issues/54617>`_.  This appears to be a wrong code bug for strictfp which affects RISCV.
-*  [RISCV] Crash in -loop-vectorize pass (BasicTTIImplBase<llvm::RISCVTTIImpl>::getCommonMaskedMemoryOpCost) `#53599 <https://github.com/llvm/llvm-project/issues/53599>`_
 *  [RISCV] wrong vector register alloc in vector instruction `#50157 <https://github.com/llvm/llvm-project/issues/50157>`_.  Appears to be a miscompile of vgather intrinsic, and may hint at a larger lurking issue.
 
 
