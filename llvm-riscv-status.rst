@@ -23,12 +23,15 @@ llvm-objdump reports zero size for gcc generated binaries
 
 I have been told that llvm-objdump is reporting zero sizes and failing to disassemble certain gcc compiled object files.  No details available at this time, and issue has not been confirmed with a test case.
 
+This may be related to the suspected ELF interpretation differences below.
+
 Misaligned Frames w/scalable allocas
 ====================================
 
-I've been told from a couple sources that frame setup is not correct in this case.  Fraser has some tests up for review (`<https://reviews.llvm.org/D125382>`_).
+I've been told from a couple sources that frame setup is not correct in this case.  We know have at least two confirmed issues, but where there are two, there are probably more.  Known issues:
 
-Kito has a separate issue around exception handling.  Pending an upstream bug report in the nearish future.
+* Fraser has some tests up for review (`<https://reviews.llvm.org/D125382>`_) which demonstrate one problem.
+* Kito has a separate issue around exception handling.  `Tracked in 55442 <https://github.com/llvm/llvm-project/issues/55442>`_ 
 
 LLD vs LD differences in ELF interpretation
 ===========================================
