@@ -97,6 +97,10 @@ For epilogue handling, there's an open question as to whether mask predication w
 
 Note that fixed length vectorization is likely to remain the default for -mtune configurations even once we have support for scalable.  Or at least, the decision to turn it off is a separate one from having support for scalable vectorization.
 
+Punch List:
+
+* `<https://github.com/llvm/llvm-project/issues/55447>`_ is specific to fixed width vectors 512 bits and larger for issue 1 and 2, but the third occurs for any vector reduction.
+
 Scalable Loop Vectorization
 ===========================
 
