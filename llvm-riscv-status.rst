@@ -28,6 +28,8 @@ Misaligned Frames w/scalable allocas
 
 I've been told from a couple sources that frame setup is not correct in this case.  Fraser has some tests up for review (`<https://reviews.llvm.org/D125382>`_).
 
+Kito has a separate issue around exception handling.  Pending an upstream bug report in the nearish future.
+
 LLD vs LD differences in ELF interpretation
 ===========================================
 
