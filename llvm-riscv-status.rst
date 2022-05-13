@@ -213,6 +213,7 @@ Punch list (most have tests in test/CodeGen/RISCV/vlenb.ll but not all):
 * PeepholeOptimizer should eliminate redundant copies from unmodified physregs.  Looking at the code structure, we appear to already do all the required def tracking for NA copies, and just need to merge some code paths and add some tests.
 * SelectionDAG does not appear to be CSEing READ_REGISTER from constant physreg.
 * MachineLICM can hoist a COPY from constant physreg since there are no possible clobbers.
+* forward copy propagation can forward constant physreg sources.
 * Remat (during RegAllocGreedy) can trivially remat COPY from constant physreg.
 
 X0 specific punch list:
