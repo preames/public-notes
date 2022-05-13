@@ -99,7 +99,7 @@ Note that fixed length vectorization is likely to remain the default for -mtune 
 
 Punch List:
 
-* `<https://github.com/llvm/llvm-project/issues/55447>`_ is specific to fixed width vectors 512 bits and larger for issue 1 and 2, but the third occurs for any vector reduction.
+* `<https://github.com/llvm/llvm-project/issues/55447>`_ is specific to fixed width vectors 512 bits and larger.
 
 Scalable Loop Vectorization
 ===========================
