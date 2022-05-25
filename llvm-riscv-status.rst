@@ -25,12 +25,13 @@ I have been told that llvm-objdump is reporting zero sizes and failing to disass
 
 This may be related to the suspected ELF interpretation differences below.
 
-Misaligned Frames w/scalable allocas
-====================================
+Frame setup problems
+====================
 
-I've been told from a couple sources that frame setup is not correct in this case.  We know have at least two confirmed issues, but where there are two, there are probably more.  Known issues:
+I've been told from a couple sources that frame setup is not correct.  We know have at least two confirmed issues, but where there are two, there are probably more.  Known issues:
 
-* Fraser has some tests up for review (`<https://reviews.llvm.org/D125382>`_) which demonstrate one problem.
+* Its been mentioned to me that scalable allocas may not be lowered correctly.  Possibly in combination with frame alignment interactions.
+* Fraser fixed a couple of misaligned RVV stack problems recently. 
 * Kito has a separate issue around exception handling.  `Tracked in 55442 <https://github.com/llvm/llvm-project/issues/55442>`_ 
 
 LLD vs LD differences in ELF interpretation
