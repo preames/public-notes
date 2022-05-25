@@ -235,3 +235,25 @@ VLEN specific punch list:
 Vaguely related follow on ideas:
 
 * A VSETVLI a0, x0 <vtype> whose implicit VL and VTYPE defines are dead essentially just computes a fixed function of VLENB.  We could consider replacing the VSETVLI with a CSR read and a shift.  (Unclear whether this is profitable on real hardware.)
+
+
+Optimizations for VSETVLI insertion
+===================================
+
+This is collection of pending items for improving VSETVLI placement.
+
+Correctness
+
+* No currently known issues.  Have to see what falls out from strict asserts though.
+
+Compile Time
+
+* https://github.com/llvm/llvm-project/issues/55596
+
+Optimization
+
+* https://github.com/llvm/llvm-project/issues/55615 -- not really VSETVLI specific, looks like a bad interaction with fixed width vs scalable lowering
+* https://github.com/llvm/llvm-project/issues/55594
+* LMUL handling in PRE
+* (possible) generalize PRE to handle loop invariant register form
+* Looking at tests added in a4a438f0, we appear to have a couple problems around LMUL.  Specific things noted so far: constants larger than 32 can't be folded into immediate, but aren't general register values either, it looks like the i8 element type canonicalization is interfering with VSETVLI insertion.
