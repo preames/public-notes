@@ -58,6 +58,12 @@ Skiming through the issue tracker for "riscv", I see a couple of concerning look
 *  [SelectionDAGISel] Mysteriously dropped chain on strict FP node. `#54617 <https://github.com/llvm/llvm-project/issues/54617>`_.  This appears to be a wrong code bug for strictfp which affects RISCV.
 *  [RISCV] wrong vector register alloc in vector instruction `#50157 <https://github.com/llvm/llvm-project/issues/50157>`_.  Appears to be a miscompile of vgather intrinsic, and may hint at a larger lurking issue.
 
+VLEN=32 is known to be broken
+=============================
+
+This means that Zve32x and Zve32f are not supported.  Specific problems noted were around vscale computation and "scalable types" (unclear exact meaning to me).
+
+It is not clear to me that anyone is ever going to care about this.  I'm not aware of any hardware existing or announced which would need this.
 
 Testing Infrastructure
 ----------------------
