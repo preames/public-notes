@@ -251,8 +251,9 @@ This is collection of pending items for improving VSETVLI placement.
 
 Correctness
 
-* No currently known issues.  Have to see what falls out from strict asserts though.
-
+* https://reviews.llvm.org/D126574.
+* There's also one other problem reported to me by email that I don't yet have a test case or understand.
+  
 Compile Time
 
 * https://github.com/llvm/llvm-project/issues/55596
@@ -261,6 +262,5 @@ Optimization
 
 * https://github.com/llvm/llvm-project/issues/55615 -- not really VSETVLI specific, looks like a bad interaction with fixed width vs scalable lowering
 * https://github.com/llvm/llvm-project/issues/55594
-* LMUL handling in PRE
 * (possible) generalize PRE to handle loop invariant register form
-* Looking at tests added in a4a438f0, we appear to have a couple problems around LMUL.  Specific things noted so far: constants larger than 32 can't be folded into immediate, but aren't general register values either, it looks like the i8 element type canonicalization is interfering with VSETVLI insertion.
+* With LMUL > 1 and fixed length vectorization, we can get AVL constants which don't fit in the 5 bit immediate field.  We either need to handle registers generically, or special case constant values in registers.  
