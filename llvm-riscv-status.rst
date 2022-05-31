@@ -264,3 +264,13 @@ Optimization
 * https://github.com/llvm/llvm-project/issues/55594
 * (possible) generalize PRE to handle loop invariant register form
 * With LMUL > 1 and fixed length vectorization, we can get AVL constants which don't fit in the 5 bit immediate field.  We either need to handle registers generically, or special case constant values in registers.  
+
+Compressed Expansion for Alignment
+==================================
+
+If we have sequence of compressed instructions followed by an align directive, it would be better to uncompress the prior instructions instead of asserting nops for alignment.
+
+This is analogous to the relaxation support on X86 for using larger instruction encodings for alignment in the integrated assembler.
+
+This is of questionable value, but might be interesting around e.g. loop alignment.
+
