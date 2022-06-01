@@ -43,4 +43,4 @@ Alibaba
 Other Sources
 -------------
 
-Reddit post: `<https://www.reddit.com/r/RISCV/comments/uf0kc5/riscv_optimization_guides_resource_request/i6qp5p7/>_.  Has some good commentary; was also source of two of the better links above.  
+Reddit post: `<https://www.reddit.com/r/RISCV/comments/uf0kc5/riscv_optimization_guides_resource_request/i6qp5p7/>`_.  Has some good commentary; was also source of two of the better links above.  
