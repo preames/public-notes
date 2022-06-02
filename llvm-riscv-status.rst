@@ -251,8 +251,7 @@ This is collection of pending items for improving VSETVLI placement.
 
 Correctness
 
-* https://reviews.llvm.org/D126574.
-* There's also one other problem reported to me by email that I don't yet have a test case or understand.
+* I've had one problem reported to me by email, for which I don't yet have a test case or understand.
   
 Compile Time
 
@@ -261,9 +260,7 @@ Compile Time
 Optimization
 
 * https://github.com/llvm/llvm-project/issues/55615 -- not really VSETVLI specific, looks like a bad interaction with fixed width vs scalable lowering
-* https://github.com/llvm/llvm-project/issues/55594
-* (possible) generalize PRE to handle loop invariant register form
-* With LMUL > 1 and fixed length vectorization, we can get AVL constants which don't fit in the 5 bit immediate field.  We either need to handle registers generically, or special case constant values in registers.  
+* https://reviews.llvm.org/D126884 - PRE of register form, handles constants in registers (AVL > 32)
 
 Compressed Expansion for Alignment
 ==================================
