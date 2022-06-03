@@ -247,11 +247,11 @@ Vaguely related follow on ideas:
 Optimizations for VSETVLI insertion
 ===================================
 
-This is collection of pending items for improving VSETVLI placement.
+This is collection of pending items for improving VSETVLI placement.  In general, I think we're starting to hit the point of diminishing returns here, and some of the items noted below stand a good chance of being punted to later.
 
 Correctness
 
-* I've had one problem reported to me by email, for which I don't yet have a test case or understand.
+* None currently known.  
   
 Compile Time
 
@@ -261,6 +261,16 @@ Optimization
 
 * https://github.com/llvm/llvm-project/issues/55615 -- not really VSETVLI specific, looks like a bad interaction with fixed width vs scalable lowering
 * https://reviews.llvm.org/D126884 - PRE of register form, handles constants in registers (AVL > 32)
+* We seem to end up with vsetvli which only toggle policy bits (tail and mask agnosticism).  There look to be oppurtunities here, but my first approach didn't work (https://reviews.llvm.org/D126967).  Pending discussion on approach.
+* Splats appear to be triggering SEW/VL changes without need.  (e.g. splat of zero is always zero, same for any bytewise value, etc..)
+* A bunch of special cases where individual instructions ignore particular feilds in VL and VTYPE.  Some are handled, many are not.  Probably need to do a methodical scan.
+* Missing DAGCombine rules:
+
+  * Canonicalize AVLImm >= VLMax to VLMax register form.
+  * GPR = vsetvli <value>, GPR folds to value when <value> less than VLMAX
+  * If AVL=VLMAX, then TU is meaningless and can become TA.
+  * If unmasked, then MU is meaningless and can become TU.
+    
 
 Compressed Expansion for Alignment
 ==================================
