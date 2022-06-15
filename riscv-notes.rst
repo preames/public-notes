@@ -32,7 +32,49 @@ The five bit immediate field in vsetivli can encode a maximum value of 31.  For 
 Odd gaps in vector ISA
 ----------------------
 
-There are a number of odd gaps in the vector ISA.
+There are a number of odd gaps in the vector extension.  By "gap" I mean a case where the ISA appears to force common idioms to generate oddly complex or expensive code.  By "odd" I mean either seemingly inconsistent within the extension itself, or significantly worse that alternative vector ISAs (e.g. x86 or AArch64 SVE).  I haven't gone actively looking for these; they're simply examples of repeating patterns I've seen when looking at compiler generated assembly where there doesn't seem to be something "obvious" the compiler should have done instead.
+
+No Zbb, Zbd (Basic bitmanip idioms) vector analogy extensions
+=============================================================
+
+The lack of Zbb and Zbd prevent the vectorization of many common bit manipulation idioms.  The code sequences to replicate e.g. bitreverse without a dedicated instruction are rather painfully expensive.  Being able to generate fast code for e.g. vredmax(ctlz(v)) has some interesting applications.
+
+Impact: Major.  Practically speaking prevents vector usage for many common idioms.
+
+No Zbc (carryless multiply) analogy extensions
+==================================================
+
+I haven't yet seen code which would benefit from a Zbc vector analogy, but I also don't much time on crypto and my understanding is that is the motivator for these.
+
+Impact: ??
+
+No SEW ignoring math ops
+========================
+
+When working with indexed load and stores, the index width and data width are often different.  For instance, say I want to add 8 bits of data from addresses `(9 x i +256)` off a common base.  The code sequence looks roughly like this::
+  
+  vsetvli x0, x0, e64, mf8, ta, ma
+  vshl v2, v2, 3
+  vadd v2, v2, 256
+  vsetvli x0, x0, e8, m1, ta, ma
+  vluxei64.v vd, (x1), v2, vm
+
+Note that we're toggling vtype solely for the purpose of performing indexing in i64.  
+
+If we had a version of the basic arithmetic ops which ignored SEW - or even better, a variant of the Zba instructions! - we could rewrite this sequence as::
+
+  vshl64 v2, v2, 3
+  vadd64 v2, v2, 256
+  vluxei64.v vd, (x1), v2, vm
+
+Or even better::
+
+  vsh3add64 v2, v2, 256
+  vluxei64.v vd, (x1), v2, vm
+
+Note that 64 here comes from the native index width for a 64 bit machine.  We could either produce two 32/64 variants or a single ELEN paraterized variant.
+
+Impact: minor, main benefit is reduced code size and fewer vtype changes
 
 No Cheap Mask Extend
 ====================
@@ -58,44 +100,6 @@ No Product Reduction
 There does not appear to be a way to lower an "llvm.vector.reduce.mul" or "llvm.vector.reduce.fmul" into a single reduction instruction.  Other reduction types are supported, but for some reason there's no 'vredprod', 'vfredoprod' or 'vfreduprod'.
 
 Impact: minor, mostly me being completionist.
-
-No Zba, Zbb, Zbc, or Zbd vector analogy extensions
-==================================================
-
-The lack of Zba is painful due to the lack of '[base + offset]' addressing in vector loads and stores.
-
-Impact: widespread small increases in code size
-
-The lack of Zbb and Zbd prevent the vectorization of many common bit manipulation idioms.  The code sequences to replicate e.g. bitreverse without a dedicated instruction are rather painfully expensive.
-
-Impact: Major.  Practically speaking prevents vector usage for many common idioms.
-
-I haven't yet seen code which would benefit from a Zbc vector analogy, but I also don't much time on crypto and my understanding is that is the motivator for these.
-
-Impact: ??
-
-No SEW ignoring math ops
-========================
-
-When working with indexed load and stores, the index width and data width are often different.  For instance, say I want to add 8 bits of data from a fixed offset off a list of pointers.  The code sequence looks roughly like this::
-  
-  vsetvli x0, x0, e64, mf8, ta, ma
-  vshl v2, v2, 2
-  vadd v2, v2, 256
-  vsetvli x0, x0, e8, m1, ta, ma
-  vluxei64.v vd, (x1), v2, vm
-
-Note that we're toggling vtype solely for the purpose of performing indexing in i64.  
-
-If we had a version of the basic arithmetic ops which ignored SEW - or even better, a variant of the Zba instructions! - we could rewrite this sequence as::
-
-  vshl64 v2, v2, 2
-  vadd64 v2, v2, 256
-  vluxei64.v vd, (x1), v2, vm
-
-Note that 64 here comes from the native index width for a 64 bit machine.  We could either produce two 32/64 variants or a single ELEN paraterized variant.
-
-Impact: minor
 
 Lack of e1 element type
 =======================
