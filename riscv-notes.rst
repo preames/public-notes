@@ -132,7 +132,14 @@ For working with large bitvectors, having an element type of e1 would be helpful
 
 Impact: minor, mostly a seeming inconsistency
 
+vlast.m variant
+===============
 
+The extension has vfirst.m (and it's variants), but not vlast.m (and its variants).  I've been told the later is sometimes useful, though I don't have a good motivating example as of yet.
+
+The other option here would be to support bitreverse on mask vectors.  A bitreverse followed by a vfirst.m should be equivalent to a vlast.m - modulo register pressure and latency.
+
+In the currently available extension, probably the best option is to use CTZ in Zba to emulate this for any case we know VLMAX < ELEN.  This is likely enough for fixed vectors as ELEN=64, etype=e8, would give VLEN=512 as the maximally supported size for this trick.  By using a series of vslidedown, copy to gpr, and CTZs we could probably generate correct - if ever slower with every ELEN sized chunk - code for any fixed vector.
 
 
 
