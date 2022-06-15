@@ -34,10 +34,10 @@ Odd gaps in vector ISA
 
 There are a number of odd gaps in the vector extension.  By "gap" I mean a case where the ISA appears to force common idioms to generate oddly complex or expensive code.  By "odd" I mean either seemingly inconsistent within the extension itself, or significantly worse that alternative vector ISAs (e.g. x86 or AArch64 SVE).  I haven't gone actively looking for these; they're simply examples of repeating patterns I've seen when looking at compiler generated assembly where there doesn't seem to be something "obvious" the compiler should have done instead.
 
-No Zbb, Zbd (Basic bitmanip idioms) vector analogy extensions
+No Zbb, Zbs (Basic bitmanip idioms) vector analogy extensions
 =============================================================
 
-The lack of Zbb and Zbd prevent the vectorization of many common bit manipulation idioms.  The code sequences to replicate e.g. bitreverse without a dedicated instruction are rather painfully expensive.  Being able to generate fast code for e.g. vredmax(ctlz(v)) has some interesting applications.
+The lack of Zbb and Zbs prevent the vectorization of many common bit manipulation idioms.  The code sequences to replicate e.g. bitreverse without a dedicated instruction are rather painfully expensive.  Being able to generate fast code for e.g. vredmax(ctlz(v)) has some interesting applications.
 
 Impact: Major.  Practically speaking prevents vector usage for many common idioms.
 
@@ -76,6 +76,11 @@ Note that 64 here comes from the native index width for a 64 bit machine.  We co
 
 Impact: minor, main benefit is reduced code size and fewer vtype changes
 
+Another idea here might be to instead have an indexed load/store variant which implicitly scaled its index vector by the index type.  (That is, implicitly included a mutiplication of the index vector by the index width..)  That would give us code along the lines of the following::
+
+  add x2, x1, 256
+  vluxei64.v.scaled vd, (x2), v2, vm
+
 No Cheap Mask Extend
 ====================
 
@@ -83,8 +88,8 @@ There does not appear to be a cheap zero or sign extend sequence to take a mask 
 
 The best sequence I see is::
 
-  vmv.v.i v1, 0
-  vadd v1, v1, 1, v0
+  vmv.v.i vd, 0
+  vmerge.vim vd, vd, 1, v0
 
 How to fix:
 
@@ -100,6 +105,25 @@ No Product Reduction
 There does not appear to be a way to lower an "llvm.vector.reduce.mul" or "llvm.vector.reduce.fmul" into a single reduction instruction.  Other reduction types are supported, but for some reason there's no 'vredprod', 'vfredoprod' or 'vfreduprod'.
 
 Impact: minor, mostly me being completionist.
+
+Non vrgather vector.reverse
+===========================
+
+Reversing the order of elements in a vector is a common operation.  On RISC-V today, this requires the use of a vrgather, and almost more importantly, a several instruction long sequence to materialize the index vector.  E,g, the following sequence reverses an i8 vector::
+
+    csrr a0, vlenb
+    srli a0, a0, 2
+    addi a0, a0, -1
+    vsetvli a1, zero, e16, mf2, ta, mu
+    vid.v v9
+    vrsub.vx v10, v9, a0
+    vsetvli zero, zero, e8, mf4, ta, mu
+    vrgatherei16.vv v9, v8, v10
+    vmv1r.v v8, v9
+
+Note that AArch64 provides an instruction for this.
+
+Other ways to improve this sequence might be to variants of the SEW independent index arithmetic above, or providing a cheap way to get the VLMax splat.
 
 Lack of e1 element type
 =======================
