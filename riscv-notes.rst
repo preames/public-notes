@@ -44,7 +44,7 @@ Impact: Major.  Practically speaking prevents vector usage for many common idiom
 No Zbc (carryless multiply) analogy extensions
 ==================================================
 
-I haven't yet seen code which would benefit from a Zbc vector analogy, but I also don't much time on crypto and my understanding is that is the motivator for these.
+I haven't yet seen code which would benefit from a Zbc vector analogy, but I also don't much time on crypto and my understanding is that is the motivator for these.  Here's a `public proposal for a set of vector crypto operations <https://docs.google.com/presentation/d/1HxRp22kANHHnaO9p-rqXfsTX3_IoK1WeSbZm70QfVhc/edit#slide=id.p1>`_ which do include some restricted forms of carryless multiply.
 
 Impact: ??
 
