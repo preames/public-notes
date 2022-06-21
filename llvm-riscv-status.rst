@@ -249,28 +249,47 @@ Optimizations for VSETVLI insertion
 
 This is collection of pending items for improving VSETVLI placement.  In general, I think we're starting to hit the point of diminishing returns here, and some of the items noted below stand a good chance of being punted to later.
 
-Correctness
-
-* None currently known.  
-  
-Compile Time
-
-* https://github.com/llvm/llvm-project/issues/55596
-
 Optimization
 
 * https://github.com/llvm/llvm-project/issues/55615 -- not really VSETVLI specific, looks like a bad interaction with fixed width vs scalable lowering
-* https://reviews.llvm.org/D126884 - PRE of register form, handles constants in registers (AVL > 32)
 * We seem to end up with vsetvli which only toggle policy bits (tail and mask agnosticism).  There look to be oppurtunities here, but my first approach didn't work (https://reviews.llvm.org/D126967).  Pending discussion on approach.
-* Splats appear to be triggering SEW/VL changes without need.  (e.g. splat of zero is always zero, same for any bytewise value, etc..)
-* A bunch of special cases where individual instructions ignore particular feilds in VL and VTYPE.  Some are handled, many are not.  Probably need to do a methodical scan.
 * Missing DAGCombine rules:
 
   * Canonicalize AVLImm >= VLMax to VLMax register form.
   * GPR = vsetvli <value>, GPR folds to value when <value> less than VLMAX
   * If AVL=VLMAX, then TU is meaningless and can become TA.
   * If unmasked, then MU is meaningless and can become TU.
-    
+
+Vectorization
+=============
+
+Goal is to smoke out as many correctness problems around vectorization as possible, then enable some vectorization configuration (any configuration).
+
+Configurations of Note
+
+* -riscv-v-vector-bits-min=128 -- short fixed length
+* -riscv-v-vector-bits-min=1024 -- long fixed length
+* -scalable-vectorization=on -- scalable only, likely initial default
+* -riscv-v-vector-bits-min=128 -scalable-vectorization=on -- both fixed and scalable enabled, very useful for smoking out cost model issues
+
+Correctness - build code with vectorization flags enabled.
+
+* sqlite3 (done, stable)
+* Clang stage2 build
+* llvm test-suite build
+
+Cost Model Completeness - Add "strictly valid costs" mode, and build code with it.
+
+* sqlite3 (nearly done)
+* Clang stage2 build
+* llvm test-suite build
+
+Tuning
+
+* VScaleFortuning - currently set to None, which effectively disables scalable vectorization.  Is this even the right concept?  Would have expected e.g. VLENForTuning which is not 1-to-1.
+* Issues around epilogue vectorization w/VF > 16 (for fixed length vectors, i8 for VLEN >= 128, i16 for VLEN >= 256, etc..)
+* Initial target assumes scalar epilogue loop, return to folding/epilogue vectorization in future.
+
 
 Compressed Expansion for Alignment
 ==================================
