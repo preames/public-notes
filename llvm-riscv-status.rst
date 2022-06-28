@@ -272,21 +272,22 @@ Configurations of Note
 * -scalable-vectorization=on -- scalable only, likely initial default
 * -riscv-v-vector-bits-min=128 -scalable-vectorization=on -- both fixed and scalable enabled, very useful for smoking out cost model issues
 
-Correctness - build code with vectorization flags enabled.
+Stages:
 
-* sqlite3 (done, stable)
-* Clang stage2 build
-* llvm test-suite build
+* Correctness - build code with vectorization flags enabled.
+* Cost Model Completeness - No invalid costs seen when compiling (requires custom patch)
 
-Cost Model Completeness - Add "strictly valid costs" mode, and build code with it.
+Workload Status:
 
-* sqlite3 (nearly done)
-* Clang stage2 build
-* llvm test-suite build
+* sqlite3 (many configs) -- stable, no invalid costs
+* imagemagick -- build w/o link due to "missing files" (likely autoconf cross compile probl, CFLAGS not respected, so not building interesting configs
+* Clang stage2 build (many configs) -- successful build/link, no invalid costs, can't tests due to enviornment issue in lit not passing QEMU_LD_PREFIX)
+* llvm test-suite -- build/link w/ one error due to missing TCL in cross build (only currently default config)
+* spec2017
 
 Tuning
 
-* VScaleFortuning - currently set to None, which effectively disables scalable vectorization.  Is this even the right concept?  Would have expected e.g. VLENForTuning which is not 1-to-1.
+* Lots...
 * Issues around epilogue vectorization w/VF > 16 (for fixed length vectors, i8 for VLEN >= 128, i16 for VLEN >= 256, etc..)
 * Initial target assumes scalar epilogue loop, return to folding/epilogue vectorization in future.
 
