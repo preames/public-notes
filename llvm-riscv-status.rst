@@ -281,8 +281,8 @@ Workload Status:
 
 * sqlite3 (many configs) -- stable, no invalid costs
 * imagemagick -- build w/o link due to "missing files" (likely autoconf cross compile probl, CFLAGS not respected, so not building interesting configs
-* Clang stage2 build (many configs) -- successful build/link, no invalid costs, can't tests due to enviornment issue in lit not passing QEMU_LD_PREFIX)
-* llvm test-suite -- build/link w/ one error due to missing TCL in cross build (only currently default config)
+* Clang stage2 build (many configs) -- successful build/link, no invalid costs, ran tests using llvm-lit + qemu-user no suspicious looking errors (I slightly screwed up my run, so there were errors, but none that looked to be anything other than user error - did not rerun due to length of run)
+* llvm test-suite -- build/link w/ one error due to missing TCL in cross build (scalable vectorization only), ran all tests under qemu-user.  Several failures due to strip not recognizing cross compiled binaries, but nothing which looked suspicious.  Log output includes a bunch of Invalid costs for later consideration.
 * spec2017
 
 Tuning
