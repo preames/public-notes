@@ -9,14 +9,11 @@ This document contains an initial survey of gaps in the RISCV LLVM toolchain eco
 Functional
 ----------
 
-LLD doesn’t handle R_RISCV_ALIGN
-================================
+LLD Status Update
+=================
 
-The align directive requires linker relaxation to be functionally correct.  Currently, unless -mrelax is specified explicitly LLVM's assembler does not emit these relocations.  GCC does, and as a result, object files compiled by GCC can not be linked by LLD.
+As of 2022-07-08, `D127581 <https://reviews.llvm.org/D127581>`_ has landed with support for R_RISCV_ALIGN.  Given this, -mno-relax is no longer required when linking with LLD.
 
-`maskray has a writeup <http://maskray.me/blog/2021-03-14-the-dark-side-of-riscv-linker-relaxation>`_ on the topic.  See also `this llvm bug <https://github.com/llvm/llvm-project/issues/44181>`_.
-
-gkm has a patch up `<https://reviews.llvm.org/D125036>`_.  This was split off an earlier patch which included both support for the functional fix and the broader topic of linker optimization and relaxation.  
 
 llvm-objdump reports zero size for gcc generated binaries
 =========================================================
@@ -87,7 +84,13 @@ Performance
 LLD - Linker Optimization and Relaxation
 ========================================
 
-LLD does not currently implement either linker optimization (substituting one code sequence for a smaller/faster one when resolving relocations) or relaxation (shrinking code size exploiting smaller sequences found via optimization.)  Note that this is different from the functional issue described above, though the infrastructure to fix may end up being the same.
+Up until recently, LLD did not implement either linker optimization (substituting one code sequence for a smaller/faster one when resolving relocations) or relaxation (shrinking code size exploiting smaller sequences found via optimization.)  However, the infrastructure to do so is now in tree, and `D127611 <https://reviews.llvm.org/D127611>`_ included support for call relaxation for both PC relative and absolute addresses.  This covered cases where target address was initially a 32 bit immediate or 32 bit relative.
+
+Cases known to be missing today:
+
+* Branch relaxation with 32 bit immediate or PC relative.
+* GP relative addressing.  (Unclear status?)
+* Relaxation of 64 bit immediate or 64 bit relative offset cases.  Likely requires specification of Large code model.
 
 Fixed Length Loop Vectorization
 ===============================
