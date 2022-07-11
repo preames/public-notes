@@ -92,59 +92,57 @@ Cases known to be missing today:
 * GP relative addressing.  (Unclear status?)
 * Relaxation of 64 bit immediate or 64 bit relative offset cases.  Likely requires specification of Large code model.
 
-Fixed Length Loop Vectorization
-===============================
+Vectorization
+=============
 
-Fixed length vectorization is currently disabled by default, but can be enabled by explicitly configuring the min vector length at the command line.  Alternatively, you can now specifify the special value -1 to mean "do what the target cpu and extensions say" (e.g. take vector length from Zl128).  
+I have been actively working towards enabling vectorization for RISCV.  The framing of this section was recently heavily reworked to reflect current impressions, and my plan for near term execution.
 
-I have not yet heard of any functional issues here, but some may exist.  Given this is a fairly well exercised code path in the vectorizer, likely issues will be in codegen and the backend.
+Scalable + Scalar Epilogue
+++++++++++++++++++++++++++
 
-From a performance standpoint, the status is unclear.  I've been told we need to improve the cost model, but don't currently have a set of reproducers to demonstrate where our cost model needs improvement.
+ARM SVE has pioneered support in the loop vectorizer for runtime vector lengths in the main loop, while using a scalar epilogue loop to handle the last couple of iterations.  I have now spent several weeks working through issues found when compiling larger and larger sets of code.  The main change required was to gracefully handle invalid costs in optimizations.
 
-One particular point worth noting is that vectorizing long hot loops (with a classic vector loop + scalar epilogue) and vectorizing short loops (with vector epilogue or tail folding) will involve slightly different work and may be enabled at different times.
+I have a change up (`D129013 <https://reviews.llvm.org/D129013>`_) which will enable this by default, and expect it to land in the next couple of weeks.
 
-For epilogue handling, there's an open question as to whether mask predication will be performant enough or whether we will need explicit vector length predication.  The later involves the VP intrinsics discussed later.
+My expectation is that the result of this change will be that the vectorizer sometimes kicks in when the `+v` extension is enabled, and that when it does, it generates reasonable vector code which matches or outperforms the scalar equivalent.  There is still quite a bit of work to be done in increasing the robustness of vectorization, and refining cost models so that we vectorize as often as we can.
 
-Note that fixed length vectorization is likely to remain the default for -mtune configurations even once we have support for scalable.  Or at least, the decision to turn it off is a separate one from having support for scalable vectorization.
+Originally, I had thought scalable vectorization would only be relevant when not using -mcpu to target a particular chip, but after looking at generated code for a while, I'm largely convinced that scalable loops are usually on par with fixed length vectorization.  As a result, using scalable as our default, and only falling back to fixed length vectorization when required is looking like a reasonable long term default.
 
-Punch List:
+Fixed Length (e.g. use minimum VLEN)
+++++++++++++++++++++++++++++++++++++
 
-* `<https://github.com/llvm/llvm-project/issues/55447>`_ is specific to fixed width vectors 512 bits and larger.
+Fixed length vectorization is currently disabled by default, but can be enabled by explicitly configuring the min vector length at the command line.  Alternatively, you can now specifify the special value -1 to mean "do what the target cpu and extensions say" (e.g. take vector length from Zl128).
 
-Scalable Loop Vectorization
-===========================
+Functionally, I am not aware of any blockers.  I have cross built a reasonable amount of code with multiple fixed length configurations, and have not hit any crashes in the compiler.  Given this is a fairly well exercised code path on other targets, I am not expecting sigificant further issues.
 
-Scalable vectorization is mostly relevant for code which is compiled against a generic RISCV target.  Such code will be important, but is likely to be biased away from the hotest of vector kernels.  Given that, producing good quality code at minimal code size is likely to be relatively more important.
+I am expecting to enable this roughly 2-3 weeks after the scalable vectorization change mentioned above.  
 
-Hot Loops
-+++++++++
+For the loop vectorizer, the main effect of enabling fixed length vectors in addition to scalable ones is in improving the robustness of the vectorizer.  On the scalable side, we have a lot of unimplemented cases (e.g. uniform stores, internal predication of memory access, etc..).  Without fixed length vectorization enabled, these cases cause code to stay entirely scalar.  Being able to vectorize at fixed length gets us performance wins while we work through addressing gaps in scalable capabilities.
 
-ARM SVE has pioneered support in the loop vectorizer for runtime vector lengths in the main loop.  Starting with a vector body + scalar epilogue lowering may be a reasonable intermediate for scalable compilation.
+Enabling fixed length vectors should also let SLP kick in as well.  Given `+v` includes a minimum VLEN of 128, we may see some benefit here.
 
-Short Loops
-+++++++++++
+For both LV and SLP, there are cases where fixed length vectors result in much easier costing decisions.  (i.e. indexed loads have runtime performance depending on VL; if we don't know VL, it's really hard to decide using one is profitable.)  As a result, even long term, having both enabled and deciding between them based on cost estimates seems like the right path forward.
 
-The goal here is to generate a single vector loop which uses either masking or vector lengths to handle the epilogue iterations.  This is a much longer term project.
+As with scalable above, the near goal is to have vectorization kick in when feasible and profitable.  We are still going to have a lot of tuning and robustness work to do once enabled.  
 
-For explicit masking, we may be able to reuse existing infrastructure in the vectorizer.  The key question - which I don't think anyone actually knows yet - is whether the resulting code can be made sufficiently performant.  Of particular uncertainty is the importance (for hardware performance) of using vector length vs predication, and if vector length is strongly preferred whether vector length changes can be reliably pattern matched from mask predicated IR.
+Tail Folding
+============
 
-For IR level vector lengths, the consensus approach appears to be to use the VP intrinsic infrastructure and there is a public repo which has some degree of prototyping.  I have not evaluated it in depth.
+For code size reasons, it is desirable to be able to fold the remainder loop into the main loop body.  At the moment, we have two options for tail folding: mask predication and VL predication.  I've been starting to look at the tradeoffs here, but this section is still highly preliminary and subject to change.
 
-At a minimum, here are the major tasks involved:
-* Teach the optimizer about basic properties of VP intrinsics (e.g. constant folding, known bits, instcombine, etc..)
-* Audit optimizer bailouts on scalable vectors and handle as uniformly as possible.  
-* Teach the cost models about VP intrinsics
-* Teach the vectorizer how to generate scalable vectorized loops (POC patches on phabricator, but very stale)
+Mask predication appears to work today.  We'd need to enable the flag, but at least some loops would start folding immediately.  There are some major profitability questions around doing so, particularly for short running loops which today would bypass the vector body entirely.
 
-SLP Vectorization
-=================
+Talking with various hardware players, there appears to be a somewhat significant cost to using mask predication over VL predication.  For several teams I've talked to, SETVLI runs in the scalar domain whereas mask generation via vector compares run in the vector domain.  Particular for small loops which might be vector bottlenecked, this means VL predication is preferrable.
 
-Listing separately to make clear this is not the same work as loop vectorization.  I don't currently see a way to do variable length SLP vectorization, so this is likely to overlap with the fixed length loop vectorization to some degree.
+For VL predication, we have two major options.  We can either pattern match mask predication into VL predication in the backend, or we can upstream the work BSC has done on vectorizing using the VP intrinsics.  I'm unclear on which approach is likely to work out best long term.
+
 
 Code Size
 =========
 
 There has been a general view that RISCV code size has significant room for improvement aired in recent LLVM RISC-V sync-up calls, but no specifics are currently known.
+
+2022-07-11 - I spent some time last week glancing at usage of compressed instructions.  Main take away is that lack of linker optimization/relaxation support in LLD was really painful code size wise.  We should revisit once that support is complete, or evaluate using LD in the meantime.
 
 
 Performance (Minor)
