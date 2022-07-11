@@ -126,7 +126,7 @@ For both LV and SLP, there are cases where fixed length vectors result in much e
 As with scalable above, the near goal is to have vectorization kick in when feasible and profitable.  We are still going to have a lot of tuning and robustness work to do once enabled.  
 
 Tail Folding
-============
+++++++++++++
 
 For code size reasons, it is desirable to be able to fold the remainder loop into the main loop body.  At the moment, we have two options for tail folding: mask predication and VL predication.  I've been starting to look at the tradeoffs here, but this section is still highly preliminary and subject to change.
 
@@ -135,6 +135,11 @@ Mask predication appears to work today.  We'd need to enable the flag, but at le
 Talking with various hardware players, there appears to be a somewhat significant cost to using mask predication over VL predication.  For several teams I've talked to, SETVLI runs in the scalar domain whereas mask generation via vector compares run in the vector domain.  Particular for small loops which might be vector bottlenecked, this means VL predication is preferrable.
 
 For VL predication, we have two major options.  We can either pattern match mask predication into VL predication in the backend, or we can upstream the work BSC has done on vectorizing using the VP intrinsics.  I'm unclear on which approach is likely to work out best long term.
+
+Robustness and Cost Modeling Improvements
++++++++++++++++++++++++++++++++++++++++++
+
+I mentioned this above in a few cases, but I want to specifically call it out as a top level item as well.  Beyond simply getting the vectorizer enabled, we have a significant amount of work required to make sure that the vectorizer is kicking in as widely as it can.  This will involve both a lot of cost model tuning, and also changes to the vectorizer itself to eliminate implementation limits.  I don't yet have a good grasp on the work required more specifically, but expect this to take several months of effort.
 
 
 Code Size
