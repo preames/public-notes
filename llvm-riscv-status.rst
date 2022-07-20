@@ -307,3 +307,17 @@ This is analogous to the relaxation support on X86 for using larger instruction 
 
 This is of questionable value, but might be interesting around e.g. loop alignment.
 
+Scalable Vectorizer Gaps
+========================
+
+Here is a punch list of known missing cases around scalable vectorization in the LoopVectorizer.  These are mostly target independent.
+
+* Uniform Store.  See @uniform_store in test/Transforms/LoopVectorize/RISCV/scalable-basics.ll.  Basic issue is we need to implement last active lane extraction.  May be an easy sub-case for non-tail folding when last active is by definition last lane.
+* Interleaving Groups.  Code structure in vectorize contains an unconditonal bailout.
+* Block Predication of div/rem.  Don't have a way to represent the scalalization of the vector op required for legality.  Consider either VP intrinsic (without EVL), loop, bounded-from-above expansion, or safe-divisor via select.
+
+
+RISCV Target Specific:
+
+* Gather/Scatter.  Effectively disables as worst case cost is assumed in RISCV backend, and the vectorizer uses vscale for tuning (which is much lower), resulting in high cost and non-use.  Unclear what we should do here.
+
