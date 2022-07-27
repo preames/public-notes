@@ -38,6 +38,8 @@ At a recent LLVM RISC-V sync-up, it was mentioned that LLD and LD disagree on in
 
 No specifics currently known, so first step here is to find differences if any.  Adopting something similiar to the MSVC differential abi fuzzing that was done a few years back might be very worthwhile.
 
+2022-07-26 - In the process of reviewing the psABI document which is currently going through ratification, I stumbled across `one real difference <https://github.com/riscv-non-isa/riscv-elf-psabi-doc/issues/197>`_.  In this case, GNU assumes a pc-relative relocation can always resolve to zero even if that's out of bounds for the pc-relative range.  LLVM LLD considers this an error, and asserts that a PLT/GOT entry should have been used instead.
+
 LLDB Support
 ============
 
@@ -312,9 +314,9 @@ Scalable Vectorizer Gaps
 
 Here is a punch list of known missing cases around scalable vectorization in the LoopVectorizer.  These are mostly target independent.
 
-* Uniform Store.  See @uniform_store in test/Transforms/LoopVectorize/RISCV/scalable-basics.ll.  Basic issue is we need to implement last active lane extraction.  May be an easy sub-case for non-tail folding when last active is by definition last lane.
-* Interleaving Groups.  Code structure in vectorize contains an unconditonal bailout.
-* Block Predication of div/rem.  Don't have a way to represent the scalalization of the vector op required for legality.  Consider either VP intrinsic (without EVL), loop, bounded-from-above expansion, or safe-divisor via select.
+* Uniform Store.  See @uniform_store in test/Transforms/LoopVectorize/RISCV/scalable-basics.ll.  Basic issue is we need to implement last active lane extraction.  May be an easy sub-case for non-tail folding when last active is by definition last lane.  Actively working on this, with a couple of patches (`D130364<https://reviews.llvm.org/D130364>`_, `D130637<https://reviews.llvm.org/D130637>`_) on review; probably fairly quick to resolve subject to getting prompt reviews.
+* Interleaving Groups.  This one looks tricky as selects in IR require constants and the required shuffles for scalable can't currently be expressed as constants.  This is likely going to need an IR change; details as yet unsettled.
+* Block Predication of div/rem.  Don't have a way to represent the scalalization of the vector op required for legality.  Consider either VP intrinsic (without EVL), loop, bounded-from-above expansion, or safe-divisor via select.  `D130164<https://reviews.llvm.org/D130164>`_ is one approach out for review; this may evolve into something different though.
 
 
 RISCV Target Specific:
