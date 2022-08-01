@@ -102,9 +102,7 @@ I have been actively working towards enabling vectorization for RISCV.  The fram
 Scalable + Scalar Epilogue
 ++++++++++++++++++++++++++
 
-ARM SVE has pioneered support in the loop vectorizer for runtime vector lengths in the main loop, while using a scalar epilogue loop to handle the last couple of iterations.  I have now spent several weeks working through issues found when compiling larger and larger sets of code.  The main change required was to gracefully handle invalid costs in optimizations.
-
-I have a change up (`D129013 <https://reviews.llvm.org/D129013>`_) which will enable this by default, and expect it to land in the next couple of weeks.
+ARM SVE has pioneered support in the loop vectorizer for runtime vector lengths in the main loop, while using a scalar epilogue loop to handle the last couple of iterations.  As of 2022-07-27, scalable vectorization (with a scalar epilogue) is enabled by default in upstream LLVM.  This may go through a few revert cycles before it sticks, so checking the status of the review thread (`D129013 <https://reviews.llvm.org/D129013>`_) is advised.  
 
 My expectation is that the result of this change will be that the vectorizer sometimes kicks in when the `+v` extension is enabled, and that when it does, it generates reasonable vector code which matches or outperforms the scalar equivalent.  There is still quite a bit of work to be done in increasing the robustness of vectorization, and refining cost models so that we vectorize as often as we can.
 
@@ -142,6 +140,8 @@ Robustness and Cost Modeling Improvements
 +++++++++++++++++++++++++++++++++++++++++
 
 I mentioned this above in a few cases, but I want to specifically call it out as a top level item as well.  Beyond simply getting the vectorizer enabled, we have a significant amount of work required to make sure that the vectorizer is kicking in as widely as it can.  This will involve both a lot of cost model tuning, and also changes to the vectorizer itself to eliminate implementation limits.  I don't yet have a good grasp on the work required more specifically, but expect this to take several months of effort.
+
+There's a more detailed punch list for this below in the minor perf items section.
 
 
 Code Size
@@ -317,9 +317,9 @@ Here is a punch list of known missing cases around scalable vectorization in the
 * Uniform Store.  See @uniform_store in test/Transforms/LoopVectorize/RISCV/scalable-basics.ll.  Basic issue is we need to implement last active lane extraction.  May be an easy sub-case for non-tail folding when last active is by definition last lane.  Actively working on this, with a couple of patches (`D130364<https://reviews.llvm.org/D130364>`_, `D130637<https://reviews.llvm.org/D130637>`_) on review; probably fairly quick to resolve subject to getting prompt reviews.
 * Interleaving Groups.  This one looks tricky as selects in IR require constants and the required shuffles for scalable can't currently be expressed as constants.  This is likely going to need an IR change; details as yet unsettled.
 * Block Predication of div/rem.  Don't have a way to represent the scalalization of the vector op required for legality.  Consider either VP intrinsic (without EVL), loop, bounded-from-above expansion, or safe-divisor via select.  `D130164<https://reviews.llvm.org/D130164>`_ is one approach out for review; this may evolve into something different though.
-
+* General loop scalarization.  For scalable vectors, we _can_ scalarize, but not via unrolling.  Instead, we must generate a loop.  This can be done in the vectorizer itself (since its a generic IR transform pass), but is not possible in SelectionDAG (which is not allowed to modify the CFG).  Interacts both with div/rem and intrinsic costing.
 
 RISCV Target Specific:
 
 * Gather/Scatter.  Effectively disables as worst case cost is assumed in RISCV backend, and the vectorizer uses vscale for tuning (which is much lower), resulting in high cost and non-use.  Unclear what we should do here.
-
+* ceil/floor/round.  In general, we are missing a bunch of intrinsic costs for vectorized intrinsic calls.  This results - due to the inability to scalarize - in invalid costs being returned and thus vectorization not triggering.
