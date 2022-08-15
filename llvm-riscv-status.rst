@@ -49,6 +49,16 @@ Workaround: GDB appears to work well with LLVM generated code, and is widely use
 
 Debug info quality in the backend is unclear.  Would be good to do a systematic search for issues ala the Sony efforts from a few years ago.
 
+Split Dwarf Issue
+-----------------
+
+I have been told that there is an issue with split dwarf.  If I understood correctly, the actual issue is target independent, but RISCV will see it at higher frequency.
+
+My understanding is that split dwarf doesn't allow relocations which change function sizes in the split portion.  Specifically, applying fixups in the split files is undesirable to reduce link time.  Because of the strategy taken with call relaxation, RISC-V is much more likely to see this problem in practice than other targets.
+
+Workaround: Don't use split dwarf.  Or disable -mrelax.  
+
+
 Concerning items in LLVM issue tracker
 ======================================
 
@@ -115,7 +125,7 @@ Fixed length vectorization is currently disabled by default, but can be enabled 
 
 Functionally, I am not aware of any blockers.  I have cross built a reasonable amount of code with multiple fixed length configurations, and have not hit any crashes in the compiler.  Given this is a fairly well exercised code path on other targets, I am not expecting sigificant further issues.
 
-I am expecting to enable this roughly 2-3 weeks after the scalable vectorization change mentioned above.  
+I have a change (`D131508<https://reviews.llvm.org/D131508>`_) posted for review, which I expect to land in the next few weeks.  
 
 For the loop vectorizer, the main effect of enabling fixed length vectors in addition to scalable ones is in improving the robustness of the vectorizer.  On the scalable side, we have a lot of unimplemented cases (e.g. uniform stores, internal predication of memory access, etc..).  Without fixed length vectorization enabled, these cases cause code to stay entirely scalar.  Being able to vectorize at fixed length gets us performance wins while we work through addressing gaps in scalable capabilities.
 
