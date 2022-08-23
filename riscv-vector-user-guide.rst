@@ -14,7 +14,7 @@ qemu-riscv32/64 support the v1.0 vector extension in upstream.  Note that the de
 
 Once you have a sufficiently recent qemu-riscv, you should be able to run binaries containing vector instructions.  Note that vector is not enabled by qemu-user by default at this time, so you will need to explicitly enable it.  If you get unhelpful error output when doing so, you are most likely using a version of qemu which is too old.  
 
-With qemu-user, you can run and test programs in a cross build environment.
+With qemu-user, you can run and test programs in a cross build environment with one major gotcha.  glibc does not have mcontext/ucontext support for vector, so anything which requires them - e.g. longjmp, signals, green threads, etc - will fail in interesting and unexpected ways.
 
 **WARNING**: At the moment, support for the vector extension has *NOT* landed in upstream Linux kernel, and I am not aware of any distro which currently applies the required patches.  So, unless you are running a custom kernel, there is a *very* good chance you can't run a native environment.
 
