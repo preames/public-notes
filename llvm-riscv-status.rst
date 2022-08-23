@@ -333,8 +333,7 @@ Here is a punch list of known missing cases around scalable vectorization in the
 
 RISCV Target Specific:
 
-* Gather/Scatter.  Effectively disables as worst case cost is assumed in RISCV backend, and the vectorizer uses vscale for tuning (which is much lower), resulting in high cost and non-use.  Patch up for review: `D131519<https://reviews.llvm.org/D131519>`_
-* ceil/floor/round.  In general, we are missing a bunch of intrinsic costs for vectorized intrinsic calls.  This results - due to the inability to scalarize - in invalid costs being returned and thus vectorization not triggering.  We might want to consider generic call vectorization via scalarization for non-intrinsics or unsupported intrinsics.
+* vectorizable intrinsic costs.  We are missing a bunch of intrinsic costs for vectorized intrinsic calls.  This results - due to the inability to scalarize - in invalid costs being returned and thus vectorization not triggering.  I've added floating point rounding intrinsics, but we need to cost the remainder.
 
 Tail Folding Gaps
 =================
