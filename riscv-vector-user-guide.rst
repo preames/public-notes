@@ -16,9 +16,9 @@ Once you have a sufficiently recent qemu-riscv, you should be able to run binari
 
 With qemu-user, you can run and test programs in a cross build environment.
 
-*WARNING*: At the moment, support for the vector extension has *NOT* landed in upstream Linux kernel, and I am not aware of any distro which currently applies the required patches.  So, unless you are running a custom kernel, there is a *very* good chance you can't run a native environment.
+**WARNING**: At the moment, support for the vector extension has *NOT* landed in upstream Linux kernel, and I am not aware of any distro which currently applies the required patches.  So, unless you are running a custom kernel, there is a *very* good chance you can't run a native environment.
 
-   If you try, you will most likely get an illegal instruction exception (SIGILL) on the first vector instruction you execute.  In many programs - though not all - this will look like a SIGILL on the first access to a vector CSR (e.g. ''csrr a2, vlenb'') or a vector configuration instruction (e.g. `vsetvli	a1, zero, e32, m1, ta, mu`).  
+   If you try, you will most likely get an illegal instruction exception (SIGILL) on the first vector instruction you execute.  In many programs - though not all - this will look like a SIGILL on the first access to a vector CSR (e.g. `csrr a2, vlenb`) or a vector configuration instruction (e.g. `vsetvli	a1, zero, e32, m1, ta, mu`).  
 
 **Said differently, unless you're running a patched kernel, you can not enable vector code even if your hardware supports it!**
 
@@ -42,7 +42,7 @@ You need to make sure to explicitly tell the compiler (via `-mattr=...,+v`) to e
 
 For fixed length vectors, you also currently need to set `-mllvm -riscv-v-vector-bits-min=-1`.  Note that this is an internal compiler flag, and not a documented interface which will be supported long term.  Be cautious of adding this to any build command which is not easy to change as you move to a new compiler version.
 
-*Warning*: The flags mentioned above also have the effect of enabling auto-vectorization; if this is undesirable, consider `-fno-vectorize` and `-fno-slp-vectorize`.  Vectorizer user documention can be found `here <https://llvm.org/docs/Vectorizers.html>`_.
+**Warning**: The flags mentioned above also have the effect of enabling auto-vectorization; if this is undesirable, consider `-fno-vectorize` and `-fno-slp-vectorize`.  Vectorizer user documention can be found `here <https://llvm.org/docs/Vectorizers.html>`_.
 
 Enabling Vector Codeen on GNU
 =============================
