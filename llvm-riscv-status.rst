@@ -125,11 +125,11 @@ Fixed length vectorization is currently disabled by default, but can be enabled 
 
 Functionally, I am not aware of any blockers.  I have cross built a reasonable amount of code with multiple fixed length configurations, and have not hit any crashes in the compiler.  Given this is a fairly well exercised code path on other targets, I am not expecting sigificant further issues.
 
-I have a change (`D131508<https://reviews.llvm.org/D131508>`_) posted for review, which I expect to land in the next few weeks.  
+I have a change (`D131508 <https://reviews.llvm.org/D131508>`_) posted for review, which I expect to land in the next few weeks.  
 
 For the loop vectorizer, the main effect of enabling fixed length vectors in addition to scalable ones is in improving the robustness of the vectorizer.  On the scalable side, we have a lot of unimplemented cases (e.g. uniform stores, internal predication of memory access, etc..).  Without fixed length vectorization enabled, these cases cause code to stay entirely scalar.  Being able to vectorize at fixed length gets us performance wins while we work through addressing gaps in scalable capabilities.
 
-For SLP, current plan is to leave it disabled (`D132680<https://reviews.llvm.org/D132680>`_) for the moment, then return to the costing issues (below) seperately.
+For SLP, current plan is to leave it disabled (`D132680 <https://reviews.llvm.org/D132680>`_) for the moment, then return to the costing issues (below) seperately.
 
 For both LV and SLP, there are cases where fixed length vectors result in much easier costing decisions.  (i.e. indexed loads have runtime performance depending on VL; if we don't know VL, it's really hard to decide using one is profitable.)  As a result, even long term, having both enabled and deciding between them based on cost estimates seems like the right path forward.
 
