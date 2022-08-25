@@ -356,3 +356,25 @@ Tail folding appears to have a number of limitations which can be removed.
 * Some cases with predicate-dont-vectorize are vectorizing without predication.  Bug.
 * Any use outside of loop appears to kills predication.  Oddly, on examples I've tried, simply removing the bailout seems to generate correct code?
 * Stores appear to be tripping scalarization cost not masking cost which inhibits profitability.
+
+Constant Materialization Gaps
+=============================
+
+Current constant materialization for large constant vectors leaves a bit to be desired.  Here's a list of cases which might be interesting to improve:
+
+* Forming vector splats for constant fixed length vectors which can't be folded into operand (e.g. for a store).  Currently, we emit constant pool loads where-as splatting an etype constant would be significantly better.  Shows up in idiomatic vectorized constant memset patterns.
+* Forming vector splats where the element size is larger than the largest natively supported element.  (e.g. splat of a 128b value with largest etype being e64.)  Shows up in vector crypto, and probably any i128 math lib.  One strategy is to splat two vectors (one for high, one for low), and then mask them together.  Can probably generalize for a whole sequence of vectors.
+* sizeof(vector) < ELEN.  These could be scalar mat + a vector insert at ELEN etype.  Not always profitable depending on required constant mat cost on scalar side.
+* Forming 128b constants with "cheap" i64 halfs.  We don't want to always use 64 bit scalar + insert idioms since general 64 bit constants are expensive, but for cases where we can materialize the halfs in one or two instructions, it's probably better than a constant pool load.  (Can also use two splats + merge idiom.)
+* Few common bytes.  If a constant has only a handful of unique bytes, then using a smaller constant (made up only of those bytes) and a vrgather (with a new constant index vector) to shuffle bytes is feasible.  Only profitable if a) vrgather is cheap enough and b) cost of two new constants is low.
+* Small constants values in large etype.  Can use vsext and vzext variants to reduce size of constant being materialized.  Combines with tricks (e.g. move from scalar) to make vectors with all lanes near zero significantly cheaper.  (e.g. <i32 -1, i32 0, i32 2, i32 1>, is sext <i8 -1, i8 0, i8 2, i8 1> to <4 x i32>, and thus a 32 bit constant + the extend cost)
+* All the usual arithmetic tricks apply.  Probably only profitable on non-splat vectors, but could be useful for e.g. reducing number of active bits.
+
+Note that many of these patterns aren't really constant specific, they're more build vector idioms appiled to constants.
+
+
+
+
+
+
+
