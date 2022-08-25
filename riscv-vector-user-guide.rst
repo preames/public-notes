@@ -28,7 +28,7 @@ Assembler Support
 
 The LLVM assembler fully supports for v1.0 vector extension specification, and has for a while.  Using the 15.x release branch is definitely safe, and older release branches may also work.
 
-The binutil's assembler used by GNU also supports the v1.0 vector extension since `the 2.38 release<https://sourceware.org/pipermail/binutils/2022-August/122594.html>`_  (released Feb 2022).
+The binutil's assembler used by GNU also supports the v1.0 vector extension since `the 2.38 release <https://sourceware.org/pipermail/binutils/2022-August/122594.html>`_  (released Feb 2022).
 
 Compiler Support
 ----------------

@@ -129,7 +129,7 @@ I have a change (`D131508<https://reviews.llvm.org/D131508>`_) posted for review
 
 For the loop vectorizer, the main effect of enabling fixed length vectors in addition to scalable ones is in improving the robustness of the vectorizer.  On the scalable side, we have a lot of unimplemented cases (e.g. uniform stores, internal predication of memory access, etc..).  Without fixed length vectorization enabled, these cases cause code to stay entirely scalar.  Being able to vectorize at fixed length gets us performance wins while we work through addressing gaps in scalable capabilities.
 
-Enabling fixed length vectors should also let SLP kick in as well.  Given `+v` includes a minimum VLEN of 128, we may see some benefit here.
+For SLP, current plan is to leave it disabled (`D132680<https://reviews.llvm.org/D132680>`_) for the moment, then return to the costing issues (below) seperately.
 
 For both LV and SLP, there are cases where fixed length vectors result in much easier costing decisions.  (i.e. indexed loads have runtime performance depending on VL; if we don't know VL, it's really hard to decide using one is profitable.)  As a result, even long term, having both enabled and deciding between them based on cost estimates seems like the right path forward.
 
@@ -152,6 +152,20 @@ Robustness and Cost Modeling Improvements
 I mentioned this above in a few cases, but I want to specifically call it out as a top level item as well.  Beyond simply getting the vectorizer enabled, we have a significant amount of work required to make sure that the vectorizer is kicking in as widely as it can.  This will involve both a lot of cost model tuning, and also changes to the vectorizer itself to eliminate implementation limits.  I don't yet have a good grasp on the work required more specifically, but expect this to take several months of effort.
 
 There's a more detailed punch list for this below in the minor perf items section.
+
+SLP Vectorization
++++++++++++++++++
+
+I've run reasonable broad functional testing without issue.  
+
+The major issues for SLP/RISCV I currently know of are:
+
+* We have a cost modeling problem for vector constants. SLP mostly ignores the cost of materializing constants, and on most targets that works out mostly okay. RISCV has unusually expensive constant materialization for large constants, so we end up with common patterns (e.g. initializing adjacent unsigned fields with constants) being unprofitably vectorized. Work on this started under D126885, and there is ongoing discussion on follow ups there.
+* We will vectorize sub-word parallel operations and don't have robust lowering support to re-scalarize. Consider a pair of i32 stores which could be vectorized as <2 x i32> or could be done as a single i64 store. The later is likely more profitable, but not what we currently generate. I have not fully dug into why yet.
+
+Note that both of these issues could exist for LV in theory, but are significantly less likely. LV is strongly biased towards constant splats and longer vectors. Splats are significantly cheaper to lower (as a class), and longer vectors allows fixed cost errors to be amortized across more elements.
+
+Another concern is that SLP doesn't always respect target register width and assumes legalization.  I somewhat worry about how this will interact with LMUL8 and register allocation, but I think I've convinced myself that the same basic problem exists on all architectures.  (For reference, SLP will happily generate a 128 element wide reduction with 64 bit elements.  On a 128 bit vector machine, that requires stack spills during legalization.)  Such sequences don't seem to happen in practice, except maybe in machine generated code or cases where we've over-unrolled.  
 
 
 Code Size
