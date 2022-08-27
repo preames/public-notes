@@ -50,7 +50,7 @@ Workaround: GDB appears to work well with LLVM generated code, and is widely use
 Debug info quality in the backend is unclear.  Would be good to do a systematic search for issues ala the Sony efforts from a few years ago.
 
 Split Dwarf Issue
------------------
++++++++++++++++++
 
 I have been told that there is an issue with split dwarf.  If I understood correctly, the actual issue is target independent, but RISCV will see it at higher frequency.
 
@@ -121,11 +121,7 @@ Originally, I had thought scalable vectorization would only be relevant when not
 Fixed Length (e.g. use minimum VLEN)
 ++++++++++++++++++++++++++++++++++++
 
-Fixed length vectorization is currently disabled by default, but can be enabled by explicitly configuring the min vector length at the command line.  Alternatively, you can now specifify the special value -1 to mean "do what the target cpu and extensions say" (e.g. take vector length from Zl128).
-
-Functionally, I am not aware of any blockers.  I have cross built a reasonable amount of code with multiple fixed length configurations, and have not hit any crashes in the compiler.  Given this is a fairly well exercised code path on other targets, I am not expecting sigificant further issues.
-
-I have a change (`D131508 <https://reviews.llvm.org/D131508>`_) posted for review, which I expect to land in the next few weeks.  
+Fixed length vectorization is currently enabled by default (as of `D131508 <https://reviews.llvm.org/D131508>`_), but can be disabled by explicitly configuring the min vector length at the command line.  
 
 For the loop vectorizer, the main effect of enabling fixed length vectors in addition to scalable ones is in improving the robustness of the vectorizer.  On the scalable side, we have a lot of unimplemented cases (e.g. uniform stores, internal predication of memory access, etc..).  Without fixed length vectorization enabled, these cases cause code to stay entirely scalar.  Being able to vectorize at fixed length gets us performance wins while we work through addressing gaps in scalable capabilities.
 
@@ -295,31 +291,7 @@ Optimization
 Vectorization
 =============
 
-Goal is to smoke out as many correctness problems around vectorization as possible, then enable some vectorization configuration (any configuration).
 
-Configurations of Note
-
-* -riscv-v-vector-bits-min=128 -- short fixed length
-* -riscv-v-vector-bits-min=1024 -- long fixed length
-* -scalable-vectorization=on -- scalable only, current default ToT
-* -riscv-v-vector-bits-min=128 -scalable-vectorization=on -- both fixed and scalable enabled, very useful for smoking out cost model issues
-
-Stages:
-
-* Correctness - build code with vectorization flags enabled.
-* Cost Model Completeness - No invalid costs seen when compiling (requires custom patch)
-
-Workload Status:
-
-* sqlite3 (many configs) -- stable, no invalid costs
-* imagemagick -- build w/o link due to "missing files" (likely autoconf cross compile problem, using modified compiler to avoid CFLAGs issuess
-* Clang stage2 build (many configs) -- successful build/link, no invalid costs, ran tests using llvm-lit + qemu-user no suspicious looking errors (I slightly screwed up my run, so there were errors, but none that looked to be anything other than user error - did not rerun due to length of run)
-* llvm test-suite -- build/link w/ one error due to missing TCL in cross build (scalable vectorization only), ran all tests under qemu-user.  Several failures due to strip not recognizing cross compiled binaries, but nothing which looked suspicious.  Log output includes a bunch of Invalid costs for later consideration.
-* spec2017 - all successfully cross compile, several generate link errors
-
-Tuning
-
-* Lots...
 * Issues around epilogue vectorization w/VF > 16 (for fixed length vectors, i8 for VLEN >= 128, i16 for VLEN >= 256, etc..)
 * Initial target assumes scalar epilogue loop, return to folding/epilogue vectorization in future.
 
@@ -345,7 +317,7 @@ Here is a punch list of known missing cases around scalable vectorization in the
 
 RISCV Target Specific:
 
-* vectorizable intrinsic costs.  We are missing a bunch of intrinsic costs for vectorized intrinsic calls.  This results - due to the inability to scalarize - in invalid costs being returned and thus vectorization not triggering.  I've added floating point rounding intrinsics, but we need to cost the remainder.
+* vectorizable intrinsic costs.  We are missing a bunch of intrinsic costs for vectorized intrinsic calls.  This results - due to the inability to scalarize - in invalid costs being returned and thus vectorization not triggering.  I've added floating point rounding and integer intrinsics, but we need to cost the remainder.
 
 Tail Folding Gaps
 =================
