@@ -14,13 +14,23 @@ LLD Status Update
 
 As of 2022-07-08, `D127581 <https://reviews.llvm.org/D127581>`_ has landed with support for R_RISCV_ALIGN.  Given this, -mno-relax is no longer required when linking with LLD.
 
+GNU vs LLVM Toolchain Compatibility
+===================================
 
-llvm-objdump reports zero size for gcc generated binaries
-=========================================================
+I have been told that mixing object files from g++ and clang does not work reliably.  I've also been told that linking gnu generated object files with LLVM's LD does not work reliably.  Essentially, we have likely differences in ABI interpretation.
 
-I have been told that llvm-objdump is reporting zero sizes and failing to disassemble certain gcc compiled object files.  No details available at this time, and issue has not been confirmed with a test case.
+Here are some example issues in the recent past:
 
-This may be related to the suspected ELF interpretation differences below.
+* https://github.com/llvm/llvm-project/issues/57084 was caused by incorrect argument handling for struct arguments.  It has been fixed.
+
+Here are specific open items I'm aware of:
+
+* https://github.com/llvm/llvm-project/issues/57261 is an open issue around argument passing of values less than ELEN.  It's open currently, but likely to be fixed shortly.
+* I have been told that llvm-objdump is reporting zero sizes and failing to disassemble certain gcc compiled object files.  No details available at this time, and issue has not been confirmed with a test case. This may be related to the suspected ELF interpretation differences below.
+* In the process of reviewing the psABI document which is currently going through ratification, I stumbled across `one real difference <https://github.com/riscv-non-isa/riscv-elf-psabi-doc/issues/197>`_.  In this case, GNU assumes a pc-relative relocation can always resolve to zero even if that's out of bounds for the pc-relative range.  LLVM LLD considers this an error, and asserts that a PLT/GOT entry should have been used instead.  This means that LLD can not be used to link gcc generated object files in this case.
+
+Beyond these specific issues, there are likely others.  We need to invest time in systematically testing for further issues.  We may want to take a look at the effort which was done a few years ago for the microsoft ABI; we may be able to leverage some of the tooling.
+
 
 Frame setup problems
 ====================
@@ -30,15 +40,6 @@ I've been told from a couple sources that frame setup is not correct.  We know h
 * Its been mentioned to me that scalable allocas may not be lowered correctly.  Possibly in combination with frame alignment interactions.
 * Fraser fixed a couple of misaligned RVV stack problems recently. 
 * Kito has a separate issue around exception handling.  `Tracked in 55442 <https://github.com/llvm/llvm-project/issues/55442>`_ 
-
-LLD vs LD differences in ELF interpretation
-===========================================
-
-At a recent LLVM RISC-V sync-up, it was mentioned that LLD and LD disagree on interpretation of certain ELF fields.  As a result, using LLD to link gnu generated object files and LD to link LLVM generated ones was thought to be unreliable.
-
-No specifics currently known, so first step here is to find differences if any.  Adopting something similiar to the MSVC differential abi fuzzing that was done a few years back might be very worthwhile.
-
-2022-07-26 - In the process of reviewing the psABI document which is currently going through ratification, I stumbled across `one real difference <https://github.com/riscv-non-isa/riscv-elf-psabi-doc/issues/197>`_.  In this case, GNU assumes a pc-relative relocation can always resolve to zero even if that's out of bounds for the pc-relative range.  LLVM LLD considers this an error, and asserts that a PLT/GOT entry should have been used instead.
 
 LLDB Support
 ============
