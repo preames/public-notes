@@ -5,9 +5,6 @@ User Guide for RISCV-V Target
 .. contents::
    :local:
 
-.. toctree::
-   :hidden:
-
 Introduction
 ============
 
@@ -46,30 +43,30 @@ on support follow.
      ============= ================
      Extension     Status
      ============= ================
-     ``A``         Supported
-     ``C``         Supported
-     ``D``         Supported
-     ``F``         Supported
-     ``M``         Supported
-     ``Q``         Supported
-     ``V``         Supported
-     ``Zicsr``     Supported
-     ``Zifencei``  Supported
-     ``Zba``       Supported
-     ``Zbb``       Supported
-     ``Zbc``       Supported
-     ``Zbs``       Supported
-     ``Zve32x``    Unsupported
-     ``Zve32f``    Unsupported
-     ``Zve64x``    Supported
-     ``Zve64f``    Supported
-     ``Zve64d``    Supported
-     ``Zvl32b``    Unsupported
-     ``Zvl64b``    Supported
-     ``Zvl128b``   Supported
-     ``Zvl256b``   Supported
-     ``Zvl512b``   Supported
-     ``Zvl1024b``  Supported
+     ``A``          Supported
+     ``C``          Supported
+     ``D``          Supported
+     ``F``          Supported
+     ``M``          Supported
+     ``Q``          Supported
+     ``V``          Supported
+     ``Zicsr``      Supported
+     ``Zifencei``   Supported
+     ``Zba``        Supported
+     ``Zbb``        Supported
+     ``Zbc``        Supported
+     ``Zbs``        Supported
+     ``Zve32x``     Unsupported
+     ``Zve32f``     Unsupported
+     ``Zve64x``     Supported
+     ``Zve64f``     Supported
+     ``Zve64d``     Supported
+     ``Zvl32b``     Unsupported
+     ``Zvl64b``     Supported
+     ``Zvl128b``    Supported
+     ``Zvl256b``    Supported
+     ``Zvl512b``    Supported
+     ``Zvl1024b``   Supported
      ============= =================
 
 Zve32x, Zve32f, Zvl32b
