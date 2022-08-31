@@ -40,9 +40,9 @@ on support follow.
 
   .. table:: Ratified Extensions by Status
 
-     ============= ================
-     Extension     Status
-     ============= ================
+     =============  ========================
+     Extension      Status
+     =============  ========================
      ``A``          Supported
      ``C``          Supported
      ``D``          Supported
@@ -67,7 +67,7 @@ on support follow.
      ``Zvl256b``    Supported
      ``Zvl512b``    Supported
      ``Zvl1024b``   Supported
-     ============= =================
+     =============  ========================
 
 Zve32x, Zve32f, Zvl32b
   LLVM currently assumes a minimum VLEN (vector register width) of 64 bytes.
