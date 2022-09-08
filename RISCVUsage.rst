@@ -71,7 +71,7 @@ on support follow.
      ``Zicboz``       Assembly Support
      ``Zihintpause``  Assembly Support
      ``Zkn``          Supported
-     ``Zknd``         Supported (:ref:`See note <riscv-scalar-crypto-note2>`)
+     ``Zknd``         Supported (`See note <#riscv-scalar-crypto-note2>`_)
      ``Zkne``         Supported (:ref:`See note <riscv-scalar-crypto-note2>`)
      ``Zknh``         Supported (:ref:`See note <riscv-scalar-crypto-note2>`)
      ``Zksed``        Supported (:ref:`See note <riscv-scalar-crypto-note2>`)
