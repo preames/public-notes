@@ -56,9 +56,9 @@ on support follow.
      ``Zba``          Supported
      ``Zbb``          Supported
      ``Zbc``          Supported
-     ``Zbkb``         Supported (:ref:`See note <riscv-scalar-crypto-note1>`)
+     ``Zbkb``         Supported ([:ref:`See note <riscv-scalar-crypto-note1>`])
      ``Zbkc``         Supported
-     ``Zbkx``         Supported (:ref:`See note <riscv-scalar-crypto-note1>`)
+     ``Zbkx``         Supported ([:ref:`See note <riscv-scalar-crypto-note1>`])
      ``Zbs``          Supported
      ``Zdinx``        Assembly Support
      ``Zfh``          Supported
