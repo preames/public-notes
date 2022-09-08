@@ -35,10 +35,18 @@ Esperanto
 
 "ESPERANTO MAXES OUT RISC-V".  Linley Group, Microprocessor Report.  December 10, 2018.  `<https://www.esperanto.ai/wp-content/uploads/2018/12/Esperanto-Maxes-Out-RISC-V.pdf>`_
 
-Alibaba
--------
+Alibaba/T-Head
+--------------
 
 "T-head RVB-ICE Development Board,Dual-core XuanTie C910 RISC-V 64GC ,1.2GHz, Support Android/Debian System" `<https://www.aliexpress.com/item/3256803209663707.html?gatewayAdapt=4itemAdapt>`_.  Sales page, but scroll down to description section for a reasonable detailed description.  
+
+"T-Head ISA extension specification" `<https://github.com/T-head-Semi/thead-extension-spec/releases/download/2.0.0/xthead-2022-09-05-2.0.0.pdf>`_.  Defines the custom extensions shipped by T-Head.
+
+Ventana
+-------
+
+"VTx-family custom instructions: Custom ISA extensions for Ventana Micro Systems RISC-V cores"
+`<https://github.com/ventanamicro/ventana-custom-extensions/releases/download/v1.0.0/ventana-custom-extensions-v1.0.0.pdf>`_
 
 Other Sources
 -------------
