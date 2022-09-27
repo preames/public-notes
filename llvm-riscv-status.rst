@@ -311,7 +311,6 @@ Scalable Vectorizer Gaps
 
 Here is a punch list of known missing cases around scalable vectorization in the LoopVectorizer.  These are mostly target independent.
 
-* Uniform Store.  See @uniform_store in test/Transforms/LoopVectorize/RISCV/scalable-basics.ll.  Basic issue is we need to implement last active lane extraction.  May be an easy sub-case for non-tail folding when last active is by definition last lane.  Have landed changes for invariant store of uniform value.  General case of loop varying value still remains outstanding.
 * Interleaving Groups.  This one looks tricky as selects in IR require constants and the required shuffles for scalable can't currently be expressed as constants.  This is likely going to need an IR change; details as yet unsettled.  Current thinking has shifted towards just adding three more intrinsics and deferring shuffle definition change to some future point.  Pending sync with ARM SVE folks.
 * General loop scalarization.  For scalable vectors, we _can_ scalarize, but not via unrolling.  Instead, we must generate a loop.  This can be done in the vectorizer itself (since its a generic IR transform pass), but is not possible in SelectionDAG (which is not allowed to modify the CFG).  Interacts both with div/rem and intrinsic costing.  Initial patch for non-predicated scalarization up as `D131118 <https://reviews.llvm.org/D131118>`_
 * Unsupported reduction operators.  For reduction operations without instructions, we can handle via the simple scalar reduction loop.  This allows e.g. a product reduction to be done via widening strategy, then outside the loop reduced into the final result.  Only useful for outloop reduction.  (i.e. both options should be considered by the cost model)
@@ -328,6 +327,7 @@ Tail folding appears to have a number of limitations which can be removed.
 * Some cases with predicate-dont-vectorize are vectorizing without predication.  Bug.
 * Any use outside of loop appears to kills predication.  Oddly, on examples I've tried, simply removing the bailout seems to generate correct code?
 * Stores appear to be tripping scalarization cost not masking cost which inhibits profitability.
+* Uniform Store.  Basic issue is we need to implement last active lane extraction.  Note active bits are a prefix and thus popcnt can be used to find index.  No current plans to support general predication.
 
 Constant Materialization Gaps
 =============================
