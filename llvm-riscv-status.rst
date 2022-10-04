@@ -9,10 +9,17 @@ This document contains an initial survey of gaps in the RISCV LLVM toolchain eco
 Functional
 ----------
 
-LLD Status Update
-=================
+Draft Extensions
+================
 
-As of 2022-07-08, `D127581 <https://reviews.llvm.org/D127581>`_ has landed with support for R_RISCV_ALIGN.  Given this, -mno-relax is no longer required when linking with LLD.
+There are numerous potential extensions in flight.  The following is a list of specification links for a few of the potentially interesting ones.  This explicitly excludes anything `already implemented in LLVM <https://llvm.org/docs/RISCVUsage.html>`_.
+
+* `Zc* variants <https://github.com/riscv/riscv-code-size-reduction/releases>`_
+* `Vector crypto extensions <https://github.com/riscv/riscv-crypto/releases>`_
+* `bfloat16 support <https://github.com/riscv/riscv-bfloat16/releases>`_
+* `Zvfh (float16) support <https://github.com/riscv/riscv-v-spec/tree/zvfh>`_
+* Zfb
+* CFI
 
 GNU vs LLVM Toolchain Compatibility
 ===================================
@@ -158,18 +165,7 @@ Things in this category are thought to be worth implementing individually, but l
 Interesting cases from the LLVM issue tracker:
 
 *  Unaligned read followed by bswap generates suboptimal code `#48314 <https://github.com/llvm/llvm-project/issues/48314>`_
-
    
-
-Schedule VSETVL outside non-tail folded loops
-=============================================
-
-For main/epilogue style fixed length vectorization, the SETVL instruction is invariant across loop iterations.  We can hoist it into the preheader of the loop.
-
-LSR Exit Test Formation
-========================
-
-Looking at a couple of examples, it looks like LSR is keeping around an extra induction variable just for performing the exit test.  We can probably fold it away, thus removing an increment from every iteration of simple vector loops.  
 
 LoopVectorizer generating duplicate broadcast shuffles
 ======================================================
