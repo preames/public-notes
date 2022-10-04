@@ -108,29 +108,11 @@ Cases known to be missing today:
 Vectorization
 =============
 
-I have been actively working towards enabling vectorization for RISCV.  The framing of this section was recently heavily reworked to reflect current impressions, and my plan for near term execution.
+ARM SVE has pioneered support in the loop vectorizer for runtime vector lengths in the main loop, while using a scalar epilogue loop to handle the last couple of iterations.  I have been actively working towards enabling loop vectorization for RISC-V.  Today, upstream LLVM will auto-vectorize with both scalable and fixed length vector types, picking whichever is cheapest.
 
-Scalable + Scalar Epilogue
-++++++++++++++++++++++++++
+In practice, scalable vectors are almost always scalable unless there's a gap in what we can vectorize.  The major gap left is handling of interleave groups (a.k.a. segmented load/stores on RISCV).  This gap is under discussion, but is not a quick fix.  All other interesting functional gaps are, to my knowledge, fixed.  If you encounter other gaps, please report them.
 
-ARM SVE has pioneered support in the loop vectorizer for runtime vector lengths in the main loop, while using a scalar epilogue loop to handle the last couple of iterations.  As of 2022-07-27, scalable vectorization (with a scalar epilogue) is enabled by default in upstream LLVM.  This may go through a few revert cycles before it sticks, so checking the status of the review thread (`D129013 <https://reviews.llvm.org/D129013>`_) is advised.  
-
-My expectation is that the result of this change will be that the vectorizer sometimes kicks in when the `+v` extension is enabled, and that when it does, it generates reasonable vector code which matches or outperforms the scalar equivalent.  There is still quite a bit of work to be done in increasing the robustness of vectorization, and refining cost models so that we vectorize as often as we can.
-
-Originally, I had thought scalable vectorization would only be relevant when not using -mcpu to target a particular chip, but after looking at generated code for a while, I'm largely convinced that scalable loops are usually on par with fixed length vectorization.  As a result, using scalable as our default, and only falling back to fixed length vectorization when required is looking like a reasonable long term default.
-
-Fixed Length (e.g. use minimum VLEN)
-++++++++++++++++++++++++++++++++++++
-
-Fixed length vectorization is currently enabled by default (as of `D131508 <https://reviews.llvm.org/D131508>`_), but can be disabled by explicitly configuring the min vector length at the command line.  
-
-For the loop vectorizer, the main effect of enabling fixed length vectors in addition to scalable ones is in improving the robustness of the vectorizer.  On the scalable side, we have a lot of unimplemented cases (e.g. uniform stores, internal predication of memory access, etc..).  Without fixed length vectorization enabled, these cases cause code to stay entirely scalar.  Being able to vectorize at fixed length gets us performance wins while we work through addressing gaps in scalable capabilities.
-
-For SLP, current plan is to leave it disabled (`D132680 <https://reviews.llvm.org/D132680>`_) for the moment, then return to the costing issues (below) seperately.
-
-For both LV and SLP, there are cases where fixed length vectors result in much easier costing decisions.  (i.e. indexed loads have runtime performance depending on VL; if we don't know VL, it's really hard to decide using one is profitable.)  As a result, even long term, having both enabled and deciding between them based on cost estimates seems like the right path forward.
-
-As with scalable above, the near goal is to have vectorization kick in when feasible and profitable.  We are still going to have a lot of tuning and robustness work to do once enabled.  
+In terms of performaning tuning, we're still in the early days.  I've been fixing issues as I find them, but there's a couple of larger gaps known such as LMUL>1 enablement.  Concrete bug reports for vector code quality are very welcome.
 
 Tail Folding
 ++++++++++++
@@ -143,17 +125,12 @@ Talking with various hardware players, there appears to be a somewhat significan
 
 For VL predication, we have two major options.  We can either pattern match mask predication into VL predication in the backend, or we can upstream the work BSC has done on vectorizing using the VP intrinsics.  I'm unclear on which approach is likely to work out best long term.
 
-Robustness and Cost Modeling Improvements
-+++++++++++++++++++++++++++++++++++++++++
-
-I mentioned this above in a few cases, but I want to specifically call it out as a top level item as well.  Beyond simply getting the vectorizer enabled, we have a significant amount of work required to make sure that the vectorizer is kicking in as widely as it can.  This will involve both a lot of cost model tuning, and also changes to the vectorizer itself to eliminate implementation limits.  I don't yet have a good grasp on the work required more specifically, but expect this to take several months of effort.
-
-There's a more detailed punch list for this below in the minor perf items section.
+Work on tail folding is currently being deferred until main loop vectorization is mature.
 
 SLP Vectorization
 +++++++++++++++++
 
-I've run reasonable broad functional testing without issue.  
+I've run reasonable broad functional testing without issue.  However, SLP is still disabled by default due to code quality problems which have not yet been adddressed.
 
 The major issues for SLP/RISCV I currently know of are:
 
