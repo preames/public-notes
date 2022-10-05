@@ -18,7 +18,7 @@ There are numerous potential extensions in flight.  The following is a list of s
 * `Vector crypto extensions <https://github.com/riscv/riscv-crypto/releases>`_
 * `bfloat16 support <https://github.com/riscv/riscv-bfloat16/releases>`_
 * `Zvfh (float16) support <https://github.com/riscv/riscv-v-spec/tree/zvfh>`_
-* Zfb
+* `Zfa <https://github.com/riscv/riscv-isa-manual/releases/tag/draft-20221004-28b46de>`_ (unreleased snapshot of main spec branch - used to be called Zfb)
 * CFI
 
 GNU vs LLVM Toolchain Compatibility
