@@ -55,6 +55,19 @@ Intrinsics and Explicit Vector Code
 
 The RVV C Intrinsic family is fully supported by Clang.  You can also use Clang's `vector type and operation extensions <https://clang.llvm.org/docs/LanguageExtensions.html#vectors-and-extended-vectors>`_ to describe vector operations in C/C++.
 
+The `#pragma clang loop <https://clang.llvm.org/docs/LanguageExtensions.html#extensions-for-loop-hint-optimizations>`_ directives can be used to override the vectorizers default heuristics.  This can be very useful for exploring performance of various vectorization options.
+
+.. code::
+
+  // Let's force LMUL4 with unroll factor of 2.
+  #pragma clang loop vectorize(enable)
+  #pragma clang loop interleave(enable)
+  #pragma clang loop vectorize_width(8, scalable)
+  #pragma clang loop interleave_count(2)
+  for (unsigned i = 0; i < a_len; i++)
+    a[i] += b;
+
+
 Auto-vectorization
 ==================
 
