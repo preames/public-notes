@@ -9,17 +9,19 @@ This page is a collection of basic tactics for debugging a problem with LLVM.  T
 Compiler Explorer (i.e. Godbolt)
 --------------------------------
 
-`https://godbolt.org/`_ is an incredibly useful tool for seeing how different compilers or compiler versions compile the same piece of code.  The ability to link to exactly what you're looking at and share it with collaborators is invaluable for asking and answering highly contextual questions.  
+`<https://godbolt.org/>`_ is an incredibly useful tool for seeing how different compilers or compiler versions compile the same piece of code.  The ability to link to exactly what you're looking at and share it with collaborators is invaluable for asking and answering highly contextual questions.  
 
 
 Assertion Builds
 ----------------
 
-Before you do literally anything else, make sure that you have assertions enabled on your local build.  As a practical matter, I do not recommend the debug flavors of the builds, but Release with assertions enabled if very very worthwhile.  For context, an assertion enabled release build is around 8GB; last time I did a debug build, it was around 60GB.  
+Before you do literally anything else, make sure that you have assertions enabled on your local build.  
 
 LLVM makes very heavy use of internal assertions, and they are generally excellent at helping to isolate a failure.  In particular, many things which appear as miscompiles in a release binary will exhibit as an assertion failure if assertions are enabled.
 
 **Warning:** Few of the commands mentioned in this document will work without assertions enabled!
+
+As a practical matter, I do not recommend the debug flavors of the builds, but Release with assertions enabled if very very worthwhile.  For context, an assertion enabled release build is around 8GB; last time I did a debug build, it was around 60GB.  
 
 Capture IR before and after optimization
 ----------------------------------------
@@ -32,7 +34,7 @@ Capture IR before and after optimization
 Capture IR before or after a pass
 ---------------------------------
 
-``-mllvm -print-before=loop-vectorize -mllvm -print-module-scope`` will print the IR before each invocation of the pass "loop-vectorize".  (As it happens, there's only one of these in the standard pipeline.)  The resulting output will be valid IR (well, with a header you need to remove) which can be fed back to "opt" to reproduce a problem.
+``-mllvm -print-before=loop-vectorize -mllvm -print-module-scope`` will print the IR before each invocation of the pass "loop-vectorize".  (As it happens, there's only one of these in the standard pipeline.)  The resulting output will be valid IR (well, with a header you need to remove) which can be fed back to "opt" to reproduce a problem.  There's also an analogous ``-print-after=`` option.
 
 If you want to trace through execution, ``-mllvm -print-after-all`` can also be useful, but be warned, this is very very verbose.  Pipe it to a file, and search through it with a decent text editor is likely your best bet.
 
@@ -59,6 +61,6 @@ These tools provide a fully automated way to reduce an input IR program to the s
 Alive2
 ------
 
-Alive2 is a tool for formally reasoning about LLVM IR.  There is a web instance available at `https://alive2.llvm.org/ce/`_.  This is a great tool for quickly checking if an optimization you have in mind is correct.
+Alive2 is a tool for formally reasoning about LLVM IR.  There is a web instance available at `<https://alive2.llvm.org/ce/>`_.  This is a great tool for quickly checking if an optimization you have in mind is correct.
 
 You can also download and build alive2 yourself, and it has a lot of useful functionality for translation validation.  This can be very useful when tracking down a nasty miscompile, but is very much an advanced topic.  
