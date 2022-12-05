@@ -351,7 +351,21 @@ The fourth is generalized shuffle indices. (i.e. figuring out what lanes are dem
 
 I'm pretty sure we'll need to generalize at least as far as subvector insert/extract. I'm not sure about going beyond that yet.
 
+Frame lowering optimization
+===========================
 
+I have been working on a series of small patches (https://reviews.llvm.org/D139037, https://reviews.llvm.org/D132839, and related NFCs) to improve the instruction sequences used for accessing spill slots on the stack.  Initial focus has been on frames greater than 2k.
+
+This started with a previous set of fixes (https://reviews.llvm.org/D137593, https://reviews.llvm.org/D137591) to avoid use of vlenb when the exact VLEN is known. When we compile vector code with an exactly known VLEN, larger frames become relatively common.  
+
+Anoyingly, the largest immediate we can fold into a load or store is 2k, and we can’t fold any immediate into a vector load/store.  As a result, I started looking into improvements for fixed offset addressing sequences in frames just larger than 2k.  This has hit a logical stopping point, so I’m likely to shift focus until I hit another example which justifies further time spent here.
+
+There are two open items:
+
+* We should be able to reuse the vlenb value instead of reloading it each time.
+* We end up materialing the high part of the frame offset (which is shared across most frame accesses) many times.  This is down to a single LUI now, but we should still not need to materialize it repeatedly.
+
+For the moment, I'm monitoring https://reviews.llvm.org/D109405.  Once that's in, it may provide a framework for solving both of the previous items.  The general problem we have here is that frame lowering happens after register allocation, so things such as these become much more chalenging.  
 
 
 
