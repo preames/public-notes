@@ -322,11 +322,11 @@ Scalable Vectors in KnownBits (and friends)
 
 Scalable vectors had not been plumbed through known bits, demanded bits, or most of the other ValueTracking-esq routines.
 
-I have a series of patches starting with `https://reviews.llvm.org/D136470`_ (see the review stack) which adds basic lane wise reasoning.  Most of these have landed.  Once all of these land, there's a couple small todos:
+I have a series of patches starting with https://reviews.llvm.org/D136470 (see the review stack) which adds basic lane wise reasoning.  Most of these have landed.  Once all of these land, there's a couple small todos:
 
 * Add support for step_vector to all the routines touched above
 * Complete the audit of all the target hooks and remove the bailouts one by one
-* Fix the hexagon legalization problem seen in `https://reviews.llvm.org/D137140`_ and add implicit truncation in SDAG's KnownBits
+* Fix the hexagon legalization problem seen in https://reviews.llvm.org/D137140 and add implicit truncation in SDAG's KnownBits
 * Add splat_vector base cases (analogous to constant base cases) to all of the isKnownX routines in ValueTracking and SDAG.  This is more generic extension to handle shufflevector than anything else.
 * Revisit insertelement handling, and be less conservative where possible.
 
