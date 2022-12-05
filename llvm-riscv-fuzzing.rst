@@ -74,6 +74,12 @@ Reference save:
 * https://oss-fuzz-build-logs.storage.googleapis.com/log-d902e118-7a63-439a-92f4-31bfaaf374f6.txt
 * https://llvm.org/docs/FuzzingLLVM.html (build instructions *do not* work)
 
+Brute Force via csmith and llvm-stress
+--------------------------------------
+
+I have written some simple shell scripts to do brute force fuzzing of clang and llc targetting RISCV driven by csmith and llvm-stress respectively.  As of this update, I have run ~100k unique csmith tests and ~10m unique llvm-stress tests.  So far, I have found no compiler crash bugs.  I am not running the resulting code, so I may have missed execution bugs.
+
+
 AFL - Upcoming
 ----------------
 

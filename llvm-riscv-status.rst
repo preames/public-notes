@@ -317,6 +317,39 @@ Current constant materialization for large constant vectors leaves a bit to be d
 
 Note that many of these patterns aren't really constant specific, they're more build vector idioms appiled to constants.
 
+Scalable Vectors in KnownBits (and friends)
+===========================================
+
+Scalable vectors had not been plumbed through known bits, demanded bits, or most of the other ValueTracking-esq routines.
+
+I have a series of patches starting with `https://reviews.llvm.org/D136470`_ (see the review stack) which adds basic lane wise reasoning.  Most of these have landed.  Once all of these land, there's a couple small todos:
+
+* Add support for step_vector to all the routines touched above
+* Complete the audit of all the target hooks and remove the bailouts one by one
+* Fix the hexagon legalization problem seen in `https://reviews.llvm.org/D137140`_ and add implicit truncation in SDAG's KnownBits
+* Add splat_vector base cases (analogous to constant base cases) to all of the isKnownX routines in ValueTracking and SDAG.  This is more generic extension to handle shufflevector than anything else.
+* Revisit insertelement handling, and be less conservative where possible.
+
+Longer term, my last comment on that review describes the direction.  It's copied here for ease of reference.
+
+For the record, let me sketch out where I think this might be going long term.
+
+For scalable vectors, we have a couple of idiomatic patterns for representing demanded elements.
+
+The first is a splat - which this patch nicely handles by letting us do lane independent reasoning on scalable vectors. This covers a majority of the cases I've noticed so far, and is thus highly useful to have in tree as we figure out next steps.
+
+The second is sub_vector insert/extract. This comes up naturally in SDAG due to the way we lower fixed length vectors on RISCV (and, I think, ARM SVE.) This requires tracking a prefix of the demanded bits corresponding to the fixed vector size, and then a single bit smeared across remaining (unknown number of) lanes.
+
+We could pick the prefix length in one of two ways:
+
+* From the fixed vector being inserted or extracted.
+* From the minimum known vector register size. This is more natural in DAG; at the IR layer, this requires combining the minimum vector length of a type which the minimum vscale_range value.
+
+The third is scalar insert/extract. For indices under the minimum vector size, this reduces the former case. I don't yet know how common various runtime indices we can't prove in bounds are. One example we might see is the "end of vector - 1" pattern which comes e.g. from loop vectorization exit values. There may also be others. I don't yet really have a good sense here.
+
+The fourth is generalized shuffle indices. (i.e. figuring out what lanes are demanded from a runtime shuffle mask) We're several steps from being able to talk about this concretely, and I'm not yet convinced we'll need anything here at all. If we do need to go here, this adds a huge amount of complexity. I'm hoping we don't get here.
+
+I'm pretty sure we'll need to generalize at least as far as subvector insert/extract. I'm not sure about going beyond that yet.
 
 
 
