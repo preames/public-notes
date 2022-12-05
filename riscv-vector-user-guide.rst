@@ -44,10 +44,14 @@ For fixed length vectors, default behavior very recently (2022-08-26) changed.  
 
 **Warning**: The flags mentioned above also have the effect of enabling auto-vectorization; if this is undesirable, consider `-fno-vectorize` and `-fno-slp-vectorize`.  Vectorizer user documention can be found `here <https://llvm.org/docs/Vectorizers.html>`_.
 
-Enabling Vector Codeen on GNU
-=============================
+Enabling Vector Codegen on GNU
+==============================
 
 I am unclear on the status of GNU support for vector.  I believe the situation to be that upstream GNU does not support vector at all, but that the `RISC-V collab version <https://github.com/riscv-collab/riscv-gnu-toolchain>`_ does.  I could not find any documentation on this point, so this is pending experimental confirmation.
+
+I know there is active development going on in upstream GCC to add vector codegen and auto-vec support.  Progress appears slow, but there is work happening.
+
+T-Head `has a custom toolchain <https://occ.t-head.cn/community/download?id=4090445921563774976>`_ which may suppport vectorization as their processors include the v0.7 vector extensions.  I have not confirmed this since a) all the documents are in Chinese, b) it requires an account to download, and c) I'm not interested in v0.7 anyways.
 
 
 Intrinsics and Explicit Vector Code
@@ -77,7 +81,7 @@ The LLVM 15 release branch contains all of the changes required for functional a
 
 For SLPVectorizer, the additional compiler flag `-mllvm -riscv-v-slp-max-vf=0` is required.  This configuration is under vecy active development, and should only be considered on a build of recent ToT source.
 
-For GNU, I am not aware of any GNU build which contains auto-vectorization support at this time.
+For GNU, I am not aware of any GNU build which contains auto-vectorization support at this time.  There is a patch series, but you'd have to apply and build locally.
 
 
 
