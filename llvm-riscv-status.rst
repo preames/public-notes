@@ -15,11 +15,17 @@ Draft Extensions
 There are numerous potential extensions in flight.  The following is a list of specification links for a few of the potentially interesting ones.  This explicitly excludes anything `already implemented in LLVM <https://llvm.org/docs/RISCVUsage.html>`_.
 
 * `Zc* variants <https://github.com/riscv/riscv-code-size-reduction/releases>`_
-* `Vector crypto extensions <https://github.com/riscv/riscv-crypto/releases>`_
+* `Vector crypto extensions <https://github.com/riscv/riscv-crypto/releases>`_, https://reviews.llvm.org/D138807
 * `bfloat16 support <https://github.com/riscv/riscv-bfloat16/releases>`_
-* `Zvfh (float16) support <https://github.com/riscv/riscv-v-spec/tree/zvfh>`_
+* zfhmin (float16) Ratified, https://reviews.llvm.org/D139391
+* `Zvfh (float16 vector) support <https://github.com/riscv/riscv-v-spec/tree/zvfh>`_, https://reviews.llvm.org/D139391
 * `Zfa <https://github.com/riscv/riscv-isa-manual/releases/tag/draft-20221004-28b46de>`_ (unreleased snapshot of main spec branch - used to be called Zfb)
 * CFI
+
+Vendor Extensions:
+
+* `THeadVDot <https://github.com/T-head-Semi/thead-extension-spec/releases/download/2.2.0/xthead-2022-12-04-2.2.0.pdf>`_, https://reviews.llvm.org/D139386
+
 
 GNU vs LLVM Toolchain Compatibility
 ===================================
