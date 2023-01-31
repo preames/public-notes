@@ -4,7 +4,7 @@ TSO Memory Mappings for RISCV
 
 This document lays out the memory mappings being proposed for Ztso.  Specifically, these are the mappings from C/C++ memory models to RISCV w/Ztso.  This document is a placeholder until this can be merged into something more official.
 
-The proposed mapping tables are the work of Andrea Pearl.  He's an actual memory model expert; I'm just a compiler guy who has gotten a bit too close to these issues, and needs to drive upcoming patches for LLVM.  As always, mistakes are probably mine, and all credit goes to Andrea.  
+The proposed mapping tables are the work of Andrea Parri.  He's an actual memory model expert; I'm just a compiler guy who has gotten a bit too close to these issues, and needs to drive upcoming patches for LLVM.  As always, mistakes are probably mine, and all credit goes to Andrea.  
 
 .. contents::
 
@@ -94,7 +94,7 @@ This mapping table is listed here for explanatory value only.  This lowering is 
    atomic_<op>(memory_order_acq_rel)        | loop: lr.{w|d} ; <op> ;
                                             |       sc.{w|d} ; bnez loop
    atomic_<op>(memory_order_seq_cst)        | loop: lr.{w|d} ; <op> ;
-                                            |       sc.{w|d}.rel ; bnez loop
+                                            |       sc.{w|d}.aqrl ; bnez loop
 
 The key difference to note is that this lowering uses an fence *after* the sequentially consistent stores,
 
