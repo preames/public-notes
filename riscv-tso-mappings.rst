@@ -8,6 +8,11 @@ The proposed mapping tables are the work of Andrea Parri.  He's an actual memory
 
 .. contents::
 
+Background
+----------
+
+RISCV uses the WMO memory model by default.  The standard mapping is defined in "Table A.6: Mappings from C/C++ primitives to RISC-V primitives" from the Unprivledged spec.  (This is arguably an odd place for this, but whatever.)  This is `the WMO mapping` we'll refer to later.  Technically, there are multiple possible mappings to WMO, but from an ABI compatibility perspective, this is the blessed one.
+
 Proposed Mapping
 ----------------
 
