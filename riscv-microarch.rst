@@ -40,7 +40,7 @@ Alibaba/T-Head
 
 "T-head RVB-ICE Development Board,Dual-core XuanTie C910 RISC-V 64GC ,1.2GHz, Support Android/Debian System" `<https://www.aliexpress.com/item/3256803209663707.html?gatewayAdapt=4itemAdapt>`_.  Sales page, but scroll down to description section for a reasonable detailed description.  
 
-"T-Head ISA extension specification" `<https://github.com/T-head-Semi/thead-extension-spec/releases/download/2.0.0/xthead-2022-09-05-2.0.0.pdf>`_.  Defines the custom extensions shipped by T-Head.
+"T-Head ISA extension specification" `<https://github.com/T-head-Semi/thead-extension-spec/releases/download/2.2.0/xthead-2022-12-04-2.2.0.pdf>`_.  Defines the custom extensions shipped by T-Head.
 
 Ventana
 -------

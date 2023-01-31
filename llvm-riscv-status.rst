@@ -374,5 +374,22 @@ There are two open items:
 For the moment, I'm monitoring https://reviews.llvm.org/D109405.  Once that's in, it may provide a framework for solving both of the previous items.  The general problem we have here is that frame lowering happens after register allocation, so things such as these become much more chalenging.  
 
 
+Global Merge
+============
 
+The following is basically a brain dump on a few things vaguely related to GlobalMerge for RISCV.  This isn't a review comment on this review per se.  Some of this came from discussion w/Palmer because I nerd sniped myself into thinking this a bit too hard, and he was willing to brainstorm with me.  I then did the same to @craig.topper a bit later, and edited in some further changes.
+
+Profitability wise, we have three known cases.
+
+Case 1 is where the alignment guarantees the second address could fold into the consuming load/store instruction.   The simplest case would be to restrict to when at least one of the globals being merged had a sufficiently large alignment.  https://reviews.llvm.org/D129686#inline-1380320 has some brainstorming on a more advanced boundary align mechanism, but building that out is likely non trivial.  There have been some other use cases for analogous features in the past, but I don't have details.
+
+Case 2 is when we have three or more accesses using the same global (regardless of alignment).  In this case, we only need one lui/addi pair + one access with small folded offset for each of the original access.  This is a 1 instruction savings for each additional access.
+
+Case 3 is a size optimization only.  This is Alex's https://reviews.llvm.org/D129686 and is geared at using compressed instructions to share common addresses.
+
+For the GP interaction, we may want to take a close look at how gcc models global merging vs how we do.  Per Palmer, it keeps around the symbols for each global, and that may impact the heuristic that LD uses for selecting globals to place near GP.  We may be able to massage our output a bit to line up with the existing heuristics.  
+
+There's a question of how worthwhile this is.   For anything beyond static builds with medlow, we need to worry about pc relative addresses.  Out of the three known profitable cases above, case 2 and 3 apply to pc relative sequences without knowing the alignment of the auipc, but case 1 does not.  For case 1, we'd need to additionally account for the alignment of the auipc.  We could potentially insert an align directive, but that wastes space.  Per Palmer, there was some previous discussion around a relocation type for an optimized "aligned auipc" construct which used (at most) a single extra instruction.  However, no one has pushed this forward.
+
+My current thinking is that we should probably enable this for code size minimization only, and return to it at a later point.  
 
