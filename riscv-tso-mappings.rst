@@ -111,4 +111,4 @@ To avoid confusion, let me emphasize that the porting concern just mentioned *do
 
 The alternative mapping also has the advantage that stores are generally dynamically rarer than loads.  So the alternative mapping *may* result in dynamically fewer fence instructions.  I do not have numbers on this.
 
-The choice between the two mappings essentially comes down to which of these we consider to be more important.  I am proposing we move forward with the mapping which gives us WMO comparability.  It is my belief that allowing mixed applications is more important to the ecoyststem then ease of porting explicit synchronization.  
+The choice between the two mappings essentially comes down to which of these we consider to be more important.  I am proposing we move forward with the mapping which gives us WMO compatibility.  It is my belief that allowing mixed applications is more important to the ecoyststem then ease of porting explicit synchronization.  
