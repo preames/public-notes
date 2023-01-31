@@ -56,7 +56,7 @@ The key thing to note here is that we using an fence *before* any seq_cst *load*
 The alternate mapping
 ---------------------
 
-This mapping table is listed here for explanatory value only.  This lowering is **incompatible** with the mapping proposed for inclusion in toolchains and psABI.
+This mapping table is listed here for explanatory value only.  This lowering is **incompatible** with the mapping proposed for inclusion in toolchains and psABI (above).
 
 .. code::
 
