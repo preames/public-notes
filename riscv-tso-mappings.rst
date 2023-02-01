@@ -11,7 +11,14 @@ The proposed mapping tables are the work of Andrea Parri.  He's an actual memory
 Background
 ----------
 
-RISCV uses the WMO memory model by default.  The standard mapping is defined in "Table A.6: Mappings from C/C++ primitives to RISC-V primitives" from the Unprivledged spec.  (This is arguably an odd place for this, but whatever.)  This is `the WMO mapping` we'll refer to later.  Technically, there are multiple possible mappings to WMO, but from an ABI compatibility perspective, this is the blessed one.
+RISCV uses the WMO memory model by default.  This is described in chapter 17 ("RVWMO Memory Consistency Model, Version 2.0") of the Unprivledged specification.  RISCV also supports the Total Store Order (TSO) model via an optional extension (Ztso) which was `<recently ratified  (Jan 2023) <https://drive.google.com/file/d/173BGJQLqtEzAAD5lV9uaLMMjS91WeAt7/view>`_.   There is also a description of version 0.1 of Ztso in the last ratified Unprivledge specification; I am not aware of any major differences between them.
+
+Programming languages such as C/C++ and Java define their own memory models.  One of the tasks in implementing such a language is choosing a mapping from the language level memory model to the hardware level memory model.  For clarity sake, it's worth emphasizing that many such mappings map be legal (that is, equally correct), but that for ABI compatibility, it is important that we designate exactly one such mapping as part of the ABI and use it across all toolchains whose results need to interoperate.  Otherwise, you could end up creating a racy program by linking two object files which both correctly implement synchronization at the source level.  Generally, that is considered bad.
+
+    Aside: There is a related ABI issue around defining the runtime function signatures and semantics used for implementing synchronization primitives that the language defines and the hardware does not natively support, but that is explicitly out of scope for this document.
+
+The ABI designated mapping for WMO is defined in "Table A.6: Mappings from C/C++ primitives to RISC-V primitives" from the Unprivledged spec.  Having this specified in the ISA specification is arguably a weird RISCV quirk; it should probably live in something like the psABI specification instead.  To my knowledge, there is not yet a designated mapping for Ztso, and that's what the rest of this document discusses.  
+
 
 Proposed Mapping
 ----------------
