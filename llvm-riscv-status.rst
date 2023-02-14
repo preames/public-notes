@@ -311,6 +311,14 @@ Tail folding appears to have a number of limitations which can be removed.
 Constant Materialization Gaps
 =============================
 
+For constant floats, we have a couple oppurtunities:
+
+* LUI/SHL-by-32/FMV.D.X - Analogous to the LUI/FMV.W.X pattern recently implemented, but requires an extra shift.  This basically reduces to increasing the cost threshold by 1, and may be worth doing for doubles.  
+* LI/FCVT.S.W - Create a small integer, and convert to half/single/double.  Note this is a convert, not a move.  For half, LUI/FMV.H.X may be preferrable.
+* FLI.S/D - Likely to be optimal when Zfa is available.
+* FLI + FNEG.S - Can be used to produce some negative floats and doubles.  LUI/FMV.W.X is likely better for floats and halfs, so this mostly applies to doubles.  FNEG.S can be used to toggle the sign bit on any float, so may be more broadly applicable as well.
+
+
 Current constant materialization for large constant vectors leaves a bit to be desired.  Here's a list of cases which might be interesting to improve:
 
 * Forming vector splats for constant fixed length vectors which can't be folded into operand (e.g. for a store).  Currently, we emit constant pool loads where-as splatting an etype constant would be significantly better.  Shows up in idiomatic vectorized constant memset patterns.
