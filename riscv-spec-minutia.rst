@@ -21,7 +21,16 @@ The part of this change relevant for Zicsr and Zifencei is described in “Prefa
 zicntr
 ======
 
-The wording which defined the RDCYCLE, RDTIME, and RDINSTRET counters was removed.  At some later point, they were re-added to the specification as Zicntr.  I have not tracked down the change or document version which corresponds to this addition.  It is *not* document version 2.2.
+The wording which defined the RDCYCLE, RDTIME, and RDINSTRET counters was removed.  They were re-added to the specification as Zicntr in `commit 77aff0 <https://github.com/riscv/riscv-profiles/commit/77aff0b84edab1fb35dd7080a7371765d28c4da3>`_ in March 2022.
+
+That change includes the following verbage:
+
+"NOTE: Counters and timers (now known as Zicntr and Zihpm) were frozen
+but not ratified in 2019, as they were removed from the base ISAs
+during the ratification process.  Due to an oversight they were not
+later ratified.  As they are required for the RVA20 and RVA22
+profiles, the proposal is to ratify these extensions in 2022 and
+retroactively add to the 2020 and 2022 profiles as an exception."
 
 The ratification status is unclear. Zicntr appears in the `current draft specification <https://github.com/riscv/riscv-isa-manual/releases/tag/draft-20230131-c0b298a>`_ without any indication it might be un-ratified, but late last year we a `call for public comment <https://www.reddit.com/r/RISCV/comments/yq73r4/public_review_for_standard_extensions_zicntr_and/>_`. I don't see any formal indication these have been fully ratified.  The best summary of status I can find is `this issue on the profiles repo <https://github.com/riscv/riscv-profiles/issues/43>`_, but even that is not conclusive.
 
@@ -30,7 +39,9 @@ There's an additional problem with the current specification text.  No version n
 Zihpm
 =====
 
-At a high level, Zihpm parallels Zicntr in that ratification status is unclear, and no version has been assigned.  However, hpmcounter3–hpmcounter31 names do not appear to be present in older specification documents.  As such, Zihpm is merely a newly proposed extension as opposed to a backwards incompatible spec change.
+At a high level, Zihpm parallels Zicntr in that ratification status is unclear, and no version has been assigned.
+
+However, hpmcounter3–hpmcounter31 names do not appear to be present in older specification documents.  As such, Zihpm is merely a newly proposed extension as opposed to a backwards incompatible spec change.  Note however that this appears to contract the text added to the specification document quoted above, so maybe there's more to the story?
 
 Redefinition of PAUSE (Dec 2022)
 --------------------------------
