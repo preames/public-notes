@@ -123,7 +123,7 @@ Vectorization
 
 ARM SVE has pioneered support in the loop vectorizer for runtime vector lengths in the main loop, while using a scalar epilogue loop to handle the last couple of iterations.  I have been actively working towards enabling loop vectorization for RISC-V.  Today, upstream LLVM will auto-vectorize with both scalable and fixed length vector types, picking whichever is cheapest.
 
-In practice, scalable vectors are almost always scalable unless there's a gap in what we can vectorize.  The major gap left is handling of interleave groups (a.k.a. segmented load/stores on RISCV).  This gap is under discussion, but is not a quick fix.  All other interesting functional gaps are, to my knowledge, fixed.  If you encounter other gaps, please report them.
+In practice, scalable vectors are almost always scalable unless there's a gap in what we can vectorize.  The major gap left is handling of interleave groups (a.k.a. segmented load/stores on RISCV).  This gap is under active development (see https://reviews.llvm.org/D144092 and related reviews).  All other interesting functional gaps are, to my knowledge, fixed.  If you encounter other gaps, please report them.
 
 In terms of performaning tuning, we're still in the early days.  I've been fixing issues as I find them, but there's a couple of larger gaps known such as LMUL>1 enablement.  Concrete bug reports for vector code quality are very welcome.
 
