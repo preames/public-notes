@@ -41,7 +41,7 @@ Zihpm
 
 At a high level, Zihpm parallels Zicntr in that ratification status is unclear, and no version has been assigned.
 
-However, hpmcounter3–hpmcounter31 names do not appear to be present in older specification documents.  As such, Zihpm is merely a newly proposed extension as opposed to a backwards incompatible spec change.  Note however that this appears to contract the text added to the specification document quoted above, so maybe there's more to the story?
+However, hpmcounter3–hpmcounter31 names do not appear to be present in older specification documents.  As such, Zihpm is merely a newly proposed extension as opposed to a backwards incompatible spec change.  Note however that this appears to contradict the text added to the specification document quoted above, so maybe there's more to the story?
 
 Redefinition of PAUSE (Dec 2022)
 --------------------------------
