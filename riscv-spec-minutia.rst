@@ -43,10 +43,18 @@ At a high level, Zihpm parallels Zicntr in that ratification status is unclear, 
 
 However, hpmcounter3–hpmcounter31 names do not appear to be present in older specification documents.  As such, Zihpm is merely a newly proposed extension as opposed to a backwards incompatible spec change.  Note however that this appears to contradict the text added to the specification document quoted above, so maybe there's more to the story?
 
-Redefinition of PAUSE (Dec 2022)
---------------------------------
+Can't we all just hold on a second?
+-----------------------------------
 
-In `commit cb3b9d <https://github.com/riscv/riscv-isa-manual/commit/cb3b9d1dcdacefbde6602ada7a0050f5c723ddee>`_ the definition of the PAUSE instruction was changed in a backwards incompatible manner.  Hardware which implemented the old specification does not implement the new one.  This particular change is well justified as the previous definition was absurd and useless (it disallowed advancing the program counter), but it wasn't explicitly tracked in any versioning scheme.
+For one little instruction, Zihintpause (i.e. the PAUSE instruction) has been a real mess process wise.  This section is largely based on research reported `here <https://inbox.sourceware.org/binutils/f662084e-8b42-a3f4-55b5-8641034d776a@irq.a4lg.com/>`_.
+
+The version number of the `zihintpause` extension **moved backwards** from 2.0 to 1.0 very shortly after being merged into the main repository.  This is easy to write off as a minor issue, except that the `commit which moved the extension number backwards <https://github.com/riscv/riscv-isa-manual/commit/773a6c4cc9db7585d42ec732d5db24f930d1157a>`_ also introduced the sentence "No architectural state is changed.".  If you think about it a bit, this is absolutely absurd because the program counter is part of the architectural state.  This effectively says the instruction must execute forever.  Except, that also contradicts the wording which says the "duration of its effect must be bounded".  So basically, 1.0 is (pedantically) unimplementable.
+
+In Aug 2021, the extension was ratified, and, a few hours later, the version number was increased again to 2.0.  The wording discussed above remained.
+
+In `commit cb3b9d <https://github.com/riscv/riscv-isa-manual/commit/cb3b9d1dcdacefbde6602ada7a0050f5c723ddee>`_ (Dec 2022) the definition of the PAUSE instruction was again revised to remove the "No architectural state is changed." wording.  This is great, and long overdue.  However, the version number of the extension was *not* increased.  So as a result, we have two versions of the extension text - both which claim to be 2.0 - which are mutually incompatible.  Arguably, this was a small enough matter that an errata should suffice, but well, we don't have one of those either.
+
+As a practical matter, the consensus seems to be to basically ignore the matter.  The prior text was unimplementable, and if you ignore that sentence, all of the known versions are substantially similar.  As a result, the discrepancies in version can mostly be ignored, and we pretend that only the most recent 2.0 version ever existed.
 
 Redefinition of Vector Overlap (Nov 2022)
 -----------------------------------------
