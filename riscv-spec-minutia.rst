@@ -56,6 +56,11 @@ In `commit cb3b9d <https://github.com/riscv/riscv-isa-manual/commit/cb3b9d1dcdac
 
 As a practical matter, the consensus seems to be to basically ignore the matter.  The prior text was unimplementable, and if you ignore that sentence, all of the known versions are substantially similar.  As a result, the discrepancies in version can mostly be ignored, and we pretend that only the most recent 2.0 version ever existed.
 
+Zmmul vs M
+----------
+
+Discussion in the issue `Is Zmmul a subset of M? <https://github.com/riscv/riscv-isa-manual/issues/869>`_ appears to indicate that in a pendantic sense that `Zmmul` is not a strict subset of `M`.  Specifically, `M` allows some configurations which don't actually support multiplication at runtime, whereas `Zmmul` does not.  Given toolchains completely ignore this possibility to start with - seriously, don't tell your toolchain you have a multiply instruction if it's disabled at runtime - in all practical sense `Zmmul` does appear to be a subset of `M`.  
+
 Redefinition of Vector Overlap (Nov 2022)
 -----------------------------------------
 
