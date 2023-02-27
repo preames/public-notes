@@ -41,7 +41,8 @@ Zihpm
 
 At a high level, Zihpm parallels Zicntr in that ratification status is unclear, and no version has been assigned.
 
-However, hpmcounter3–hpmcounter31 names do not appear to be present in older specification documents.  As such, Zihpm is merely a newly proposed extension as opposed to a backwards incompatible spec change.  Note however that this appears to contradict the text added to the specification document quoted above, so maybe there's more to the story?
+However, hpmcounter3–hpmcounter31 names do not appear to be present in older *unprivledged* specification documents.  As such, Zihpm is merely a newly proposed extension as opposed to a backwards incompatible spec change.  Note however that this appears to contradict the text added to the specification document quoted above.  It was pointed out to me that they are mentioned in some of the *privledged* specification documents, but I have not tracked when they were added or tried to reconcile the history of the two specification documents.
+
 
 Can't we all just hold on a second?
 -----------------------------------
