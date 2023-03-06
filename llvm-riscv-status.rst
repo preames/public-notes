@@ -55,6 +55,15 @@ Workaround: GDB appears to work well with LLVM generated code, and is widely use
 
 Debug info quality in the backend is unclear.  Would be good to do a systematic search for issues ala the Sony efforts from a few years ago.
 
+Split Dwarf Issue
++++++++++++++++++
+
+I have been told that there is an issue with split dwarf.  If I understood correctly, the actual issue is target independent, but RISCV will see it at higher frequency.
+
+My understanding is that split dwarf doesn't allow relocations which change function sizes in the split portion.  Specifically, applying fixups in the split files is undesirable to reduce link time.  Because of the strategy taken with call relaxation, RISC-V is much more likely to see this problem in practice than other targets.
+
+Workaround: Don't use split dwarf.  Or disable -mrelax.
+
 Sanitizer Support for Scalable Vectors
 ======================================
 
@@ -79,15 +88,6 @@ SanitizerCoverage
    Easy to disable.
 
 **WORKAROUND:** Use `-fno-vectorize` or do not add `V` extensions to architectural string when using sanitizers.
-
-Split Dwarf Issue
-+++++++++++++++++
-
-I have been told that there is an issue with split dwarf.  If I understood correctly, the actual issue is target independent, but RISCV will see it at higher frequency.
-
-My understanding is that split dwarf doesn't allow relocations which change function sizes in the split portion.  Specifically, applying fixups in the split files is undesirable to reduce link time.  Because of the strategy taken with call relaxation, RISC-V is much more likely to see this problem in practice than other targets.
-
-Workaround: Don't use split dwarf.  Or disable -mrelax.  
 
 
 Concerning items in LLVM issue tracker
