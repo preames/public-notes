@@ -17,15 +17,7 @@ There are numerous potential extensions in flight.  The following is a list of s
 * `Zc* variants <https://github.com/riscv/riscv-code-size-reduction/releases>`_
 * `Vector crypto extensions <https://github.com/riscv/riscv-crypto/releases>`_, https://reviews.llvm.org/D138807
 * `bfloat16 support <https://github.com/riscv/riscv-bfloat16/releases>`_
-* zfhmin (float16) Ratified, https://reviews.llvm.org/D139391
-* `Zvfh (float16 vector) support <https://github.com/riscv/riscv-v-spec/tree/zvfh>`_, https://reviews.llvm.org/D139391
-* `Zfa <https://github.com/riscv/riscv-isa-manual/releases/tag/draft-20221004-28b46de>`_ (unreleased snapshot of main spec branch - used to be called Zfb)
 * CFI
-
-Vendor Extensions:
-
-* `THeadVDot <https://github.com/T-head-Semi/thead-extension-spec/releases/download/2.2.0/xthead-2022-12-04-2.2.0.pdf>`_, https://reviews.llvm.org/D139386
-
 
 GNU vs LLVM Toolchain Compatibility
 ===================================
@@ -62,6 +54,31 @@ In tree, LLDB apparently does not fully work on RISCV.  Exact status unclear.  I
 Workaround: GDB appears to work well with LLVM generated code, and is widely used for this purpose.
 
 Debug info quality in the backend is unclear.  Would be good to do a systematic search for issues ala the Sony efforts from a few years ago.
+
+Sanitizer Support for Scalable Vectors
+======================================
+
+https://github.com/llvm/llvm-project/issues/61096 reveals that the sanitizers were never updated to account for scalable vector types.  Since I enabled auto-vectorization with scalable vectors by default last summer, this means that various sanitizers may crash when used in combination with the V extension.  I did an audit of some of the near by code, and identified a bunch of issues which need fixed.
+
+ASAN
+   Initial patches posted, and waiting for review.
+
+MSAN
+   Will require multiple changes
+
+TSAN
+   Preventing a crash will be easy, but proper support may require a new runtime routine.
+
+HWASAN
+   Requires small change to take slow path.
+
+BoundsChecking
+   Requires small change
+
+SanitizerCoverage
+   Easy to disable.
+
+**WORKAROUND:** Use `-fno-vectorize` or do not add `V` extensions to architectural string when using sanitizers.
 
 Split Dwarf Issue
 +++++++++++++++++
