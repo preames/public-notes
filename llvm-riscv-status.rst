@@ -19,6 +19,17 @@ There are numerous potential extensions in flight.  The following is a list of s
 * `bfloat16 support <https://github.com/riscv/riscv-bfloat16/releases>`_
 * CFI
 
+Moving to latest specification
+==============================
+
+Punch list:
+
+* F implies Zicsr (Finx probably does too)
+* Zihpm, and Zicntr
+* Various version number updates - thought to be non-semantic, but check!
+* Double check CPU definitions - need to add zicsr, zifencei, zihpm, zicntr as appropriate
+* Meaning of G, and canonical march string
+
 GNU vs LLVM Toolchain Compatibility
 ===================================
 
@@ -70,10 +81,10 @@ Sanitizer Support for Scalable Vectors
 https://github.com/llvm/llvm-project/issues/61096 reveals that the sanitizers were never updated to account for scalable vector types.  Since I enabled auto-vectorization with scalable vectors by default last summer, this means that various sanitizers may crash when used in combination with the V extension.  I did an audit of some of the near by code, and identified a bunch of issues which need fixed.
 
 ASAN
-   Initial patches posted, and waiting for review.
+   Initial patches landed, thought to work.  No end-to-end testing as of yet.
 
 MSAN
-   Will require multiple changes
+   Will require multiple changes.  Initial changes in progress.
 
 TSAN
    Preventing a crash will be easy, but proper support may require a new runtime routine.
