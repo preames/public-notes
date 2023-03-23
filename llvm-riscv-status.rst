@@ -84,7 +84,7 @@ ASAN
    Initial patches landed, thought to work.  No end-to-end testing as of yet.
 
 MSAN
-   Will require multiple changes.  Initial changes in progress.
+   Will require multiple changes.  Initial change landed, more needed.  Specifically, argument handling.
 
 TSAN
    Preventing a crash will be easy, but proper support may require a new runtime routine.
