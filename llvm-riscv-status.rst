@@ -84,16 +84,16 @@ ASAN
    Initial patches landed, thought to work.  No end-to-end testing as of yet.
 
 MSAN
-   Will require multiple changes.  Initial change landed, more needed.  Specifically, argument handling.
+   Initial change landed, can instrument simple load/stores.  Argument handling not yet implemented.
 
 TSAN
    Preventing a crash will be easy, but proper support may require a new runtime routine.
 
 HWASAN
-   Requires small change to take slow path.
+   Initial change landed, can instrument simple load/stores.  Stack (scalable alloca) not yet implemented.
 
 BoundsChecking
-   Requires small change
+   Changes landed, should work, no end-to-end testing as of yet.
 
 SanitizerCoverage
    Easy to disable.
