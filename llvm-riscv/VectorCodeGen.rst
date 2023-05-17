@@ -15,6 +15,11 @@ Skiming through the issue tracker for "riscv", I see a couple of concerning look
 
 *  [RISCV] wrong vector register alloc in vector instruction `#50157 <https://github.com/llvm/llvm-project/issues/50157>`_.  Appears to be a miscompile of vgather intrinsic, and may hint at a larger lurking issue.
 
+Zvbb Codegen
+============
+
+MC support for zvbb was added in https://reviews.llvm.org/D148483.  This extension adds a number of generically useful vector bitmanip instructions.  We should implement codegen pattern matching for it, and then ensure the cost model is adjusted such that LV and SLP benefit from the capability.
+
 Optimizations for VSETVLI insertion
 ===================================
 
@@ -97,4 +102,31 @@ The fourth is generalized shuffle indices. (i.e. figuring out what lanes are dem
 
 I'm pretty sure we'll need to generalize at least as far as subvector insert/extract. I'm not sure about going beyond that yet.
 
+Rematerialization of BuildVector idioms
+=======================================
 
+In SPEC runs, I'm seeing cases where we materialize a vector (most commonly a zero vector splat) and then spill that to the stack due to register pressure.  We should be able to rematerialize this during register allocation instead.
+
+Note that there's a catch here - the pass through operand on the instructions for vmv.v.i and vmv.s.x.  These prevent the operations from being trivially rematerializable.
+
+I see three options:
+
+* Detect a implicit_def operand.  I tried this and couldn't get it working as the implicit_def has probably already been allocated, and we're no longer in SSA so.
+* Version the intrinsics so we have one without a pass through operand.  Requires care during MI to MC lowering, and is bit ugly, but could probably be done.
+* Add TAIL_UNDEF/MERGE_UNDEF flags.  Would be generically useful.
+
+Currently, the cases I'm seeing are mostly VL=2 and I think we can skin that cat differently, so this is more of a future item at the moment.
+
+MachineLICM of Vector Constant Idioms
+=====================================
+
+If we have a constant pool load in the loop, we should be able to hoist it out.  Note that splats aren't interesting here as they're usually folded into the consuming instruction.
+
+We should be able to *sink* into a loop to reduce register pressure.  This is a big deal at high LMUL.
+
+Note that this may inter-related with the remat item above - if so, the focus might be different due to constant pool loads vs expanded build vector idioms.
+
+TAIL_UNDEF
+==========
+
+We have multiple cases where we can better optimize a vector idiom knowing that the merge operand is undef.  See existing cases in RISCVInsertVSETVLI.cpp and above on rematerialization.
