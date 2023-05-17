@@ -14,10 +14,11 @@ Draft Extensions
 
 There are numerous potential extensions in flight.  The following is a list of specification links for a few of the potentially interesting ones.  This explicitly excludes anything `already implemented in LLVM <https://llvm.org/docs/RISCVUsage.html>`_.
 
-* `Zc* variants <https://github.com/riscv/riscv-code-size-reduction/releases>`_
-* `Vector crypto extensions <https://github.com/riscv/riscv-crypto/releases>`_, https://reviews.llvm.org/D138807
-* `bfloat16 support <https://github.com/riscv/riscv-bfloat16/releases>`_
+* `bfloat16 support <https://github.com/riscv/riscv-bfloat16/releases>`_, https://reviews.llvm.org/D147610 -- Unblocked and approved, should land shortly.
+* `zacas <https://github.com/riscv/riscv-zacas/>`_, https://reviews.llvm.org/D149248
 * CFI
+* Zicclsm
+* Zam
 
 Rash of Linker issues
 =====================
