@@ -19,17 +19,6 @@ There are numerous potential extensions in flight.  The following is a list of s
 * `bfloat16 support <https://github.com/riscv/riscv-bfloat16/releases>`_
 * CFI
 
-Moving to latest specification
-==============================
-
-Punch list:
-
-* F implies Zicsr (Finx probably does too)
-* Zihpm, and Zicntr
-* Various version number updates - thought to be non-semantic, but check!
-* Double check CPU definitions - need to add zicsr, zifencei, zihpm, zicntr as appropriate
-* Meaning of G, and canonical march string
-
 Rash of Linker issues
 =====================
 
@@ -118,7 +107,6 @@ Concerning items in LLVM issue tracker
 
 Skiming through the issue tracker for "riscv", I see a couple of concerning looking items.
 
-*  [SelectionDAGISel] Mysteriously dropped chain on strict FP node. `#54617 <https://github.com/llvm/llvm-project/issues/54617>`_.  This appears to be a wrong code bug for strictfp which affects RISCV.
 *  [RISCV] wrong vector register alloc in vector instruction `#50157 <https://github.com/llvm/llvm-project/issues/50157>`_.  Appears to be a miscompile of vgather intrinsic, and may hint at a larger lurking issue.
 
 VLEN=32 is known to be broken
@@ -195,22 +183,12 @@ Note that both of these issues could exist for LV in theory, but are significant
 Another concern is that SLP doesn't always respect target register width and assumes legalization.  I somewhat worry about how this will interact with LMUL8 and register allocation, but I think I've convinced myself that the same basic problem exists on all architectures.  (For reference, SLP will happily generate a 128 element wide reduction with 64 bit elements.  On a 128 bit vector machine, that requires stack spills during legalization.)  Such sequences don't seem to happen in practice, except maybe in machine generated code or cases where we've over-unrolled.  
 
 
-Code Size
-=========
-
-There has been a general view that RISCV code size has significant room for improvement aired in recent LLVM RISC-V sync-up calls, but no specifics are currently known.
-
-2022-07-11 - I spent some time last week glancing at usage of compressed instructions.  Main take away is that lack of linker optimization/relaxation support in LLD was really painful code size wise.  We should revisit once that support is complete, or evaluate using LD in the meantime.
 
 
 Performance (Minor)
 -------------------
 
 Things in this category are thought to be worth implementing individually, but likely individually minor in their performance impact.  Eventually, everything here should be filed as a LLVM issue, but these are my rough notes for the moment.  
-
-Interesting cases from the LLVM issue tracker:
-
-*  Unaligned read followed by bswap generates suboptimal code `#48314 <https://github.com/llvm/llvm-project/issues/48314>`_
    
 
 LoopVectorizer generating duplicate broadcast shuffles
@@ -244,52 +222,7 @@ And assembly:
 
 We can do better here by exploiting the implicit broadcast of scalar arguments.  If we put the constant id vector into a vector register, and add the broadcasted scalar index we get the same result vector.
 
-Branch on inequality involving power of 2
-=========================================
-
-For the compare:
-  %c = icmp ult i64 %a, 8
-  br i1 %c, label %taken, label %untaken
-
-We currently emit:
-    li    a1, 7
-    bltu    a1, a0, .LBB0_2
-
-We could emit:
-    slli    a0, a0, 3
-    bnez    a0, .LBB1_2
-
-This lengthens the critical path by one, but reduces register pressure.  This is probably worthwhile.
-
-There are also many variations of this type of pattern if we decide this is worth spending time on.  
    
-Optimizations for constant physregs (VLENB, X0)
-===============================================
-
-Noticed while investigating use of the PseodoReadVLENB intrinsic, and working on them as follow ons to `<https://reviews.llvm.org/D125552>`_, but these also apply to other constant registers.  At the moment, the two I can think of are X0, and VLENB but there might be others.
-
-Punch list (most have tests in test/CodeGen/RISCV/vlenb.ll but not all):
-
-* PeepholeOptimizer should eliminate redundant copies from constant physregs. (`<https://reviews.llvm.org/D125564`_)
-* PeepholeOptimizer should eliminate redundant copies from unmodified physregs.  Looking at the code structure, we appear to already do all the required def tracking for NA copies, and just need to merge some code paths and add some tests.
-* SelectionDAG does not appear to be CSEing READ_REGISTER from constant physreg.
-* MachineLICM can hoist a COPY from constant physreg since there are no possible clobbers.
-* forward copy propagation can forward constant physreg sources.
-* Remat (during RegAllocGreedy) can trivially remat COPY from constant physreg.
-
-X0 specific punch list:
-
-* Regalloc should prefer constant physreg for unused defs.  (e.g. generalize 042a7a5f for e.g. volatile loads)  May be able to delete custom AArch64 handling too.
-
-VLEN specific punch list:
-
-* VLENB has a restricted range of possible values, port pseudo handling to generic property of physreg.
-* Once all above done, remove PseudoReadVLENB.
-
-
-Vaguely related follow on ideas:
-
-* A VSETVLI a0, x0 <vtype> whose implicit VL and VTYPE defines are dead essentially just computes a fixed function of VLENB.  We could consider replacing the VSETVLI with a CSR read and a shift.  (Unclear whether this is profitable on real hardware.)
 
 
 Optimizations for VSETVLI insertion
@@ -316,15 +249,6 @@ Vectorization
 * Initial target assumes scalar epilogue loop, return to folding/epilogue vectorization in future.
 
 
-Compressed Expansion for Alignment
-==================================
-
-If we have sequence of compressed instructions followed by an align directive, it would be better to uncompress the prior instructions instead of asserting nops for alignment.
-
-This is analogous to the relaxation support on X86 for using larger instruction encodings for alignment in the integrated assembler.
-
-This is of questionable value, but might be interesting around e.g. loop alignment.
-
 Scalable Vectorizer Gaps
 ========================
 
@@ -348,16 +272,8 @@ Tail folding appears to have a number of limitations which can be removed.
 * Stores appear to be tripping scalarization cost not masking cost which inhibits profitability.
 * Uniform Store.  Basic issue is we need to implement last active lane extraction.  Note active bits are a prefix and thus popcnt can be used to find index.  No current plans to support general predication.
 
-Constant Materialization Gaps
-=============================
-
-For constant floats, we have a couple oppurtunities:
-
-* LUI/SHL-by-32/FMV.D.X - Analogous to the LUI/FMV.W.X pattern recently implemented, but requires an extra shift.  This basically reduces to increasing the cost threshold by 1, and may be worth doing for doubles.  
-* LI/FCVT.S.W - Create a small integer, and convert to half/single/double.  Note this is a convert, not a move.  For half, LUI/FMV.H.X may be preferrable.
-* FLI.S/D - Likely to be optimal when Zfa is available.
-* FLI + FNEG.S - Can be used to produce some negative floats and doubles.  LUI/FMV.W.X is likely better for floats and halfs, so this mostly applies to doubles.  FNEG.S can be used to toggle the sign bit on any float, so may be more broadly applicable as well.
-
+Constant Materialization of Large Constants
+===========================================
 
 Current constant materialization for large constant vectors leaves a bit to be desired.  Here's a list of cases which might be interesting to improve:
 
