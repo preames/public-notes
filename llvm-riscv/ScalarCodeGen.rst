@@ -1,5 +1,5 @@
 -------------------------------------------------
-Open Items in Scalar Codegen
+Open Items in Scalar Codegen for RISCV
 -------------------------------------------------
 
 .. contents::

@@ -1,5 +1,5 @@
 -------------------------------------------------
-Open Items in Vector Codegen
+Open Items in Vector Codegen for RISCV
 -------------------------------------------------
 
 Note, vectorization issues are tracked distinctly from vector codegen quality issues.  They're obviously heavily inter-related.

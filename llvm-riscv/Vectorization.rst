@@ -1,5 +1,5 @@
 -------------------------------------------------
-Open Items in Vectorization
+Open Items in Vectorization for RISCV
 -------------------------------------------------
 
 .. contents::
