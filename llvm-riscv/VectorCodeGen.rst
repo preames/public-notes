@@ -107,13 +107,18 @@ Rematerialization of BuildVector idioms
 
 In SPEC runs, I'm seeing cases where we materialize a vector (most commonly a zero vector splat) and then spill that to the stack due to register pressure.  We should be able to rematerialize this during register allocation instead.
 
-Note that there's a catch here - the pass through operand on the instructions for vmv.v.i and vmv.s.x.  These prevent the operations from being trivially rematerializable.
+Note that there's two catches here:
 
-I see three options:
+1) the pass through operand on the instructions for vmv.v.i and vmv.s.x.  These prevent the operations from being trivially rematerializable.
+2) we've inserted uses of VL and VTYPE in InsertVSETVLI before register allocation which are hard to trace through.
+
+For the former, I see three options:
 
 * Detect a implicit_def operand.  I tried this and couldn't get it working as the implicit_def has probably already been allocated, and we're no longer in SSA so.
 * Version the intrinsics so we have one without a pass through operand.  Requires care during MI to MC lowering, and is bit ugly, but could probably be done.
 * Add TAIL_UNDEF/MERGE_UNDEF flags.  Would be generically useful.
+
+For the later, we may have to move VSETVLI post reg-alloc, or support a non-trivial form of remat (when the constant values in registers match).
 
 Currently, the cases I'm seeing are mostly VL=2 and I think we can skin that cat differently, so this is more of a future item at the moment.
 
@@ -130,3 +135,13 @@ TAIL_UNDEF
 ==========
 
 We have multiple cases where we can better optimize a vector idiom knowing that the merge operand is undef.  See existing cases in RISCVInsertVSETVLI.cpp and above on rematerialization.
+
+
+VL Widening/Narrowing
+=====================
+
+In VSETVLIInsert, we may be able to widen the VL for any instruction for which exeuction is guaranteed not to fault or have (observable) side effects.
+
+If we had a robust form of that, we can consider VL narrowing optimizations earlier in the pipeline - specifically, SDAG.  This could allow rescalarization in some cases.
+
+This could be used to support illegal vector types (i.e. <3 x i64>) efficiently (i.e. at VL=3), and maybe help with tail folding (via masking in IR).
