@@ -193,5 +193,80 @@ define void @v6i64_vadd(ptr %p) {
   ret void
 }
 
+; TODO: We should be able to use vfslide1down here
+define <2 x double> @buildvec_v2f64(double %a, double %b) {
+; CHECK-LABEL: buildvec_v2f64:
+; CHECK:       # %bb.0:
+; CHECK-NEXT:    vsetivli zero, 2, e64, m1, ta, ma
+; CHECK-NEXT:    vfmv.v.f v8, fa1
+; CHECK-NEXT:    vsetvli zero, zero, e64, m1, tu, ma
+; CHECK-NEXT:    vfmv.s.f v8, fa0
+; CHECK-NEXT:    ret
+  %v1 = insertelement <2 x double> poison, double %a, i64 0
+  %v2 = insertelement <2 x double> %v1, double %b, i64 1
+  ret <2 x double> %v2
+}
+
+; TODO: Can be a slidedown1 + a vfslide1down
+define <2 x double> @rotatedown_v2f64_a(<2 x double> %v, double %b) {
+; CHECK-LABEL: rotatedown_v2f64_a:
+; CHECK:       # %bb.0:
+; CHECK-NEXT:    vsetivli zero, 2, e64, m1, ta, ma
+; CHECK-NEXT:    vrgather.vi v9, v8, 1
+; CHECK-NEXT:    vfmv.s.f v8, fa0
+; CHECK-NEXT:    vslideup.vi v9, v8, 1
+; CHECK-NEXT:    vmv.v.v v8, v9
+; CHECK-NEXT:    ret
+  %v1 = shufflevector <2 x double> %v, <2 x double> poison, <2 x i32> <i32 1, i32 1>
+  %v2 = insertelement <2 x double> %v1, double %b, i64 1
+  ret <2 x double> %v2
+}
+
+define <2 x double> @rotatedown_v2f64_b(<2 x double> %v, double %b) {
+; CHECK-LABEL: rotatedown_v2f64_b:
+; CHECK:       # %bb.0:
+; CHECK-NEXT:    vsetivli zero, 2, e64, m1, ta, ma
+; CHECK-NEXT:    vrgather.vi v9, v8, 1
+; CHECK-NEXT:    vfmv.s.f v8, fa0
+; CHECK-NEXT:    vslideup.vi v9, v8, 1
+; CHECK-NEXT:    vmv.v.v v8, v9
+; CHECK-NEXT:    ret
+  %v1 = shufflevector <2 x double> %v, <2 x double> poison, <2 x i32> <i32 1, i32 undef>
+  %v2 = insertelement <2 x double> %v1, double %b, i64 1
+  ret <2 x double> %v2
+}
+
+
+; TODO: This shouldn't have to go through the scalar domain!
+define <2 x double> @rotatedown_v2f64_c(<2 x double> %v, double %b) {
+; CHECK-LABEL: rotatedown_v2f64_c:
+; CHECK:       # %bb.0:
+; CHECK-NEXT:    vsetivli zero, 1, e64, m1, ta, ma
+; CHECK-NEXT:    vslidedown.vi v8, v8, 1
+; CHECK-NEXT:    vfmv.f.s fa5, v8
+; CHECK-NEXT:    vsetivli zero, 2, e64, m1, ta, ma
+; CHECK-NEXT:    vfmv.v.f v8, fa0
+; CHECK-NEXT:    vsetvli zero, zero, e64, m1, tu, ma
+; CHECK-NEXT:    vfmv.s.f v8, fa5
+; CHECK-NEXT:    ret
+  %a = extractelement <2 x double> %v, i64 1
+  %v1 = insertelement <2 x double> poison, double %a, i64 0
+  %v2 = insertelement <2 x double> %v1, double %b, i64 1
+  ret <2 x double> %v2
+}
+
+define <4 x double> @rotatedown_42f64_2(<4 x double> %v, double %b) {
+; CHECK-LABEL: rotatedown_42f64_2:
+; CHECK:       # %bb.0:
+; CHECK-NEXT:    vsetivli zero, 4, e64, m2, ta, ma
+; CHECK-NEXT:    vslidedown.vi v8, v8, 1
+; CHECK-NEXT:    vfmv.s.f v10, fa0
+; CHECK-NEXT:    vslideup.vi v8, v10, 3
+; CHECK-NEXT:    ret
+  %v1 = shufflevector <4 x double> %v, <4 x double> poison, <4 x i32> <i32 1, i32 2, i32 3, i32 undef>
+  %v2 = insertelement <4 x double> %v1, double %b, i64 3
+  ret <4 x double> %v2
+}
+
 
 ; TODO: Consider using PerfectShuffle tool for VF=4?
