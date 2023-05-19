@@ -129,5 +129,69 @@ define void @shuffle_constant_mask(<16 x ptr> %a, ptr %p) {
   ret void
 }
 
+; For these odd types, we could consider using a masked load and store
+; to widen the illegal types.
+define void @v3i64_vadd(ptr %p) {
+; CHECK-LABEL: v3i64_vadd:
+; CHECK:       # %bb.0:
+; CHECK-NEXT:    vsetivli zero, 4, e64, m2, ta, ma
+; CHECK-NEXT:    vle64.v v8, (a0)
+; CHECK-NEXT:    vadd.vi v8, v8, 1
+; CHECK-NEXT:    vsetivli zero, 1, e64, m2, ta, ma
+; CHECK-NEXT:    vslidedown.vi v10, v8, 2
+; CHECK-NEXT:    addi a1, a0, 16
+; CHECK-NEXT:    vse64.v v10, (a1)
+; CHECK-NEXT:    vsetivli zero, 2, e64, m1, ta, ma
+; CHECK-NEXT:    vse64.v v8, (a0)
+; CHECK-NEXT:    ret
+  %v1 = load <3 x i64>, ptr %p
+  %v2 = add <3 x i64> %v1, <i64 1, i64 1, i64 1>
+  store <3 x i64> %v2, ptr %p
+  ret void
+}
+
+define void @v3i64_vadd_elem_aligned(ptr %p) {
+; CHECK-LABEL: v3i64_vadd_elem_aligned:
+; CHECK:       # %bb.0:
+; CHECK-NEXT:    vsetivli zero, 2, e64, m1, ta, ma
+; CHECK-NEXT:    ld a1, 16(a0)
+; CHECK-NEXT:    vle64.v v8, (a0)
+; CHECK-NEXT:    vmv.s.x v10, a1
+; CHECK-NEXT:    vsetivli zero, 4, e64, m2, ta, ma
+; CHECK-NEXT:    vslideup.vi v8, v10, 2
+; CHECK-NEXT:    addi a1, a0, 16
+; CHECK-NEXT:    vadd.vi v8, v8, 1
+; CHECK-NEXT:    vsetivli zero, 1, e64, m2, ta, ma
+; CHECK-NEXT:    vslidedown.vi v10, v8, 2
+; CHECK-NEXT:    vse64.v v10, (a1)
+; CHECK-NEXT:    vsetivli zero, 2, e64, m1, ta, ma
+; CHECK-NEXT:    vse64.v v8, (a0)
+; CHECK-NEXT:    ret
+  %v1 = load <3 x i64>, ptr %p, align 8
+  %v2 = add <3 x i64> %v1, <i64 1, i64 1, i64 1>
+  store <3 x i64> %v2, ptr %p, align 8
+  ret void
+}
+
+define void @v6i64_vadd(ptr %p) {
+; CHECK-LABEL: v6i64_vadd:
+; CHECK:       # %bb.0:
+; CHECK-NEXT:    vsetivli zero, 8, e64, m4, ta, ma
+; CHECK-NEXT:    vle64.v v8, (a0)
+; CHECK-NEXT:    vadd.vi v8, v8, 1
+; CHECK-NEXT:    vsetivli zero, 2, e64, m4, ta, ma
+; CHECK-NEXT:    vslidedown.vi v12, v8, 4
+; CHECK-NEXT:    addi a1, a0, 32
+; CHECK-NEXT:    vsetivli zero, 2, e64, m1, ta, ma
+; CHECK-NEXT:    vse64.v v12, (a1)
+; CHECK-NEXT:    vsetivli zero, 4, e64, m2, ta, ma
+; CHECK-NEXT:    vse64.v v8, (a0)
+; CHECK-NEXT:    ret
+  %v1 = load <6 x i64>, ptr %p
+  %v2 = add <6 x i64> %v1, <i64 1, i64 1, i64 1, i64 1, i64 1, i64 1>
+  store <6 x i64> %v2, ptr %p
+  ret void
+}
+
 
 ; TODO: Consider using PerfectShuffle tool for VF=4?
