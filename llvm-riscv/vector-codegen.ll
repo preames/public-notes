@@ -6,9 +6,8 @@
 define void @copy_via_small_vector(ptr %a, ptr %b) {
 ; CHECK-LABEL: copy_via_small_vector:
 ; CHECK:       # %bb.0:
-; CHECK-NEXT:    vsetivli zero, 2, e16, mf4, ta, ma
-; CHECK-NEXT:    vle16.v v8, (a0)
-; CHECK-NEXT:    vse16.v v8, (a1)
+; CHECK-NEXT:    lw a0, 0(a0)
+; CHECK-NEXT:    sw a0, 0(a1)
 ; CHECK-NEXT:    ret
   %v = load <2 x i16>, ptr %a
   store <2 x i16> %v, ptr %b
@@ -52,12 +51,8 @@ define <2 x i8> @small_constant() {
 define void @small_constant_store(ptr %p) {
 ; CHECK-LABEL: small_constant_store:
 ; CHECK:       # %bb.0:
-; CHECK-NEXT:    vsetivli zero, 2, e8, mf8, ta, ma
-; CHECK-NEXT:    vmv.v.i v8, 3
-; CHECK-NEXT:    vid.v v9
-; CHECK-NEXT:    li a1, 3
-; CHECK-NEXT:    vmadd.vx v9, a1, v8
-; CHECK-NEXT:    vse8.v v9, (a0)
+; CHECK-NEXT:    li a1, 1539
+; CHECK-NEXT:    sh a1, 0(a0)
 ; CHECK-NEXT:    ret
   store <2 x i8> <i8 3, i8 6>, ptr %p
   ret void
@@ -198,9 +193,8 @@ define <2 x double> @buildvec_v2f64(double %a, double %b) {
 ; CHECK-LABEL: buildvec_v2f64:
 ; CHECK:       # %bb.0:
 ; CHECK-NEXT:    vsetivli zero, 2, e64, m1, ta, ma
-; CHECK-NEXT:    vfmv.v.f v8, fa1
-; CHECK-NEXT:    vsetvli zero, zero, e64, m1, tu, ma
-; CHECK-NEXT:    vfmv.s.f v8, fa0
+; CHECK-NEXT:    vfslide1down.vf v8, v8, fa0
+; CHECK-NEXT:    vfslide1down.vf v8, v8, fa1
 ; CHECK-NEXT:    ret
   %v1 = insertelement <2 x double> poison, double %a, i64 0
   %v2 = insertelement <2 x double> %v1, double %b, i64 1
@@ -245,9 +239,8 @@ define <2 x double> @rotatedown_v2f64_c(<2 x double> %v, double %b) {
 ; CHECK-NEXT:    vslidedown.vi v8, v8, 1
 ; CHECK-NEXT:    vfmv.f.s fa5, v8
 ; CHECK-NEXT:    vsetivli zero, 2, e64, m1, ta, ma
-; CHECK-NEXT:    vfmv.v.f v8, fa0
-; CHECK-NEXT:    vsetvli zero, zero, e64, m1, tu, ma
-; CHECK-NEXT:    vfmv.s.f v8, fa5
+; CHECK-NEXT:    vfslide1down.vf v8, v8, fa5
+; CHECK-NEXT:    vfslide1down.vf v8, v8, fa0
 ; CHECK-NEXT:    ret
   %a = extractelement <2 x double> %v, i64 1
   %v1 = insertelement <2 x double> poison, double %a, i64 0
