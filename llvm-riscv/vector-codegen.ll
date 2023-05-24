@@ -18,6 +18,19 @@ define <4 x i32> @reverse_high_low(<4 x i32> %a) {
   ret <4 x i32> %res
 }
 
+define <2 x i64> @high_low_elem(<4 x i64> %a) {
+; CHECK-LABEL: high_low_elem:
+; CHECK:       # %bb.0:
+; CHECK-NEXT:    vsetivli zero, 2, e64, m2, ta, ma
+; CHECK-NEXT:    vslidedown.vi v10, v8, 2
+; CHECK-NEXT:    vsetivli zero, 1, e64, m1, tu, ma
+; CHECK-NEXT:    vslideup.vi v10, v8, 0
+; CHECK-NEXT:    vmv1r.v v8, v10
+; CHECK-NEXT:    ret
+  %res = shufflevector <4 x i64> %a, <4 x i64> poison, <2 x i32> <i32 0, i32 3>
+  ret <2 x i64> %res
+}
+
 ; Using the VID expansion here is really terrible, the result is simply
 ; 16 bits.  Can be either an insert, or a load from memory.
 define <2 x i8> @small_constant() {
@@ -191,6 +204,49 @@ define <2 x double> @rotatedown_v2f64_b(<2 x double> %v, double %b) {
   ret <2 x double> %v2
 }
 
+define <2 x double> @redundant_splat_v2f64_a(<2 x double> %v, double %b) {
+; CHECK-LABEL: redundant_splat_v2f64_a:
+; CHECK:       # %bb.0:
+; CHECK-NEXT:    vsetivli zero, 2, e64, m1, ta, ma
+; CHECK-NEXT:    vrgather.vi v9, v8, 0
+; CHECK-NEXT:    vfmv.s.f v8, fa0
+; CHECK-NEXT:    vslideup.vi v9, v8, 1
+; CHECK-NEXT:    vmv.v.v v8, v9
+; CHECK-NEXT:    ret
+  %v1 = shufflevector <2 x double> %v, <2 x double> poison, <2 x i32> <i32 0, i32 0>
+  %v2 = insertelement <2 x double> %v1, double %b, i64 1
+  ret <2 x double> %v2
+}
+
+; TODO: this should be a single vfslide1up
+define <2 x double> @rotateup_v2f64_a(<2 x double> %v, double %b) {
+; CHECK-LABEL: rotateup_v2f64_a:
+; CHECK:       # %bb.0:
+; CHECK-NEXT:    vsetivli zero, 2, e64, m1, ta, ma
+; CHECK-NEXT:    vrgather.vi v9, v8, 0
+; CHECK-NEXT:    vsetvli zero, zero, e64, m1, tu, ma
+; CHECK-NEXT:    vfmv.s.f v9, fa0
+; CHECK-NEXT:    vmv1r.v v8, v9
+; CHECK-NEXT:    ret
+  %v1 = shufflevector <2 x double> %v, <2 x double> poison, <2 x i32> <i32 0, i32 0>
+  %v2 = insertelement <2 x double> %v1, double %b, i64 0
+  ret <2 x double> %v2
+}
+
+; TODO: this should be a single vfslide1up
+define <2 x double> @rotateup_v2f64_b(<2 x double> %v, double %b) {
+; CHECK-LABEL: rotateup_v2f64_b:
+; CHECK:       # %bb.0:
+; CHECK-NEXT:    vsetivli zero, 2, e64, m1, ta, ma
+; CHECK-NEXT:    vfmv.v.f v9, fa0
+; CHECK-NEXT:    vslideup.vi v9, v8, 1
+; CHECK-NEXT:    vmv.v.v v8, v9
+; CHECK-NEXT:    ret
+  %vb = insertelement <2 x double> poison, double %b, i64 0
+  %v1 = shufflevector <2 x double> %v, <2 x double> %vb, <2 x i32> <i32 2, i32 0>
+  ret <2 x double> %v1
+}
+
 
 ; TODO: This shouldn't have to go through the scalar domain!
 define <2 x double> @rotatedown_v2f64_c(<2 x double> %v, double %b) {
@@ -221,6 +277,5 @@ define <4 x double> @rotatedown_42f64_2(<4 x double> %v, double %b) {
   %v2 = insertelement <4 x double> %v1, double %b, i64 3
   ret <4 x double> %v2
 }
-
 
 ; TODO: Consider using PerfectShuffle tool for VF=4?
