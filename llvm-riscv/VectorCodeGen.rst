@@ -205,6 +205,7 @@ Vector Remat and Spills for Short Vectors
 In cases where we have vector values live over calls, we currently end up with some really awful spill fill sequences.
 
 There's a couple of different ways of looking at this; fixing some subset of these is probably called for.
+
 * The calling convention for exp doesn't have any callee saved vector registers.
 * We could reschedule the vector extracts and inserts to reduce the need for vector registers over the calls.  This could be done as either some kind of scheduling/remat, or simply as a change to how we scalarize vector intrinsic calls.  (Or both.)
 * We're spilling the scalable vector type, when we know that the minimum VLEN contains our value type.  Maybe we should add a special register class for fixed length values of this kind?  Or a family of such?  This may imply changes to the general legalize as scalable vector approach.
