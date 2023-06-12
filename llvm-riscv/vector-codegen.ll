@@ -62,9 +62,8 @@ define <4 x i16> @vmerge_v4i16_simm5(<4 x i16> %x, <4 x i16> %y) {
 ; CHECK-LABEL: vmerge_v4i16_simm5:
 ; CHECK:       # %bb.0:
 ; CHECK-NEXT:    li a0, 11
-; CHECK-NEXT:    vsetivli zero, 1, e8, mf8, ta, ma
-; CHECK-NEXT:    vmv.s.x v0, a0
 ; CHECK-NEXT:    vsetivli zero, 4, e16, mf2, ta, ma
+; CHECK-NEXT:    vmv.s.x v0, a0
 ; CHECK-NEXT:    vmerge.vvm v8, v9, v8, v0
 ; CHECK-NEXT:    ret
   %s = shufflevector <4 x i16> %x, <4 x i16> %y, <4 x i32> <i32 0, i32 1, i32 6, i32 3>
@@ -99,9 +98,8 @@ define void @shuffle_constant_mask(<16 x ptr> %a, ptr %p) {
 ; CHECK:       # %bb.0:
 ; CHECK-NEXT:    lui a1, 2
 ; CHECK-NEXT:    addiw a1, a1, 545
-; CHECK-NEXT:    vsetivli zero, 1, e16, mf4, ta, ma
-; CHECK-NEXT:    vmv.s.x v0, a1
 ; CHECK-NEXT:    vsetivli zero, 16, e64, m8, ta, ma
+; CHECK-NEXT:    vmv.s.x v0, a1
 ; CHECK-NEXT:    vmv.v.i v16, 3
 ; CHECK-NEXT:    vmerge.vim v24, v16, 0, v0
 ; CHECK-NEXT:    lui a1, 1
@@ -126,14 +124,11 @@ define void @shuffle_constant_mask(<16 x ptr> %a, ptr %p) {
 define void @v3i64_vadd(ptr %p) {
 ; CHECK-LABEL: v3i64_vadd:
 ; CHECK:       # %bb.0:
-; CHECK-NEXT:    vsetivli zero, 4, e64, m2, ta, ma
+; CHECK-NEXT:    vsetivli zero, 3, e64, m2, ta, ma
 ; CHECK-NEXT:    vle64.v v8, (a0)
+; CHECK-NEXT:    vsetivli zero, 4, e64, m2, ta, ma
 ; CHECK-NEXT:    vadd.vi v8, v8, 1
-; CHECK-NEXT:    vsetivli zero, 1, e64, m2, ta, ma
-; CHECK-NEXT:    vslidedown.vi v10, v8, 2
-; CHECK-NEXT:    addi a1, a0, 16
-; CHECK-NEXT:    vse64.v v10, (a1)
-; CHECK-NEXT:    vsetivli zero, 2, e64, m1, ta, ma
+; CHECK-NEXT:    vsetivli zero, 3, e64, m2, ta, ma
 ; CHECK-NEXT:    vse64.v v8, (a0)
 ; CHECK-NEXT:    ret
   %v1 = load <3 x i64>, ptr %p
@@ -145,18 +140,11 @@ define void @v3i64_vadd(ptr %p) {
 define void @v3i64_vadd_elem_aligned(ptr %p) {
 ; CHECK-LABEL: v3i64_vadd_elem_aligned:
 ; CHECK:       # %bb.0:
-; CHECK-NEXT:    vsetivli zero, 2, e64, m1, ta, ma
-; CHECK-NEXT:    ld a1, 16(a0)
+; CHECK-NEXT:    vsetivli zero, 3, e64, m2, ta, ma
 ; CHECK-NEXT:    vle64.v v8, (a0)
-; CHECK-NEXT:    vmv.s.x v10, a1
 ; CHECK-NEXT:    vsetivli zero, 4, e64, m2, ta, ma
-; CHECK-NEXT:    vslideup.vi v8, v10, 2
-; CHECK-NEXT:    addi a1, a0, 16
 ; CHECK-NEXT:    vadd.vi v8, v8, 1
-; CHECK-NEXT:    vsetivli zero, 1, e64, m2, ta, ma
-; CHECK-NEXT:    vslidedown.vi v10, v8, 2
-; CHECK-NEXT:    vse64.v v10, (a1)
-; CHECK-NEXT:    vsetivli zero, 2, e64, m1, ta, ma
+; CHECK-NEXT:    vsetivli zero, 3, e64, m2, ta, ma
 ; CHECK-NEXT:    vse64.v v8, (a0)
 ; CHECK-NEXT:    ret
   %v1 = load <3 x i64>, ptr %p, align 8
@@ -168,15 +156,11 @@ define void @v3i64_vadd_elem_aligned(ptr %p) {
 define void @v6i64_vadd(ptr %p) {
 ; CHECK-LABEL: v6i64_vadd:
 ; CHECK:       # %bb.0:
-; CHECK-NEXT:    vsetivli zero, 8, e64, m4, ta, ma
+; CHECK-NEXT:    vsetivli zero, 6, e64, m4, ta, ma
 ; CHECK-NEXT:    vle64.v v8, (a0)
+; CHECK-NEXT:    vsetivli zero, 8, e64, m4, ta, ma
 ; CHECK-NEXT:    vadd.vi v8, v8, 1
-; CHECK-NEXT:    vsetivli zero, 2, e64, m4, ta, ma
-; CHECK-NEXT:    vslidedown.vi v12, v8, 4
-; CHECK-NEXT:    addi a1, a0, 32
-; CHECK-NEXT:    vsetivli zero, 2, e64, m1, ta, ma
-; CHECK-NEXT:    vse64.v v12, (a1)
-; CHECK-NEXT:    vsetivli zero, 4, e64, m2, ta, ma
+; CHECK-NEXT:    vsetivli zero, 6, e64, m4, ta, ma
 ; CHECK-NEXT:    vse64.v v8, (a0)
 ; CHECK-NEXT:    ret
   %v1 = load <6 x i64>, ptr %p
