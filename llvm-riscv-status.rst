@@ -20,16 +20,10 @@ There are numerous potential extensions in flight.  The following is a list of s
 * Zicclsm
 * Zam
 
-Rash of Linker issues
-=====================
+Open Linker issues
+==================
 
-As of May 2023, I'm aware of an odd rash of confirmed or suspected linker errors.  Listing these all out to simplify tracking:
-
-* [Landed] https://github.com/llvm/llvm-project/issues/62535 -- The fix for this still looks pretty suspect for this.
-* [Landed] https://reviews.llvm.org/D150722 "ld.lld: error: section size decrease is too large" 
 * [Open] https://reviews.llvm.org/D149432 -- Region sizes are computed before relaxation is done in LLD.
-* [Landed[ Repeat relaxation of symbol aliases in LLD.  Patch posted as https://reviews.llvm.org/D150220, but discussion revealed already fixed (by accident) in https://reviews.llvm.org/D149735.  
-* [Undiagnosed] Failure in LTO spec builds, not yet triaged to upstream issue.  Believe to not overlap with preceeding.
 
 
 GNU vs LLVM Toolchain Compatibility
