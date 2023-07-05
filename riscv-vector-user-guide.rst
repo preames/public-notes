@@ -33,33 +33,23 @@ The binutil's assembler used by GNU also supports the v1.0 vector extension sinc
 Compiler Support
 ----------------
 
-Enabling Vector Codegen on LLVM/Clang
-=====================================
+Enabling Vector Codegen
+=======================
 
-This section is describing the behavior of current upstream development tip-of-tree.  This is an area under very heavy churn.  These instructions will probably work on LLVM 15.0 (once released); using prior versions is strongly not advised.
+Vector code generation has been supported since (at least) LLVM 15.0.  I've been told by gcc developers that upstream GNU does support vector code generation as of (at least) gcc 13.
 
 You need to make sure to explicitly tell the compiler (via `-mattr=...,+v`) to enable vector code lowering.  If you don't, you may be get compiler errors (i.e. use of vector types rejected), you may see code being scalarized by the backend, or (hopefully not) you may stumble across internal compiler errors.
 
-For fixed length vectors, default behavior very recently (2022-08-26) changed.  As of now, fixed length vectors are enabled by the presence of the vector instructions (e.g. `-mattr=...,+v`).  You can disable via `-mllvm -riscv-v-vector-bits-min=0`.  Note that this is an internal compiler flag, and not a documented interface which will be supported long term.  Be cautious of adding this to any build command which is not easy to change as you move to a new compiler version.
-
-**Warning**: The flags mentioned above also have the effect of enabling auto-vectorization; if this is undesirable, consider `-fno-vectorize` and `-fno-slp-vectorize`.  Vectorizer user documention can be found `here <https://llvm.org/docs/Vectorizers.html>`_.
-
-Enabling Vector Codegen on GNU
-==============================
-
-I am unclear on the status of GNU support for vector.  I believe the situation to be that upstream GNU does not support vector at all, but that the `RISC-V collab version <https://github.com/riscv-collab/riscv-gnu-toolchain>`_ does.  I could not find any documentation on this point, so this is pending experimental confirmation.
-
-I know there is active development going on in upstream GCC to add vector codegen and auto-vec support.  Progress appears slow, but there is work happening.
-
-T-Head `has a custom toolchain <https://occ.t-head.cn/community/download?id=4090445921563774976>`_ which may suppport vectorization as their processors include the v0.7 vector extensions.  I have not confirmed this since a) all the documents are in Chinese, b) it requires an account to download, and c) I'm not interested in v0.7 anyways.
-
+**Warning**: The flag mentioned above also have the effect of enabling auto-vectorization; if this is undesirable, consider `-fno-vectorize` and `-fno-slp-vectorize`.  Vectorizer user documention can be found `here <https://llvm.org/docs/Vectorizers.html>`_.
 
 Intrinsics and Explicit Vector Code
 ===================================
 
-The RVV C Intrinsic family is fully supported by Clang.  You can also use Clang's `vector type and operation extensions <https://clang.llvm.org/docs/LanguageExtensions.html#vectors-and-extended-vectors>`_ to describe vector operations in C/C++.
+The `gcc vector extension syntax <https://gcc.gnu.org/onlinedocs/gcc/Vector-Extensions.html>`_ is fully supported by both GCC and Clang.  This is a good way of writing explicitly fixed length vector code in C/C++.
 
-The `#pragma clang loop <https://clang.llvm.org/docs/LanguageExtensions.html#extensions-for-loop-hint-optimizations>`_ directives can be used to override the vectorizers default heuristics.  This can be very useful for exploring performance of various vectorization options.
+The RVV C Intrinsic family is fully supported by Clang and GCC.  This is currently the main way to write explicit length agnostic vector code.  
+
+For clang, the `#pragma clang loop <https://clang.llvm.org/docs/LanguageExtensions.html#extensions-for-loop-hint-optimizations>`_ directives can be used to override the vectorizers default heuristics.  This can be very useful for exploring performance of various vectorization options.
 
 .. code::
 
@@ -75,15 +65,17 @@ The `#pragma clang loop <https://clang.llvm.org/docs/LanguageExtensions.html#ext
 Auto-vectorization
 ==================
 
-I have been actively working to improve the state of auto-vectorization in LLVM for RISC-V.  If you're curious about the details, see `my working notes <https://github.com/preames/public-notes/blob/master/llvm-riscv-status.rst#vectorization>`_.  The following is a user focused summary of where we stand right now.  This is an area of extremely heavy change, so please keep in mind that this snapshot is very specific to the current moment in time, and is likely to continue changing.
+I have been actively working to improve the state of auto-vectorization in LLVM for RISC-V.  If you're curious about the details, see `my working notes <https://github.com/preames/public-notes/blob/master/llvm-riscv-status.rst#vectorization>`_.  The following is a user focused summary of where we stand right now.  This is an area of extremely heavy churn, so please keep in mind that this snapshot is very specific to the current moment in time, and is likely to continue changing.
 
-The LLVM 15 release branch contains all of the changes required for functional auto-vectorization via the LoopVectorizer, but (intentionally) does not contain the change to enable it by default.  Tip of tree LLVM contains multiple changes to improve the performance robustness of LoopVectorization vectorization, and enables vectorization via both scalable and fixed vectors when vector codegen is enabled (see above).  If you're interested in this area, it is strongly recommended that you build LLVM from (very recent!) source.  If you wish to enable vectorization on the release branch for experimental purposes, you need to specify `-mllvm -scalable-vectorization=on`.  Note that this is an internal compiler option, and will not be supported.  Any bugs found will only be fixed on tip-of-tree, and will not be backported.  The current expectation is that auto-vectorization will be supported in the 16.x release series, but that's subject to change.
+The LLVM 16 release branch contains all of the changes required for auto-vectorization via the LoopVectorizer via both scalable and fixed vectors when vector codegen is enabled (see above).
 
-For SLPVectorizer, the additional compiler flag `-mllvm -riscv-v-slp-max-vf=0` is required.  This configuration is under vecy active development, and should only be considered on a build of recent ToT source.
+For SLPVectorizer, use of a very recent tip of tree is recommended.  SLP has recently been enabled by default in trunk, and is on track to be enabled in the 17.x release series, but that's subject to change.  If you're interested in this area, it is strongly recommended that you build LLVM from (very recent!) source.  If you wish to enable SLP vectorization on the 16.x release branch for experimental purposes, you need to specify `-mllvm -riscv-v-slp-max-vf=0`.  Note that this is an internal compiler option, and will not be supported.  Any bugs found will only be fixed on tip-of-tree, and will not be backported.
 
-For GNU, I am not aware of any GNU build which contains auto-vectorization support at this time.  There is a patch series, but you'd have to apply and build locally.
+For gcc, patches to support auto-vectorization have recently started landing.  There's very active development going on with multiple contributors, so the exact status is hard to track.  Hopefully, the gcc-14 release notes will contain information about what is and is not supported.
 
+T-Head `has a custom toolchain <https://occ.t-head.cn/community/download?id=4090445921563774976>`_ which may suppport vectorization as their processors include the v0.7 vector extensions.  I have not confirmed this since a) all the documents are in Chinese, b) it requires an account to download, and c) I'm not interested in v0.7 anyways.
 
+If you wish to disable auto-vectorization for any reason, please consider `-fno-vectorize` and `-fno-slp-vectorize`.  Vectorizer user documention can be found `here <https://llvm.org/docs/Vectorizers.html>`_.
 
 
 

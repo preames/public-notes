@@ -153,31 +153,6 @@ Cases known to be missing today:
 * GP relative addressing.  (Unclear status?)
 * Relaxation of 64 bit immediate or 64 bit relative offset cases.  Likely requires specification of Large code model.
 
-Loop Vectorization
-==================
-
-ARM SVE has pioneered support in the loop vectorizer for runtime vector lengths in the main loop, while using a scalar epilogue loop to handle the last couple of iterations.  I have been actively working towards enabling loop vectorization for RISC-V.  Today, upstream LLVM will auto-vectorize with both scalable and fixed length vector types, picking whichever is cheapest.
-
-In practice, scalable vectors are almost always scalable unless there's a gap in what we can vectorize.  The major gap left is handling of interleave groups (a.k.a. segmented load/stores on RISCV).  This gap is under active development (see https://reviews.llvm.org/D144092 and related reviews).  All other interesting functional gaps are, to my knowledge, fixed.  If you encounter other gaps, please report them.
-
-In terms of performaning tuning, we're still in the early days.  I've been fixing issues as I find them, but there's a couple of larger gaps known such as LMUL>1 enablement.  Concrete bug reports for vector code quality are very welcome.
-
-
-SLP Vectorization
-+++++++++++++++++
-
-I've run reasonable broad functional testing without issue.  However, SLP is still disabled by default due to code quality problems which have not yet been adddressed.
-
-The major issues for SLP/RISCV I currently know of are:
-
-* We have a cost modeling problem for vector constants. SLP mostly ignores the cost of materializing constants, and on most targets that works out mostly okay. RISCV has unusually expensive constant materialization for large constants, so we end up with common patterns (e.g. initializing adjacent unsigned fields with constants) being unprofitably vectorized. Work on this started under D126885, and there is ongoing discussion on follow ups there.
-* We will vectorize sub-word parallel operations and don't have robust lowering support to re-scalarize. Consider a pair of i32 stores which could be vectorized as <2 x i32> or could be done as a single i64 store. The later is likely more profitable, but not what we currently generate. I have not fully dug into why yet.
-
-Note that both of these issues could exist for LV in theory, but are significantly less likely. LV is strongly biased towards constant splats and longer vectors. Splats are significantly cheaper to lower (as a class), and longer vectors allows fixed cost errors to be amortized across more elements.
-
-Another concern is that SLP doesn't always respect target register width and assumes legalization.  I somewhat worry about how this will interact with LMUL8 and register allocation, but I think I've convinced myself that the same basic problem exists on all architectures.  (For reference, SLP will happily generate a 128 element wide reduction with 64 bit elements.  On a 128 bit vector machine, that requires stack spills during legalization.)  Such sequences don't seem to happen in practice, except maybe in machine generated code or cases where we've over-unrolled.  
-
-
 
 Performance (Minor)
 -------------------
