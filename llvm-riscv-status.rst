@@ -14,7 +14,6 @@ Draft Extensions
 
 There are numerous potential extensions in flight.  The following is a list of specification links for a few of the potentially interesting ones.  This explicitly excludes anything `already implemented in LLVM <https://llvm.org/docs/RISCVUsage.html>`_.
 
-* `bfloat16 support <https://github.com/riscv/riscv-bfloat16/releases>`_, https://reviews.llvm.org/D147610 -- Unblocked and approved, should land shortly.
 * `zacas <https://github.com/riscv/riscv-zacas/>`_, https://reviews.llvm.org/D149248
 * CFI
 * Zicclsm
@@ -71,8 +70,13 @@ My understanding is that split dwarf doesn't allow relocations which change func
 
 Workaround: Don't use split dwarf.  Or disable -mrelax.
 
-Sanitizer Support for Scalable Vectors
-======================================
+Sanitizer Support
+=================
+
+My current understanding is that all of the sanitizers work with sv39 and rv64gc.
+
+Interactions with Scalable Vectors
+++++++++++++++++++++++++++++++++++
 
 https://github.com/llvm/llvm-project/issues/61096 reveals that the sanitizers were never updated to account for scalable vector types.  Since I enabled auto-vectorization with scalable vectors by default last summer, this means that various sanitizers may crash when used in combination with the V extension.  I did an audit of some of the near by code, and identified a bunch of issues which need fixed.
 
@@ -94,8 +98,23 @@ BoundsChecking
 SanitizerCoverage
    Easy to disable.
 
+UBSAN
+   Not yet investigated.
+
 **WORKAROUND:** Use `-fno-vectorize` or do not add `V` extensions to architectural string when using sanitizers.
 
+Non-sv39 systems
+++++++++++++++++
+
+I have honestly not been following this line of work, but there's clearly some set of remaining issues with enabling santizers on sv48 and sv57.  A couple of starting point patches for investigation:
+
+* https://reviews.llvm.org/D139823
+* https://reviews.llvm.org/D139827
+* https://reviews.llvm.org/D152895
+* https://reviews.llvm.org/D152990
+* https://reviews.llvm.org/D152991
+
+**WORKAROUND:** Use sv39.
 
 VLEN=32 is known to be broken
 =============================
