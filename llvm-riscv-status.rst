@@ -2,55 +2,45 @@
 Overall status of RISCV in LLVM
 -------------------------------------------------
 
-This document contains an initial survey of gaps in the RISCV LLVM toolchain ecosystem.  It is being written in May 2022 as I come up to speed on RISCV, and start to wrap my head around the shape of things in general.  It may or may not stay current, so if you're reading this long after the date it was written, keep in mind it may be out of date.  All of the analogous docs I could find online certaintly were!
+This document contains a survey of major gaps in the RISCV LLVM toolchain ecoystem.  It was initially written in May 2022 as I first came up to speed on RISCV.  It was most recently majorly updated in July 2023.  It may or may not stay current, so if you're reading this long after the date it was written, keep in mind it may be out of date. 
 
 .. contents::
 
 Functional
 ----------
 
-Draft Extensions
-================
+At a macro level, we appear to be convergening towards a feature complete toolchain for common use cases.  There are still a few gaps, but many of the major issues identified in the initial survey are now mostly complete.
+
+Support for Draft Extensions
+============================
 
 There are numerous potential extensions in flight.  The following is a list of specification links for a few of the potentially interesting ones.  This explicitly excludes anything `already implemented in LLVM <https://llvm.org/docs/RISCVUsage.html>`_.
 
 * `zacas <https://github.com/riscv/riscv-zacas/>`_, https://reviews.llvm.org/D149248
-* CFI
 * Zicclsm
 * Zam
 
-Open Linker issues
-==================
+ABI Questions
+=============
 
-* [Open] https://reviews.llvm.org/D149432 -- Region sizes are computed before relaxation is done in LLD.
+There are a couple areas where we need clarification and extensions to the psABI. On the smaller side, there are some `minor changes required for bf16 <https://github.com/riscv-non-isa/riscv-elf-psabi-doc/pull/367>`_.  On the more major side, we do not have a ratiied vector ABI.  Eventually, we will need support for a large code model variant.  We should probably also get the TLSDESC bits finalized and in.
 
+Intrinsics
+==========
 
-GNU vs LLVM Toolchain Compatibility
-===================================
+TBD - Major distinction between vector intrinsics and all others.
 
-I have been told that mixing object files from g++ and clang does not work reliably.  I've also been told that linking gnu generated object files with LLVM's LD does not work reliably.  Essentially, we have likely differences in ABI interpretation.
+LTO and Function Multi Versioning
+=================================
 
-Here are some example issues in the recent past:
+TBD
 
-* https://github.com/llvm/llvm-project/issues/57084 was caused by incorrect argument handling for struct arguments.  It has been fixed.
+CFI/Shadow Stack
+================
 
-Here are specific open items I'm aware of:
+There are two major threads of work on this. Pure software Forward CFI and Shadow Stack appears to be complete.  Recent changes have landed to support KCFI, and shadow stack via software emulation, and the android folks have reported no remaining blocking items.
 
-* https://github.com/llvm/llvm-project/issues/57261 is an open issue around argument passing of values less than ELEN.  It's open currently, but likely to be fixed shortly.
-* I have been told that llvm-objdump is reporting zero sizes and failing to disassemble certain gcc compiled object files.  No details available at this time, and issue has not been confirmed with a test case. This may be related to the suspected ELF interpretation differences below.
-* In the process of reviewing the psABI document which is currently going through ratification, I stumbled across `one real difference <https://github.com/riscv-non-isa/riscv-elf-psabi-doc/issues/197>`_.  In this case, GNU assumes a pc-relative relocation can always resolve to zero even if that's out of bounds for the pc-relative range.  LLVM LLD considers this an error, and asserts that a PLT/GOT entry should have been used instead.  This means that LLD can not be used to link gcc generated object files in this case.
-
-Beyond these specific issues, there are likely others.  We need to invest time in systematically testing for further issues.  We may want to take a look at the effort which was done a few years ago for the microsoft ABI; we may be able to leverage some of the tooling.
-
-
-Frame setup problems
-====================
-
-I've been told from a couple sources that frame setup is not correct.  We know have at least two confirmed issues, but where there are two, there are probably more.  Known issues:
-
-* Its been mentioned to me that scalable allocas may not be lowered correctly.  Possibly in combination with frame alignment interactions.
-* Fraser fixed a couple of misaligned RVV stack problems recently. 
-* Kito has a separate issue around exception handling.  `Tracked in 55442 <https://github.com/llvm/llvm-project/issues/55442>`_ 
+Hardware assisted CFI/SS is blocked on the stablization of the `relevant extensions <https://github.com/riscv/riscv-cfi/>`_.  Recently (as of July 2023), several rounds of sigificant feeback from ARC have made it seem that progress towards that goal is unlikely in the immediate future.  There's a bunch of toolchain work blocked behind having a reasonable stable specification.
 
 LLDB Support
 ============
@@ -116,12 +106,42 @@ I have honestly not been following this line of work, but there's clearly some s
 
 **WORKAROUND:** Use sv39.
 
-VLEN=32 is known to be broken
-=============================
+VLEN=32 is known to be broken (WONTFIX)
+=======================================
 
-This means that Zve32x and Zve32f are not supported.  Specific problems noted were around vscale computation and "scalable types" (unclear exact meaning to me).
+This means that Zve32x and Zve32f are not supported.  It is not clear to me that anyone is ever going to care about this.  I'm not aware of any hardware existing or announced which would need this.
 
-It is not clear to me that anyone is ever going to care about this.  I'm not aware of any hardware existing or announced which would need this.
+Stablity
+--------
+
+These items were previously under functional, but were moved to reflect the fact they're basically bugs, and from the lack of progress or reported concern on several, not highly impactful bugs at that.
+
+My overall impression at this point is that we're in a reasonable stable state, but are lacking serious burn in.  A couple of vendors have shipped LLVM based toolchains, but it's unclear how hard these have actually been hammered at scale.  We also know that said vendors are shipping branches with some fairly major feature divergences from upstream, so it may be they're shipping non-trivial amounts of bug fixes as well.
+
+In terms of open source, Android (and particularly ClangBuiltLinux) are our largest public users following upstream closely.  We're leaning fairly heavily on them noticing issues.
+
+Open Linker issues
+==================
+
+* [Open] https://reviews.llvm.org/D149432 -- Region sizes are computed before relaxation is done in LLD.
+
+
+GNU vs LLVM Toolchain Compatibility
+===================================
+
+A couple months back, I was told by multiple parties that mixing object files from g++ and clang did not work reliably.  I've also been told that linking gnu generated object files with LLVM's LD does not work reliably.  We'd had a couple of specific issues which we identified and fixed.  I have not heard specific failure reports after that, but we may have other issues yet to be found.
+
+We need to invest time in systematically testing for further issues.  We may want to take a look at the effort which was done a few years ago for the microsoft ABI; we may be able to leverage some of the tooling.
+
+
+Frame setup problems
+====================
+
+I've been told from a couple sources that frame setup is not correct.  We know have at least two confirmed issues, but where there are two, there are probably more.  Known issues:
+
+* Its been mentioned to me that scalable allocas may not be lowered correctly.  Possibly in combination with frame alignment interactions.
+* Fraser fixed a couple of misaligned RVV stack problems recently. 
+* Kito has a separate issue around exception handling.  `Tracked in 55442 <https://github.com/llvm/llvm-project/issues/55442>`_ 
 
 Testing Infrastructure
 ----------------------
