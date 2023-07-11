@@ -30,10 +30,42 @@ Intrinsics
 
 TBD - Major distinction between vector intrinsics and all others.
 
-LTO and Function Multi Versioning
-=================================
+Function Multi Versioning
+=========================
 
-TBD
+Classic multi versioning via distinct compiler command lines and linking appears to work as expected.  LTO appears to have some suprising (but correct) interactions, see the section below.  (Warning: Use C, not C++!  C++ has different manging and dispatch rules.).
+
+Use of a custom resolver routine (via ``__attribute__((ifunc("resolver")))``) appears to work as expected.  This can be combined with the prior mechanism to support lazily bound dispatch via user-defined mechanisms.  Note that if the target function uses the (highly experimental) vector ABI, we loose lazy binding and instead have all the resolutions done eagerly.
+
+Use of the target attribute (``__attribute__ ((target ("arch=+v")))``) is unsupported.  This appears to be a target specific syntax, and hasn't been implemented for RISCV as of yet.  See https://reviews.llvm.org/D151730.
+
+Use of the default ifunc resolver (which is invokved via either compiler machinery for target attribute manging for C++ source or via target_clones) requires the availablity of hwprobe (or hwcaps for limited feature set).  My understanding is that the kernel patches recently landed, and that the glibc usage is pending. I am unclear whether the default resolver is emitted by the compiler, or provided by glibc.
+
+Use of the target_clones attribute (``__attribute__((target_clones("default","arch=+v","arch=-v")))``) is unsupported.  This depends on both of the previously mentioned items.
+
+Summary of open tasks:
+
+* Implement target attribute.
+* Ensure hwprobe mechanism works for manual resolver.
+* Watch hwprobe progress in glibc.
+* Implement target_clones attribute.
+* Explore vector calling convention interaction and ways to preserve lazy binding.
+
+LTO
+===
+
+I keep hearing about problems with LTO, but have few specific details.  The only concrete items I currently know of are non-functional user interface issues, but I suspect the existance of functional problems as well.
+
+Known issues:
+
+* When linking multiple translation units compiled with distinct target features (i.e. ``-march=rv64gcv`` vs ``-march=rv64g``), LTO produces a different arch attribute in the final ELF than a normal link does.  LTO appears to take the intersection, whereas normal linking appears to take union.  The result of this is that llvm-objdump and friends fail to disassemble some code in LTO linked binaries.
+
+Suspected Issues:
+
+* After a fairly minor amount of trying, I was unable to get LTO working via the ld.gold plugin mechanism.  I found some online discussion indicating that architectural support in gold might be required, but have not pursued this further.  This may be user error.
+* We previously had issues with assembly excessively sized functions, or linking (in LLD) with execively sized sections.  Neither of these were technically LTO specific, but LTO is significantly more likely to produce large link inputs.   There may be more such cases lurking.  https://reviews.llvm.org/D154958 may be one such example.
+* There's some old patches talking about problems mixing ABIs in the same LTO step.  I haven't investigated this at all.
+
 
 CFI/Shadow Stack
 ================
