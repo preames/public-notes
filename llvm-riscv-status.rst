@@ -33,13 +33,13 @@ TBD - Major distinction between vector intrinsics and all others.
 Function Multi Versioning
 =========================
 
-Classic multi versioning via distinct compiler command lines and linking appears to work as expected.  LTO appears to have some suprising (but correct) interactions, see the section below.  (Warning: Use C, not C++!  C++ has different manging and dispatch rules.).
+Classic multi versioning via distinct compiler command lines and linking appears to work as expected.  LTO appears to have some suprising (but correct) interactions, see the section below.  
 
 Use of a custom resolver routine (via ``__attribute__((ifunc("resolver")))``) appears to work as expected.  This can be combined with the prior mechanism to support lazily bound dispatch via user-defined mechanisms.  Note that if the target function uses the (highly experimental) vector ABI, we loose lazy binding and instead have all the resolutions done eagerly.
 
-Use of the target attribute (``__attribute__ ((target ("arch=+v")))``) is unsupported.  This appears to be a target specific syntax, and hasn't been implemented for RISCV as of yet.  See https://reviews.llvm.org/D151730.
+Use of the target attribute (``__attribute__ ((target ("arch=+v")))``) is unsupported.  There's two sub-parts to this - the attribute itself on a single definition and the implicit function multi-versioning if multiple target variants are provided.  This appears to be a target specific syntax, and hasn't been implemented for RISCV as of yet.  See https://reviews.llvm.org/D151730.  (Warning: ``__attribute__ ((target ("default")))`` triggers the function multi-versioning even when no other definitions are provided.)
 
-Use of the default ifunc resolver (which is invokved via either compiler machinery for target attribute manging for C++ source or via target_clones) requires the availablity of hwprobe (or hwcaps for limited feature set).  My understanding is that the kernel patches recently landed, and that the glibc usage is pending. I am unclear whether the default resolver is emitted by the compiler, or provided by glibc.
+Use of the default ifunc resolver (which is invokved via either compiler machinery for target attribute manging for target or target_clones) requires the availablity of hwprobe (or hwcaps for limited feature set).  My understanding is that the kernel patches recently landed, and that the glibc usage is pending. I am unclear whether the default resolver is emitted by the compiler, or provided by glibc.
 
 Use of the target_clones attribute (``__attribute__((target_clones("default","arch=+v","arch=-v")))``) is unsupported.  This depends on both of the previously mentioned items.
 
