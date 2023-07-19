@@ -51,6 +51,8 @@ Summary of open tasks:
 * Implement target_clones attribute.
 * Explore vector calling convention interaction and ways to preserve lazy binding.
 
+For multi-versioning with compressed extensions, we may need to examine interaction with R_RISCV_ALIGN in code following the +c (and also rvc) regions.  This is tricky.
+
 LTO
 ===
 
@@ -156,6 +158,7 @@ Open Linker issues
 ==================
 
 * [Open] https://reviews.llvm.org/D149432 -- Region sizes are computed before relaxation is done in LLD.
+* [Open] https://github.com/llvm/llvm-project/issues/63964 - Nasty bug when mixing object files with and without compressed
 
 
 GNU vs LLVM Toolchain Compatibility
