@@ -4,8 +4,7 @@
 define void @test(ptr %p) {
 ; CHECK-LABEL: test:
 ; CHECK:       # %bb.0:
-; CHECK-NEXT:    sw zero, 0(a0)
-; CHECK-NEXT:    sw zero, 4(a0)
+; CHECK-NEXT:    sd zero, 0(a0)
 ; CHECK-NEXT:    ret
   store i32 0, ptr %p
   %p1 = getelementptr i8, ptr %p, i32 4
