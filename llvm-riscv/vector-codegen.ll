@@ -56,8 +56,7 @@ define <2 x i8> @small_constant() {
 }
 
 
-; TODO: We should be able to use a vmv.v.i here to remove the constant
-; materialization and make it e16 to remove the toggle
+; TODO: We should be able to make the mask op e16 to remove the toggle
 define <4 x i16> @vmerge_v4i16_simm5(<4 x i16> %x, <4 x i16> %y) {
 ; CHECK-LABEL: vmerge_v4i16_simm5:
 ; CHECK:       # %bb.0:
@@ -231,20 +230,6 @@ define <2 x double> @rotateup_v2f64_a(<2 x double> %v, double %b) {
   %v2 = insertelement <2 x double> %v1, double %b, i64 0
   ret <2 x double> %v2
 }
-
-; Fixed pending https://reviews.llvm.org/D151468
-define <2 x double> @rotateup_v2f64_b(<2 x double> %v, double %b) {
-; CHECK-LABEL: rotateup_v2f64_b:
-; CHECK:       # %bb.0:
-; CHECK-NEXT:    vsetivli zero, 2, e64, m1, ta, ma
-; CHECK-NEXT:    vfslide1up.vf v9, v8, fa0
-; CHECK-NEXT:    vmv.v.v v8, v9
-; CHECK-NEXT:    ret
-  %vb = insertelement <2 x double> poison, double %b, i64 0
-  %v1 = shufflevector <2 x double> %v, <2 x double> %vb, <2 x i32> <i32 2, i32 0>
-  ret <2 x double> %v1
-}
-
 
 ; TODO: This shouldn't have to go through the scalar domain!
 define <2 x double> @rotatedown_v2f64_c(<2 x double> %v, double %b) {
