@@ -211,3 +211,24 @@ There's a couple of different ways of looking at this; fixing some subset of the
 * We're spilling the scalable vector type, when we know that the minimum VLEN contains our value type.  Maybe we should add a special register class for fixed length values of this kind?  Or a family of such?  This may imply changes to the general legalize as scalable vector approach.
 
 Note that this specific example *is not interesting*.  It's more a source of potentially interesting observations.
+
+
+Extract Element Idioms
+======================
+
+We don't have a good generic idiom for a extractelement.  The current one we use is a vslidedown.vi + vmv.x.s pair, but vslidedown.vi requires a vector register group temporary (8 registers at LMUL8), and can be slow.
+
+Ideas to explore follow.
+
+* For VL<=VLMAX_LMUL1, make sure we are reducing LMUL before performing slide.   Can generalize for each LMUL boundary. May cover a bunch of cases in practice for fixed length vectors.
+* vslide1down v2, v1, zero + vmv.x.s -- For element=1 only, avoid the generic slide amount.  Destructive, so still requires a full register group temporary.
+* e64 extract and bitslice - Handles up to element=7 for e8 without slide.  Slides likely to CSE due to common offsets.
+* vrgather.vi + vmv.x.s - Still requires the vector group temporary, may be faster on some hardware.
+* Masked reduction -- Requires two vector register temporaries, but at LMUL8 this is sigificantly fewer registers.  Requires mask formation.
+
+Related thoughts:
+
+* We can probably extend VL over most slidedowns to avoid the need for a VL toggle.  May be some hardware where this is expensive?
+* explode_vector (i.e. the hypothetical inverse build_vector) would allow a chained representation with destructive vslide1downs.  Unclear tradeoffs.
+  
+  
