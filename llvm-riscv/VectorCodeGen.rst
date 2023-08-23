@@ -58,6 +58,9 @@ Constant Materialization of Large Constants
 
 Current constant materialization for large constant vectors leaves a bit to be desired.  Here's a list of cases which might be interesting to improve:
 
+* For constant with a single bit set, can use a "two level splat".  "vmv.v.i v0, <bytemask>; vmv.v.x vd, zero; vmerge vd, vd, <bitmask>, v0".  This can do a single bit in up to 64^2 bits.  Useful for insert/extract idioms.  Can also do a 64 bit mask at any SEW (i.e. not have to change VTYPE).  Can be generalized to non-constant index via usual div/rem and register operand.
+* The above can generalize for any single element at any ETYPE.  So "{0, 0, <any 64 bits>, 0}" can be handled as well.  Note that this should just be the dominant value case, except that we won't currently change etype to find the values.
+* Another approach for single bit constants is vmseq (vid), n.  Can be composed to build multi-bit constants via vmor, but cost scales linearly with set bits.  Only useful for "sparse" bits, maybe combined with alternate approach for remaining vector.
 * Forming vector splats for constant fixed length vectors which can't be folded into operand (e.g. for a store).  Currently, we emit constant pool loads where-as splatting an etype constant would be significantly better.  Shows up in idiomatic vectorized constant memset patterns.
 * Forming vector splats where the element size is larger than the largest natively supported element.  (e.g. splat of a 128b value with largest etype being e64.)  Shows up in vector crypto, and probably any i128 math lib.  One strategy is to splat two vectors (one for high, one for low), and then mask them together.  Can probably generalize for a whole sequence of vectors.
 * sizeof(vector) < ELEN.  These could be scalar mat + a vector insert at ELEN etype.  Not always profitable depending on required constant mat cost on scalar side.
@@ -212,6 +215,10 @@ There's a couple of different ways of looking at this; fixing some subset of the
 
 Note that this specific example *is not interesting*.  It's more a source of potentially interesting observations.
 
+Insert Element Ideas
+====================
+
+* If we know the index is smaller than the LMUL, we can use extract_subvector+insertelement+insert_subvector.  This will likely get lowered to a single narrower slide operation since the elements beyond the (smaller) register group are implicitly tail.
 
 Extract Element Idioms
 ======================
@@ -220,15 +227,40 @@ We don't have a good generic idiom for a extractelement.  The current one we use
 
 Ideas to explore follow.
 
-* For VL<=VLMAX_LMUL1, make sure we are reducing LMUL before performing slide.   Can generalize for each LMUL boundary. May cover a bunch of cases in practice for fixed length vectors.
 * vslide1down v2, v1, zero + vmv.x.s -- For element=1 only, avoid the generic slide amount.  Destructive, so still requires a full register group temporary.
 * e64 extract and bitslice - Handles up to element=7 for e8 without slide.  Slides likely to CSE due to common offsets.
 * vrgather.vi + vmv.x.s - Still requires the vector group temporary, may be faster on some hardware.
 * Masked reduction -- Requires two vector register temporaries, but at LMUL8 this is sigificantly fewer registers.  Requires mask formation.
+* oneuse extract of load -- can become a scalar load of the right offset.
+* Can we use vsrl.vx on a larger vtype for small elements?  (i.e. up to 8 on e8).  Not sure how profitable this is assuming LMUL has been narrowed.
 
 Related thoughts:
 
 * We can probably extend VL over most slidedowns to avoid the need for a VL toggle.  May be some hardware where this is expensive?
 * explode_vector (i.e. the hypothetical inverse build_vector) would allow a chained representation with destructive vslide1downs.  Unclear tradeoffs.
   
+  
+Shuffle Lowering
+-----------------
+
+Generic Combines Needed
+
+* vecreduce-binop - generalize generic for any "neutral element"
+* vecreduce(concat_vector(a,b)) - usually vecreduce(a op b).  Generic, but profitable on RISCV due to slide costs.
+* vecreduce(concat_vector(a, <neutral-element-constant>)) -> vecreduce(a)
+* vecreduce(a op <neutral-element-constant>) -> vecreduce(a)
+
+RISCV Specific Combines Needed
+
+* shuffle of build_vector into build_vector - only on RISCV as generically not profitable.
+* build_vector of extractelement into shuffle - need to cluster by source vector, but likely profitable even with fairly aggressive version given relative costs.
+* shuffle wide=in to narrow-out - can combine to multiple smaller LMUL vrgathers with masking.  Useful for machines where vrgather is quadratic, and reduces register pressure.
+* shuffle narrow-in to wide-out - can combine to multiple smaller LMUL vrgathers w/o masking.  Probably generally profitable due to register pressure.  May need concat_vector work to exploit vreg boundaries without slides.
+* shuffle of build vectors - often better as a single buildvector.  Do need to be careful if shuffle is "cheap".
+
+Shuffle Idioms during Lowering
+
+* byteswap and rotates via ROTL
+* large element shifts with sufficient undef elements
+
   
