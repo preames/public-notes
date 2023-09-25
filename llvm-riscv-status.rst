@@ -14,11 +14,7 @@ At a macro level, we appear to be convergening towards a feature complete toolch
 Support for Draft Extensions
 ============================
 
-There are numerous potential extensions in flight.  The following is a list of specification links for a few of the potentially interesting ones.  This explicitly excludes anything `already implemented in LLVM <https://llvm.org/docs/RISCVUsage.html>`_.
-
-* `zacas <https://github.com/riscv/riscv-zacas/>`_, https://reviews.llvm.org/D149248
-* Zicclsm
-* Zam
+At this point, the flow of new extensions which are interesting for application class processors is slowing down.  See the list `already implemented in LLVM <https://llvm.org/docs/RISCVUsage.html>`_.  Most activiity appears to be around extensions for embedded targets - which I'm not tracking closely.
 
 ABI Questions
 =============
@@ -194,6 +190,17 @@ OSS Fuzz used to do fuzzing of various LLVM backends.  This helps to find recent
 See `discussion here <https://github.com/google/oss-fuzz/pull/7179#issuecomment-1092802635>`_ and linked pull requests on the OSS Fuzz repo.
 
 
+Code Size
+---------
+
+In a recent sync up call, the following items were mentioned.
+
+* Clang and GCC differ in their interpretation of `Os` and `Oz`. One participant mentioned that they always use `Oz` when moving a code base from GCC.  This is not a RISCV specific issue, and is unlikely to change.
+* LLD and LD differ in their default for GP relaxation.  On very small binaries, this can be material.  Workaround: Consider using the appropriate LLD flag if impactful, or use LD.
+* LLD is missing relaxations for the medlow (as opposed to medany) code model.  This is not a functional issue.  Workaround: Use LD for now.
+
+In the same call, it was mention that LLD produces 8% worse code size than LD on embench.  It was unclear what configuration this wax, and whether any of the items above had been addressed.
+
 Performance
 -----------
 
@@ -211,6 +218,8 @@ Cases known to be missing today:
 
 Performance (Minor)
 -------------------
+
+NOTE: This section has been largely gutted with current content moved to the llvm-riscv/ folder.
 
 Things in this category are thought to be worth implementing individually, but likely individually minor in their performance impact.  Eventually, everything here should be filed as a LLVM issue, but these are my rough notes for the moment.  
 
