@@ -23,6 +23,15 @@ LLVM makes very heavy use of internal assertions, and they are generally excelle
 
 As a practical matter, I do not recommend the debug flavors of the builds, but Release with assertions enabled if very very worthwhile.  For context, an assertion enabled release build is around 8GB; last time I did a debug build, it was around 60GB.  
 
+Capture a standalone reproducer for a clang issue
+-------------------------------------------------
+
+Clang will attempt to produce a standalone reproducer for the current clang invocation if a crash is encountered during execution.  
+
+```-gen-reproducer=always``` will enable this reproducer generation for non-crashing compiles.  This can be useful for extractting reproducers for an optimization quality problem from a large build system.
+
+This doesn't always succeed.  If it reports failure, check the /tmp directory for a preprocessed file (depending on where it failed), or fall back to trying to create a preprocessed input file via -E.  
+
 Capture IR before and after optimization
 ----------------------------------------
 
