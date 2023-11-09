@@ -24,6 +24,15 @@ For VL predication, we have two major options.  We can either pattern match mask
 
 Work on tail folding is currently being deferred until main loop vectorization is mature.
 
+Epilogue Tail Folding
+=====================
+
+At the moment, my guess is that we're going to end up wanting *not* to tail fold the main loop (due to vsetvli resource limit concerns), and instead want to have a tail folded epilogue loop to run the tail in a single iteration.  At the moment, there is no support in the vectorizer for tail folded epilogues and a significant amount of rework will be needed.
+
+One interesting point is that if we're (only) tail folding the epilogue loop, the relative importance of the predicate code quality drops significantly.  This may influence the masking vs VL predication decision from a pure engineering investiment perspective.
+
+We may end up with a different strategy for loops which are known short.  There, the concern about vsetvli being a bottleneck is a lot less of a concern.  Maybe we'll tail fold the main loop in that case.
+
 Tail Folding Gaps (via Masking)
 ===============================
 
@@ -34,7 +43,29 @@ Tail folding appears to have a number of limitations which can be removed.
 * Stores appear to be tripping scalarization cost not masking cost which inhibits profitability.
 * Uniform Store.  Basic issue is we need to implement last active lane extraction.  Note active bits are a prefix and thus popcnt can be used to find index.  No current plans to support general predication.
 
+Tail Folding via Speculation
+============================
 
+This is mostly just noting an idea.  It occurs to me that if instructions in the loop are speculateable, we can "tail fold" via speculation.  That is, we can simply run the loop over the extra iterations, and then discard the result of any spurious elements.
+
+.. code::
+
+   // a is aligned by 16
+   for (int i = 0; i < N; i++)
+      sum += a[i];
+
+.. code::
+
+  // a is aligned by 16
+  for (int i = 0; i < N+3; i += 4) {
+      vtmp = a[i:i+3] // speculative load
+      vtmp = select (splat(i) + step_vector < splat(N)), vtmp, 0
+      vsum += vtmp
+  }
+  sum = reduce(vsum)
+
+
+The above example relies on alignment implying access beyond a can't fault.  Note that this concept is *not* otherwise in LLVM's dereferenceable model, and is itself a fairly deep change.
 
 LoopVectorizer generating duplicate broadcast shuffles
 ======================================================
