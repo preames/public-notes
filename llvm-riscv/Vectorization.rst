@@ -68,12 +68,12 @@ This is mostly just noting an idea.  It occurs to me that if instructions in the
 The above example relies on alignment implying access beyond a can't fault.  Note that this concept is *not* otherwise in LLVM's dereferenceable model, and is itself a fairly deep change.
 
 LoopVectorizer generating duplicate broadcast shuffles
-======================================================
+++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 This is being fixed by the backend, but we should probably tweak LV to avoid anyways.
 
 Duplicate IV for index vector
-=============================
++++++++++++++++++++++++++++++
 
 In a test which simply writes “i” to every element of a vector, we’re currently generating:
 
@@ -100,7 +100,7 @@ We can do better here by exploiting the implicit broadcast of scalar arguments. 
 
    
 Vectorization
-=============
++++++++++++++
 
 
 * Issues around epilogue vectorization w/VF > 16 (for fixed length vectors, i8 for VLEN >= 128, i16 for VLEN >= 256, etc..)
@@ -108,7 +108,7 @@ Vectorization
 
 
 Scalable Vectorizer Gaps
-========================
+++++++++++++++++++++++++
 
 Here is a punch list of known missing cases around scalable vectorization in the LoopVectorizer.  These are mostly target independent.
 
