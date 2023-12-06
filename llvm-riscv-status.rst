@@ -26,6 +26,20 @@ Intrinsics
 
 TBD - Major distinction between vector intrinsics and all others.
 
+Fortran Support via Flang (flang-new)
+=====================================
+
+(flang status is a much bigger topic, these are just a few observations)
+
+Known open items:
+
+* Materialize target features in IR for debuggability.
+* Various clang options (e.g "gcc-install-dir") cause errors, should both implement selected ones and warn on others.
+* Implement default values for vscale_range.
+* Implement mrvv-vector-bits=zvl.
+* Fast-math flags appear to not make it into IR from MLIR.
+* Weirdly large stacks with insane vector spilling - what went wrong?
+
 Function Multi Versioning
 =========================
 
