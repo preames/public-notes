@@ -4,17 +4,6 @@ Open Items in Scalar Codegen for RISCV
 
 .. contents::
 
-Moving to latest specification
-==============================
-
-Punch list:
-
-* F implies Zicsr (Finx probably does too)
-* Zihpm, and Zicntr
-* Various version number updates - thought to be non-semantic, but check!
-* Double check CPU definitions - need to add zicsr, zifencei, zihpm, zicntr as appropriate
-* Meaning of G, and canonical march string
-
 
 Items in LLVM issue tracker
 ============================

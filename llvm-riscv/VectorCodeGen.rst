@@ -8,18 +8,6 @@ See also vector-codegen.ll for individual test cases and descriptive comments.
 
 .. contents::
 
-Functional
-==========
-
-Skiming through the issue tracker for "riscv", I see a couple of concerning looking items.
-
-*  [RISCV] wrong vector register alloc in vector instruction `#50157 <https://github.com/llvm/llvm-project/issues/50157>`_.  Appears to be a miscompile of vgather intrinsic, and may hint at a larger lurking issue.
-
-Zvbb Codegen
-============
-
-MC support for zvbb was added in https://reviews.llvm.org/D148483.  This extension adds a number of generically useful vector bitmanip instructions.  We should implement codegen pattern matching for it, and then ensure the cost model is adjusted such that LV and SLP benefit from the capability.
-
 Optimizations for VSETVLI insertion
 ===================================
 
@@ -31,17 +19,10 @@ Optimization
 * We seem to end up with vsetvli which only toggle policy bits (tail and mask agnosticism).  There look to be oppurtunities here, but my first approach didn't work (https://reviews.llvm.org/D126967).  Pending discussion on approach.
 * Missing DAGCombine rules:
 
-  * Canonicalize AVLImm >= VLMax to VLMax register form.
-  * GPR = vsetvli <value>, GPR folds to value when <value> less than VLMAX
   * If AVL=VLMAX, then TU is meaningless and can become TA.
   * If unmasked, then MU is meaningless and can become TU.
 
-Segment Loads and Stores
-========================
 
-We're currently generating 2-wise segment load and stores.  See https://reviews.llvm.org/D145085.
-
-Particularly for fixed length vectors, there's both room to support up-to-8 interleave and deinterleave, and lots of room to improve codegeneration for them respectively.
 
 Expansion via General loop scalarization
 ========================================

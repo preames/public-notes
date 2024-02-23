@@ -11,16 +11,6 @@ Functional
 
 At a macro level, we appear to be convergening towards a feature complete toolchain for common use cases.  There are still a few gaps, but many of the major issues identified in the initial survey are now mostly complete.
 
-Support for Draft Extensions
-============================
-
-At this point, the flow of new extensions which are interesting for application class processors is slowing down.  See the list `already implemented in LLVM <https://llvm.org/docs/RISCVUsage.html>`_.  Most activiity appears to be around extensions for embedded targets - which I'm not tracking closely.
-
-ABI Questions
-=============
-
-There are a couple areas where we need clarification and extensions to the psABI. On the smaller side, there are some `minor changes required for bf16 <https://github.com/riscv-non-isa/riscv-elf-psabi-doc/pull/367>`_.  On the more major side, we do not have a ratiied vector ABI.  Eventually, we will need support for a large code model variant.  We should probably also get the TLSDESC bits finalized and in.
-
 Intrinsics
 ==========
 
@@ -33,11 +23,7 @@ Fortran Support via Flang (flang-new)
 
 Known open items:
 
-* Materialize target features in IR for debuggability.
 * Various clang options (e.g "gcc-install-dir") cause errors, should both implement selected ones and warn on others.
-* Implement default values for vscale_range.
-* Implement mrvv-vector-bits=zvl.
-* Fast-math flags appear to not make it into IR from MLIR.
 * Weirdly large stacks with insane vector spilling - what went wrong?
 
 Function Multi Versioning
