@@ -6,6 +6,15 @@ This document is a collection of links to documentation on various vendors' micr
 
 .. contents::
 
+Spacemit
+--------
+
+`BPi-F3 Datasheet: <https://docs.banana-pi.org/en/BPI-F3/SpacemiT_K1_datasheet>`_
+`Spacemit-K1 Datasheet: <https://developer.spacemit.com/#/documentation?token=DBd4wvqoqi2fiqkiERTcbEDknBh>`_
+
+To purchase: `AliExpress <https://a.aliexpress.com/_mOI0MCI>`_, `Amazon <https://www.amazon.com/BPI-F3-RISC-V-K1-SBC-Performance/dp/B0D44TH59S?th=1>`_
+
+`X100 <https://www.spacemit.com/en/spacemit-x100-core/>`_
 
 SiFive
 ------
