@@ -40,11 +40,14 @@ Copy the contents of your img to the device.
   
    sudo dd if=/home/preames/DevBoards/BananaPI/bianbu-23.10-desktop-k1-v1.0rc3-release-20240525133016.img of=/dev/sda status=progress bs=4M
 
+Use `gparted`, or tool of your choice, to resize the final fat32 partition to fill available space.  If you skip this step, installing new packages will fail due to insufficient space.
 
 Boot It
 -------
 
 I plugged in a HDMI monitory, keyboard, and mouse.  Then went through the initial setup to e.g. configure WiFi.  After that, I switched to SSH login.
+
+If this step fails (i.e. hangs), go back and read the warnings on the zeroing and formatting section again.
 
 Initial Setup
 -------------
@@ -61,6 +64,33 @@ Install the usual packages:
 .. code::
 
    sudo apt-get --assume-yes install emacs man-db libc6-dev dpkg-dev make build-essential binutils binutils-dev gcc g++ autoconf python3 git clang cmake patchutils ninja-build flex bison
+
+Getting `perf` working
+----------------------
+
+Do the following:
+
+.. code::
+
+   git clone https://github.com/BPI-SINOVOIP/pi-linux
+   cd pi-linux
+   uname --all
+   # Checkout the right branch for your kernel version
+   git checkout linux-6.1.15-k1
+   pushd tools/perf/pmu-events
+   ./jevents.py riscv arch pmu-events.c
+   popd
+   sudo apt install libelf-dev libdw-dev flex bison
+   sudo make -C tools/ NO_LIBBPF=1 prefix=/usr/local/ perf_install
+
+These instructions are inspired by `this blog post <https://dev.to/luzero/bringing-up-bpi-f3-part-25-27o4>`_.  Note that I'm running on the  `bianbu-23.10-desktop-k1-v1.0rc3-release-20240525133016` image, and that the default counter names appear to work for me.
+
+LLVM Native Build (Unsuccessful)
+--------------------------------
+
+I attempted to build LLVM natively on the board.  The filesystem is insanely slow, so just getting a git checkout in place took a while; starting from a zip file probably would have been a better idea.
+
+I tried "ninja -j6" and got lots of OOMs.  I tried building individually to clear large files, and made some progress, but the build time is extremely high.  I hit what appeared to be lack of forward progress after 1 hour on a single source file, and then switched away to other tasks.  It may be this can work end to end, but I haven't gotten it yet.
 
 Other References
 ----------------
