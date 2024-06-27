@@ -26,9 +26,10 @@ Zero the entire SD card.  Do not skip this step, or you get weird hangs at boot 
 
    sudo dd if=/dev/zero of=/dev/sda bs=4096 status=progress
 
-Format the partion table, etc...  (`For a lot more detail on this step <https://linuxize.com/post/how-to-format-usb-sd-card-linux/`_.)
+Format the partion table, etc...  (`For a lot more detail on this step <https://linuxize.com/post/how-to-format-usb-sd-card-linux/>`_.)
 
 .. code::
+   
    sudo parted /dev/sda --script -- mklabel msdos
    sudo parted /dev/sda --script -- mkpart primary fat32 1MiB 100%
    sudo mkfs.vfat -F32 /dev/sda1
