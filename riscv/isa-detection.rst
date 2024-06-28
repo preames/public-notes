@@ -32,7 +32,7 @@ riscv_hwprobe
 -------------
 
 syscall
-  See RISE's RISC-V Optimization Guide for `an example <https://gitlab.com/riseproject/riscv-optimization-guide/-/blob/main/riscv-optimization-guide.adoc?ref_type=heads#user-content-detecting-risc-v-extensions-on-linux>`_.  As noted there, the syscall was added in 6.4.  Attempting to use it on an earlier kernel will return ENOSYS.  The syscall is a relatively cheap syscall, but you do have the transition overhead.  Cost is probably something in the 1000s of instructions.
+  `Documentation <https://docs.kernel.org/arch/riscv/hwprobe.html>`_. See RISE's RISC-V Optimization Guide for `an example <https://gitlab.com/riseproject/riscv-optimization-guide/-/blob/main/riscv-optimization-guide.adoc?ref_type=heads#user-content-detecting-risc-v-extensions-on-linux>`_.  As noted there, the syscall was added in 6.4.  Attempting to use it on an earlier kernel will return ENOSYS.  The syscall is a relatively cheap syscall, but you do have the transition overhead.  Cost is probably something in the 1000s of instructions.
 
 vDSO
   Also added in 6.4 (so there is no kernel version with the syscall, but without the vDSO).  Caches the key/value for the intersection of the flags for all cpus.  Will return results without a syscall if either a) all_cpus is queried (i.e. no cpu set given to the call) or b) underlying system is homogeneous.  The vDSO symbol name is `__vdso_riscv_hwprobe`.  I've been told that binding a weak symbol with this name is sufficient, and that LDD will resolve it per normal dynamic link rules, but I haven't yet gotten this working.
