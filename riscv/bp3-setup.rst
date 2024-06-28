@@ -4,7 +4,7 @@ Banana PI 3 Setup Notes
 
 This board was released in Q2 2024, and appears to be the first relatively widely available board with vector 1.0.  The ISA is rva22u w/V and VLEN=256.  This page is my notes from trying to set one up as a development board.
 
-`BPi-F3 Datasheet https://docs.banana-pi.org/en/BPI-F3/SpacemiT_K1_datasheet>`_,  `Spacemit-K1 Datasheet <https://developer.spacemit.com/#/documentation?token=DBd4wvqoqi2fiqkiERTcbEDknBh>`_
+`BPi-F3 Datasheet <https://docs.banana-pi.org/en/BPI-F3/SpacemiT_K1_datasheet>`_,  `Spacemit-K1 Datasheet <https://developer.spacemit.com/#/documentation?token=DBd4wvqoqi2fiqkiERTcbEDknBh>`_
 
 To purchase: `AliExpress <https://a.aliexpress.com/_mOI0MCI>`_, `Amazon <https://www.amazon.com/BPI-F3-RISC-V-K1-SBC-Performance/dp/B0D44TH59S?th=1>`_
 
