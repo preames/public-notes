@@ -35,10 +35,13 @@ syscall
   `Documentation <https://docs.kernel.org/arch/riscv/hwprobe.html>`_. See RISE's RISC-V Optimization Guide for `an example <https://gitlab.com/riseproject/riscv-optimization-guide/-/blob/main/riscv-optimization-guide.adoc?ref_type=heads#user-content-detecting-risc-v-extensions-on-linux>`_.  As noted there, the syscall was added in 6.4.  Attempting to use it on an earlier kernel will return ENOSYS.  The syscall is a relatively cheap syscall, but you do have the transition overhead.  Cost is probably something in the 1000s of instructions.
 
 vDSO
-  Also added in 6.4 (so there is no kernel version with the syscall, but without the vDSO).  Caches the key/value for the intersection of the flags for all cpus.  Will return results without a syscall if either a) all_cpus is queried (i.e. no cpu set given to the call) or b) underlying system is homogeneous.  The vDSO symbol name is `__vdso_riscv_hwprobe`.  I've been told that binding a weak symbol with this name is sufficient, and that LDD will resolve it per normal dynamic link rules, but I haven't yet gotten this working.
+  Also added in 6.4 (so there is no kernel version with the syscall, but without the vDSO).  Caches the key/value for the intersection of the flags for all cpus.  Will return results without a syscall if either a) all_cpus is queried (i.e. no cpu set given to the call) or b) underlying system is homogeneous.  The vDSO symbol name is `__vdso_riscv_hwprobe`. 
 
 glibc
-  The patch for the glibc wrapper has landed, but *is not yet released*.  It is likely to be included in glibc 2.40 which is expected in Aug 2024, but should not be considered ABI stable until it is released.  `glibc provides <https://github.com/bminor/glibc/blob/master/sysdeps/unix/sysv/linux/riscv/sys/hwprobe.h>`_ two entry points `__riscv_hwprobe` - which is just a wrapper around the vDSO - and `__riscv_hwprobe_one` - an inline function specialized for the common single key case.
+  The patch for the glibc wrapper has landed, but *is not yet released*.  It is likely to be included in glibc 2.40 which is expected in Aug 2024, but should not be considered ABI stable until it is released.  `glibc provides <https://github.com/bminor/glibc/blob/master/sysdeps/unix/sysv/linux/riscv/sys/hwprobe.h>`_ two entry points `__riscv_hwprobe` and `__riscv_hwprobe_one` - an inline function specialized for the common single key case.  Confusingly, the `__riscv_hwprobe` case inverts the error codes from vDSO/kernel resulting in >0 being error instead of <0.  Thankfully, ==0 is success in all cases.
+
+bionic
+  Appears to be the same status as glibc, with the change landed but not yet released for Android 15.  Note that bionic does not appear to implement the `__riscv_hwprobe_one` wrapper, but does appear to match the semantics of the `__riscv_hwprobe` case.
 
 qemu-user
   It is currently an open question whether the vDSO above is supported by qemu-riscv64.  Initial testing seems to indicate no, but user error has not yet been disproven.
