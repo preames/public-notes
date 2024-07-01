@@ -92,12 +92,12 @@ Do the following:
 
 These instructions are inspired by `this blog post <https://dev.to/luzero/bringing-up-bpi-f3-part-25-27o4>`_.  Note that I'm running on the  `bianbu-23.10-desktop-k1-v1.0rc3-release-20240525133016` image, and that the default counter names appear to work for me.
 
-LLVM Native Build (Unsuccessful)
---------------------------------
+LLVM Native Build
+-----------------
 
-I attempted to build LLVM natively on the board.  The filesystem is insanely slow, so just getting a git checkout in place took a while; starting from a zip file probably would have been a better idea.
+You *can* do an LLVM native build on these, but it takes quite a while.  The filesystem on the SD card is insanely slow, so just getting a git checkout in place took a while; starting from a zip file probably would have been a better idea.  It might also have been a good idea to setup the MMC storage first.  Due to memory limitations, you end up needing to build without parallelism (e.g. "ninja -j1").  Doing so takes a bit over 38 hours.  I was able to build both the llvm 17 and llvm 18 release branches.
 
-I tried "ninja -j6" and got lots of OOMs.  I tried building individually to clear large files, and made some progress, but the build time is extremely high.  I hit what appeared to be lack of forward progress after 1 hour on a single source file, and then switched away to other tasks.  It may be this can work end to end, but I haven't gotten it yet.
+I strongly recommend configuring to build only RISCV and the projects you actually need.  Doing so greatly reduces the number of files build, and is the only thing which makes this vaguely practical.  I build RISCV only, and only LLVM core + clang.
 
 Other References
 ----------------
