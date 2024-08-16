@@ -232,3 +232,145 @@ define <4 x double> @rotatedown_42f64_2(<4 x double> %v, double %b) {
 }
 
 ; TODO: Consider using PerfectShuffle tool for VF=4?
+
+
+; TODO: This one should be a vwaddu_vv like the two below.
+define <4 x i64> @vwaddu_vv(<4 x i32> %a, <4 x i32> %b) {
+; CHECK-LABEL: vwaddu_vv:
+; CHECK:       # %bb.0:
+; CHECK-NEXT:    vsetivli zero, 4, e32, m1, ta, ma
+; CHECK-NEXT:    vadd.vv v10, v8, v9
+; CHECK-NEXT:    vsetvli zero, zero, e64, m2, ta, ma
+; CHECK-NEXT:    vzext.vf2 v8, v10
+; CHECK-NEXT:    ret
+  %add = add nuw <4 x i32> %a, %b
+  %zext = zext <4 x i32> %add to <4 x i64>
+  ret <4 x i64> %zext
+}
+
+define <4 x i64> @vwaddu_vv2(<4 x i32> %a, <4 x i32> %b) {
+; CHECK-LABEL: vwaddu_vv2:
+; CHECK:       # %bb.0:
+; CHECK-NEXT:    vsetivli zero, 4, e32, m1, ta, ma
+; CHECK-NEXT:    vwaddu.vv v10, v8, v9
+; CHECK-NEXT:    vmv2r.v v8, v10
+; CHECK-NEXT:    ret
+  %a.zext = zext <4 x i32> %a to <4 x i64>
+  %b.zext = zext <4 x i32> %b to <4 x i64>
+  %add = add <4 x i64> %a.zext, %b.zext
+  ret <4 x i64> %add
+}
+
+define <4 x i64> @vwaddu_vv_3(<4 x i32> %a) {
+; CHECK-LABEL: vwaddu_vv_3:
+; CHECK:       # %bb.0:
+; CHECK-NEXT:    vsetivli zero, 4, e32, m1, ta, ma
+; CHECK-NEXT:    vwaddu.vv v10, v8, v8
+; CHECK-NEXT:    vmv2r.v v8, v10
+; CHECK-NEXT:    ret
+  %a.zext = zext <4 x i32> %a to <4 x i64>
+  %add = add nuw <4 x i64> %a.zext, %a.zext
+  ret <4 x i64> %add
+}
+
+;; TODO: We should be able to narrow the shl here and
+;; perform that operation at a narrower LMUL
+define <8 x i64> @narrow_shl(<8 x i32> %a) {
+; CHECK-LABEL: narrow_shl:
+; CHECK:       # %bb.0:
+; CHECK-NEXT:    vsetivli zero, 8, e64, m4, ta, ma
+; CHECK-NEXT:    vzext.vf2 v12, v8
+; CHECK-NEXT:    vsll.vi v8, v12, 3
+; CHECK-NEXT:    ret
+  %a.zext = zext <8 x i32> %a to <8 x i64>
+  %shl = shl <8 x i64> %a.zext, splat (i64 3)
+  ret <8 x i64> %shl
+}
+
+; TODO: We'd be better off here using a vrsub.vi + vzext
+; that has a slightly higher critical path, but less register
+; pressure and doesn't require the extra vm1r.v
+define <8 x i16> @vwrsub_vx(<8 x i8> %a) {
+; CHECK-LABEL: vwrsub_vx:
+; CHECK:       # %bb.0:
+; CHECK-NEXT:    vsetivli zero, 8, e8, mf2, ta, ma
+; CHECK-NEXT:    vmv.v.i v10, 15
+; CHECK-NEXT:    vwsubu.vv v9, v10, v8
+; CHECK-NEXT:    vmv1r.v v8, v9
+; CHECK-NEXT:    ret
+  %a.zext = zext nneg <8 x i8> %a to <8 x i16>
+  %sub = sub nsw <8 x i16> splat(i16 15), %a.zext
+  ret <8 x i16> %sub
+}
+
+; TODO: We'd be better off here using a vrsub.vi + vzext
+; that has a slightly higher critical path, but less register
+; pressure and doesn't require the extra vm1r.v
+define <8 x i16> @vwneg(<8 x i8> %a) {
+; CHECK-LABEL: vwneg:
+; CHECK:       # %bb.0:
+; CHECK-NEXT:    vsetivli zero, 8, e8, mf2, ta, ma
+; CHECK-NEXT:    vmv.v.i v10, 0
+; CHECK-NEXT:    vwsubu.vv v9, v10, v8
+; CHECK-NEXT:    vmv1r.v v8, v9
+; CHECK-NEXT:    ret
+  %a.zext = zext nneg <8 x i8> %a to <8 x i16>
+  %sub = sub nsw <8 x i16> splat(i16 0), %a.zext
+  ret <8 x i16> %sub
+}
+
+; TODO: This can be a vwadd.vv done at m1.
+define <8 x i32> @vid_vwadd_vv() {
+; CHECK-LABEL: vid_vwadd_vv:
+; CHECK:       # %bb.0:
+; CHECK-NEXT:    vsetivli zero, 8, e32, m2, ta, ma
+; CHECK-NEXT:    vid.v v8
+; CHECK-NEXT:    vadd.vv v8, v8, v8
+; CHECK-NEXT:    ret
+  ret <8 x i32> <i32 0, i32 2, i32 4, i32 6, i32 8, i32 10, i32 12, i32 14>
+}
+
+define <8 x i32> @vid_vwadd_vx_offset() {
+; CHECK-LABEL: vid_vwadd_vx_offset:
+; CHECK:       # %bb.0:
+; CHECK-NEXT:    vsetivli zero, 8, e32, m2, ta, ma
+; CHECK-NEXT:    vid.v v8
+; CHECK-NEXT:    vadd.vv v8, v8, v8
+; CHECK-NEXT:    vadd.vi v8, v8, 1
+; CHECK-NEXT:    ret
+  ret <8 x i32> <i32 1, i32 3, i32 5, i32 7, i32 9, i32 11, i32 13, i32 15>
+}
+
+; TODO: In this case the offset is a multiple of the scale, we can
+; reverse the order of operations, use a narrow vadd.vi, and a vwadd.vv
+; to reduce the LMUL of this sequence.
+define <8 x i32> @vid_vwadd_vx_offset2() {
+; CHECK-LABEL: vid_vwadd_vx_offset2:
+; CHECK:       # %bb.0:
+; CHECK-NEXT:    vsetivli zero, 8, e32, m2, ta, ma
+; CHECK-NEXT:    vid.v v8
+; CHECK-NEXT:    vadd.vv v8, v8, v8
+; CHECK-NEXT:    vadd.vi v8, v8, 2
+; CHECK-NEXT:    ret
+  ret <8 x i32> <i32 2, i32 4, i32 6, i32 8, i32 10, i32 12, i32 14, i32 16>
+}
+
+; TODO: This can be a single vwmacc.vx at m1.  This particular
+; pattern comes up when emulating segment loads (e.g. NF=6) using
+; whole register loads and shuffles.  The user being i16 is idiomatic
+; due to vrgather.ei16.  Many of these have repeating vid based sequences
+; with different offsets, so having the vid be the smallest LMUL is
+; particularly useful.
+define <16 x i16> @vid_vwmacc() {
+; CHECK-LABEL: vid_vwmacc:
+; CHECK:       # %bb.0:
+; CHECK-NEXT:    vsetivli zero, 16, e16, m2, ta, ma
+; CHECK-NEXT:    vmv.v.i v10, 15
+; CHECK-NEXT:    vid.v v8
+; CHECK-NEXT:    li a0, 3
+; CHECK-NEXT:    vmadd.vx v8, a0, v10
+; CHECK-NEXT:    ret
+  ret <16 x i16> <i16 15, i16 18, i16 21, i16 24, i16 27, i16 30, i16 33, i16 36, i16 39, i16 42, i16 45, i16 48, i16 51, i16 54, i16 57, i16 60>
+}
+
+
