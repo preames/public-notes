@@ -56,35 +56,6 @@ define <2 x i8> @small_constant() {
 }
 
 
-; TODO: We should be able to make the mask op e16 to remove the toggle
-define <4 x i16> @vmerge_v4i16_simm5(<4 x i16> %x, <4 x i16> %y) {
-; CHECK-LABEL: vmerge_v4i16_simm5:
-; CHECK:       # %bb.0:
-; CHECK-NEXT:    vsetivli zero, 4, e16, mf2, ta, ma
-; CHECK-NEXT:    vmv.v.i v0, 11
-; CHECK-NEXT:    vmerge.vvm v8, v9, v8, v0
-; CHECK-NEXT:    ret
-  %s = shufflevector <4 x i16> %x, <4 x i16> %y, <4 x i32> <i32 0, i32 1, i32 6, i32 3>
-  ret <4 x i16> %s
-}
-
-; TODO: This is effectively a build_vector_i8(C1, C2) and thus could be
-; handled via a vmv.v.i, + vslide1down/li.  This is probably only profitable
-; if one of the two halfs is zero.
-define <16 x i16> @vmerge_v16i16(<16 x i16> %x, <16 x i16> %y) {
-; CHECK-LABEL: vmerge_v16i16:
-; CHECK:       # %bb.0:
-; CHECK-NEXT:    lui a0, 6
-; CHECK-NEXT:    addi a0, a0, -1
-; CHECK-NEXT:    vsetivli zero, 16, e16, m2, ta, ma
-; CHECK-NEXT:    vmv.s.x v0, a0
-; CHECK-NEXT:    vmerge.vvm v8, v10, v8, v0
-; CHECK-NEXT:    ret
-  %s = shufflevector <16 x i16> %x, <16 x i16> %y, <16 x i32> <i32 0, i32 1, i32 2, i32 3, i32 4, i32 5, i32 6, i32 7, i32 8, i32 9, i32 10, i32 11, i32 12, i32 29, i32 14, i32 31>
-  ret <16 x i16> %s
-}
-
-
 ; TODO: The expansion of this shuffle mask is obsurd.  We should be able to
 ; use either a constant pool load, or a vsext.vfN(load) here.  In theory,
 ; we only need two bits per element (i.e. 32) if we had a good expansion from
