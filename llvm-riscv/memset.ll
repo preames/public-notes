@@ -8,7 +8,7 @@ target triple = "riscv64-unknown-linux-gnu"
 ; but imagine a loop zeroing 15 byte structures in an array (with something to
 ; prevent compiler merging it into one memset)
 define void @memset_15(ptr %p) {
-; CHECK-LABEL: memset_16:
+; CHECK-LABEL: memset_15:
 ; CHECK:       # %bb.0: # %entry
 ; CHECK-NEXT:    sd zero, 7(a0)
 ; CHECK-NEXT:    sd zero, 0(a0)

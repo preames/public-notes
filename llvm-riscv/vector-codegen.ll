@@ -60,9 +60,8 @@ define <2 x i8> @small_constant() {
 define <4 x i16> @vmerge_v4i16_simm5(<4 x i16> %x, <4 x i16> %y) {
 ; CHECK-LABEL: vmerge_v4i16_simm5:
 ; CHECK:       # %bb.0:
-; CHECK-NEXT:    vsetivli zero, 1, e8, mf8, ta, ma
-; CHECK-NEXT:    vmv.v.i v0, 11
 ; CHECK-NEXT:    vsetivli zero, 4, e16, mf2, ta, ma
+; CHECK-NEXT:    vmv.v.i v0, 11
 ; CHECK-NEXT:    vmerge.vvm v8, v9, v8, v0
 ; CHECK-NEXT:    ret
   %s = shufflevector <4 x i16> %x, <4 x i16> %y, <4 x i32> <i32 0, i32 1, i32 6, i32 3>
@@ -76,10 +75,9 @@ define <16 x i16> @vmerge_v16i16(<16 x i16> %x, <16 x i16> %y) {
 ; CHECK-LABEL: vmerge_v16i16:
 ; CHECK:       # %bb.0:
 ; CHECK-NEXT:    lui a0, 6
-; CHECK-NEXT:    addiw a0, a0, -1
-; CHECK-NEXT:    vsetivli zero, 1, e16, mf4, ta, ma
-; CHECK-NEXT:    vmv.v.x v0, a0
+; CHECK-NEXT:    addi a0, a0, -1
 ; CHECK-NEXT:    vsetivli zero, 16, e16, m2, ta, ma
+; CHECK-NEXT:    vmv.s.x v0, a0
 ; CHECK-NEXT:    vmerge.vvm v8, v10, v8, v0
 ; CHECK-NEXT:    ret
   %s = shufflevector <16 x i16> %x, <16 x i16> %y, <16 x i32> <i32 0, i32 1, i32 2, i32 3, i32 4, i32 5, i32 6, i32 7, i32 8, i32 9, i32 10, i32 11, i32 12, i32 29, i32 14, i32 31>
@@ -97,25 +95,27 @@ define void @shuffle_constant_mask(<16 x ptr> %a, ptr %p) {
 ; CHECK-LABEL: shuffle_constant_mask:
 ; CHECK:       # %bb.0:
 ; CHECK-NEXT:    lui a1, 2
-; CHECK-NEXT:    addiw a1, a1, 545
-; CHECK-NEXT:    vsetivli zero, 1, e16, mf4, ta, ma
-; CHECK-NEXT:    vmv.v.x v0, a1
-; CHECK-NEXT:    vsetivli zero, 16, e64, m8, ta, ma
+; CHECK-NEXT:    addi a1, a1, 545
+; CHECK-NEXT:    vsetivli zero, 1, e16, m1, ta, ma
+; CHECK-NEXT:    vmv.s.x v0, a1
+; CHECK-NEXT:    vsetivli zero, 16, e8, m1, ta, ma
 ; CHECK-NEXT:    vmv.v.i v16, 3
-; CHECK-NEXT:    vmerge.vim v16, v16, 0, v0
+; CHECK-NEXT:    vmerge.vim v17, v16, 0, v0
 ; CHECK-NEXT:    lui a1, 1
-; CHECK-NEXT:    addiw a1, a1, 274
-; CHECK-NEXT:    vsetivli zero, 1, e16, mf4, ta, ma
-; CHECK-NEXT:    vmv.v.x v0, a1
-; CHECK-NEXT:    vsetivli zero, 16, e64, m8, ta, ma
-; CHECK-NEXT:    vmerge.vim v16, v16, 1, v0
+; CHECK-NEXT:    addi a1, a1, 274
+; CHECK-NEXT:    vsetvli zero, zero, e16, m2, ta, ma
+; CHECK-NEXT:    vmv.s.x v0, a1
 ; CHECK-NEXT:    lui a1, 4
-; CHECK-NEXT:    addiw a1, a1, 1092
-; CHECK-NEXT:    vsetivli zero, 1, e16, mf4, ta, ma
-; CHECK-NEXT:    vmv.v.x v0, a1
-; CHECK-NEXT:    vsetivli zero, 16, e64, m8, ta, ma
-; CHECK-NEXT:    vmerge.vim v16, v16, 2, v0
-; CHECK-NEXT:    vrgather.vv v24, v8, v16
+; CHECK-NEXT:    addi a1, a1, 1092
+; CHECK-NEXT:    vmv.s.x v16, a1
+; CHECK-NEXT:    vsetvli zero, zero, e8, m1, ta, ma
+; CHECK-NEXT:    vmerge.vim v17, v17, 1, v0
+; CHECK-NEXT:    vmv1r.v v0, v16
+; CHECK-NEXT:    vmerge.vim v16, v17, 2, v0
+; CHECK-NEXT:    vsetvli zero, zero, e16, m2, ta, ma
+; CHECK-NEXT:    vsext.vf2 v18, v16
+; CHECK-NEXT:    vsetvli zero, zero, e64, m8, ta, ma
+; CHECK-NEXT:    vrgatherei16.vv v24, v8, v18
 ; CHECK-NEXT:    vse64.v v24, (a0)
 ; CHECK-NEXT:    ret
   %res = shufflevector <16 x ptr> %a, <16 x ptr> poison, <16 x i32> <i32 0, i32 1, i32 2, i32 3, i32 1, i32 0, i32 2, i32 3, i32 1, i32 0, i32 2, i32 3, i32 1, i32 0, i32 2, i32 3>
@@ -235,11 +235,10 @@ define <2 x double> @rotateup_v2f64_a(<2 x double> %v, double %b) {
 define <2 x double> @rotatedown_v2f64_c(<2 x double> %v, double %b) {
 ; CHECK-LABEL: rotatedown_v2f64_c:
 ; CHECK:       # %bb.0:
-; CHECK-NEXT:    vsetivli zero, 1, e64, m1, ta, ma
+; CHECK-NEXT:    vsetivli zero, 2, e64, m1, ta, ma
 ; CHECK-NEXT:    vslidedown.vi v8, v8, 1
 ; CHECK-NEXT:    vfmv.f.s fa5, v8
-; CHECK-NEXT:    vsetivli zero, 2, e64, m1, ta, ma
-; CHECK-NEXT:    vfslide1down.vf v8, v8, fa5
+; CHECK-NEXT:    vfmv.v.f v8, fa5
 ; CHECK-NEXT:    vfslide1down.vf v8, v8, fa0
 ; CHECK-NEXT:    ret
   %a = extractelement <2 x double> %v, i64 1
