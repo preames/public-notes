@@ -101,9 +101,7 @@ define void @v3i64_vadd(ptr %p) {
 ; CHECK:       # %bb.0:
 ; CHECK-NEXT:    vsetivli zero, 3, e64, m2, ta, ma
 ; CHECK-NEXT:    vle64.v v8, (a0)
-; CHECK-NEXT:    vsetivli zero, 4, e64, m2, ta, ma
 ; CHECK-NEXT:    vadd.vi v8, v8, 1
-; CHECK-NEXT:    vsetivli zero, 3, e64, m2, ta, ma
 ; CHECK-NEXT:    vse64.v v8, (a0)
 ; CHECK-NEXT:    ret
   %v1 = load <3 x i64>, ptr %p
@@ -117,9 +115,7 @@ define void @v3i64_vadd_elem_aligned(ptr %p) {
 ; CHECK:       # %bb.0:
 ; CHECK-NEXT:    vsetivli zero, 3, e64, m2, ta, ma
 ; CHECK-NEXT:    vle64.v v8, (a0)
-; CHECK-NEXT:    vsetivli zero, 4, e64, m2, ta, ma
 ; CHECK-NEXT:    vadd.vi v8, v8, 1
-; CHECK-NEXT:    vsetivli zero, 3, e64, m2, ta, ma
 ; CHECK-NEXT:    vse64.v v8, (a0)
 ; CHECK-NEXT:    ret
   %v1 = load <3 x i64>, ptr %p, align 8
@@ -133,9 +129,7 @@ define void @v6i64_vadd(ptr %p) {
 ; CHECK:       # %bb.0:
 ; CHECK-NEXT:    vsetivli zero, 6, e64, m4, ta, ma
 ; CHECK-NEXT:    vle64.v v8, (a0)
-; CHECK-NEXT:    vsetivli zero, 8, e64, m4, ta, ma
 ; CHECK-NEXT:    vadd.vi v8, v8, 1
-; CHECK-NEXT:    vsetivli zero, 6, e64, m4, ta, ma
 ; CHECK-NEXT:    vse64.v v8, (a0)
 ; CHECK-NEXT:    ret
   %v1 = load <6 x i64>, ptr %p
@@ -372,5 +366,4 @@ define <16 x i16> @vid_vwmacc() {
 ; CHECK-NEXT:    ret
   ret <16 x i16> <i16 15, i16 18, i16 21, i16 24, i16 27, i16 30, i16 33, i16 36, i16 39, i16 42, i16 45, i16 48, i16 51, i16 54, i16 57, i16 60>
 }
-
 
