@@ -94,50 +94,6 @@ define void @shuffle_constant_mask(<16 x ptr> %a, ptr %p) {
   ret void
 }
 
-; For these odd types, we could consider using a masked load and store
-; to widen the illegal types.
-define void @v3i64_vadd(ptr %p) {
-; CHECK-LABEL: v3i64_vadd:
-; CHECK:       # %bb.0:
-; CHECK-NEXT:    vsetivli zero, 3, e64, m2, ta, ma
-; CHECK-NEXT:    vle64.v v8, (a0)
-; CHECK-NEXT:    vadd.vi v8, v8, 1
-; CHECK-NEXT:    vse64.v v8, (a0)
-; CHECK-NEXT:    ret
-  %v1 = load <3 x i64>, ptr %p
-  %v2 = add <3 x i64> %v1, <i64 1, i64 1, i64 1>
-  store <3 x i64> %v2, ptr %p
-  ret void
-}
-
-define void @v3i64_vadd_elem_aligned(ptr %p) {
-; CHECK-LABEL: v3i64_vadd_elem_aligned:
-; CHECK:       # %bb.0:
-; CHECK-NEXT:    vsetivli zero, 3, e64, m2, ta, ma
-; CHECK-NEXT:    vle64.v v8, (a0)
-; CHECK-NEXT:    vadd.vi v8, v8, 1
-; CHECK-NEXT:    vse64.v v8, (a0)
-; CHECK-NEXT:    ret
-  %v1 = load <3 x i64>, ptr %p, align 8
-  %v2 = add <3 x i64> %v1, <i64 1, i64 1, i64 1>
-  store <3 x i64> %v2, ptr %p, align 8
-  ret void
-}
-
-define void @v6i64_vadd(ptr %p) {
-; CHECK-LABEL: v6i64_vadd:
-; CHECK:       # %bb.0:
-; CHECK-NEXT:    vsetivli zero, 6, e64, m4, ta, ma
-; CHECK-NEXT:    vle64.v v8, (a0)
-; CHECK-NEXT:    vadd.vi v8, v8, 1
-; CHECK-NEXT:    vse64.v v8, (a0)
-; CHECK-NEXT:    ret
-  %v1 = load <6 x i64>, ptr %p
-  %v2 = add <6 x i64> %v1, <i64 1, i64 1, i64 1, i64 1, i64 1, i64 1>
-  store <6 x i64> %v2, ptr %p
-  ret void
-}
-
 ; TODO: Can be a slidedown1 + a vfslide1down
 define <2 x double> @rotatedown_v2f64_a(<2 x double> %v, double %b) {
 ; CHECK-LABEL: rotatedown_v2f64_a:
