@@ -66,3 +66,44 @@ Redefinition of Vector Overlap (Nov 2022)
 -----------------------------------------
 
 `This proposal <https://lists.riscv.org/g/tech-vector-ext/topic/94729097#845>`_ introduced a wording change which resulted in previously valid encodings become invalid.  This was raised in the discussion, and actively rejected as being a compatibility concern.  This change appears not to have been merged into the `specification repo <https://github.com/riscv/riscv-v-spec/>`_ as of 2023-02-23.  
+
+Whole Vector Register Move and VILL
+-----------------------------------
+
+The 1.0 version of the vector specification says the following in section 3.4.4. "Vector Type Illegal vill":
+
+   "If the vill bit is set, then any attempt to execute a vector instruction that depends upon vtype will raise an illegal-instruction exception.  Note vset{i}vl{i} and whole-register loads, stores, *and moves* do not depend upon vtype."
+
+By version 20240411 of the combined unpriv specification, this wording has been changed to:
+
+   "If the vill bit is set, then any attempt to execute a vector instruction that depends upon vtype will raise an illegal-instruction exception. vset{i}vl{i} and whole register loads and stores do not depend upon vtype."
+
+Note that whole register moves have been *removed* from this note, and thus
+are now required to raise an illegal-instruction exception on vill.
+
+Both versions have the following note in section 31.16.6 "Whole Vector Register Move":
+
+   "These instructions are intended to aid compilers to shuffle vector registers without needing to know or change vl or vtype."
+
+Given ``vill`` is a bit within the ``vtype`` CSR ("The vill bit is held in bit XLEN-1 of the CSR to support checking for illegal values with a branch on the sign bit."), this really seems like the new version of the specification contradicts itself.
+
+This change was introduced by:
+
+   commit 856fe5bd1cb135c39258e6ca941bf234ae63e1b1
+   Author: Andrew Waterman <andrew@sifive.com>
+   Date:   Mon Apr 3 15:40:16 2023 -0700
+
+    Delete non-normative claim that vmv<nr>r.v doesn't depend on vtype
+
+    The normative text says that vmv<nr>r.v "operates as though EEW=SEW",
+    meaning that it _does_ depend on vtype.
+
+    The semantic difference becomes visible through vstart, since vstart is
+    measured in elements; hence, how to set vstart on an interrupt, or
+    interpret vstart upon resumption, depends on vtype.
+
+Personally, I think this was the wrong change to resolve the stated issue.
+The wording changed was in a section specific to vill exception behavior,
+and adding a carve out that whole vector register move explicitly
+did not trap on vill (but otherwise did depend on vtype) would have been
+much more reasonable.
