@@ -90,17 +90,19 @@ Given ``vill`` is a bit within the ``vtype`` CSR ("The vill bit is held in bit X
 This change was introduced by:
 
    commit 856fe5bd1cb135c39258e6ca941bf234ae63e1b1
+
    Author: Andrew Waterman <andrew@sifive.com>
+
    Date:   Mon Apr 3 15:40:16 2023 -0700
 
-    Delete non-normative claim that vmv<nr>r.v doesn't depend on vtype
+   Delete non-normative claim that vmv<nr>r.v doesn't depend on vtype
 
-    The normative text says that vmv<nr>r.v "operates as though EEW=SEW",
-    meaning that it _does_ depend on vtype.
+   The normative text says that vmv<nr>r.v "operates as though EEW=SEW",
+   meaning that it _does_ depend on vtype.
 
-    The semantic difference becomes visible through vstart, since vstart is
-    measured in elements; hence, how to set vstart on an interrupt, or
-    interpret vstart upon resumption, depends on vtype.
+   The semantic difference becomes visible through vstart, since vstart is
+   measured in elements; hence, how to set vstart on an interrupt, or
+   interpret vstart upon resumption, depends on vtype.
 
 Personally, I think this was the wrong change to resolve the stated issue.
 The wording changed was in a section specific to vill exception behavior,
