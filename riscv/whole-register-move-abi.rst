@@ -23,7 +23,7 @@ unconditionally copy a dang register* is broken at a level which
 just can't be saved, however we will probably have to workaround
 this in software regardless.
 
-See also discussion here: https://github.com/llvm/llvm-project/issues/114518
+See also discussion here: https://github.com/llvm/llvm-project/issues/114518 and https://gcc.gnu.org/bugzilla/show_bug.cgi?id=117544.
 
 ABI Impact
 ----------
@@ -86,9 +86,10 @@ Key Goals:
 Options
 -------
 
-As of the 2024-11-21 LLVM RISCV Sync Up, the consensus appears to be that
-we're going to pursue Option 2 - the compiler side changes.  I personally
-disagree with this, but don't care enough to try and drive the alternative.
+As of the 2024-11-21 LLVM RISCV Sync Up, the consensus appeared to be that
+we're going to pursue Option 2 - the compiler side changes.  In offline
+discussion, it was revealed that some information was accidentally
+misreported, so this is still an open question.
 
 Option 1 - Change the ABI
 =========================
@@ -127,7 +128,9 @@ It was pointed out that this requires VTYPE to be initialized during
 program startup, and that this would defeat the kernel's lazy state
 preservation optimization which avoids needing to spill vector state
 for programs which don't use vector - because vset* is a vector
-instruction.
+instruction.  (Per Palmer, this may not be an issue depending on how
+a kernel change is handled.  He's going to expand on a psabi issue
+filed in the near future - will like once available.
 
 Option 2 - Enforce the ABI as written
 =====================================
