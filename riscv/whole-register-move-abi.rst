@@ -151,6 +151,8 @@ in the wild, and nothing would be guaranteed to work until all
 packages had been recompiled.  Unlike the previous option, most
 of those packages wouldn't "just work" in practice.
 
+LLVM POC Patch: https://github.com/llvm/llvm-project/compare/main...preames:llvm-project:wip-vmv1r-depends-on-vtype-vill?expand=1
+
 Option 3 - Ignore it
 ====================
 
