@@ -86,6 +86,10 @@ Key Goals:
 Options
 -------
 
+As of the 2024-11-21 LLVM RISCV Sync Up, the consensus appears to be that
+we're going to pursue Option 2 - the compiler side changes.  I personally
+disagree with this, but don't care enough to try and drive the alternative.
+
 Option 1 - Change the ABI
 =========================
 
@@ -119,6 +123,11 @@ This is my preferred option, but may be politically unpopular since
 it requires publicly admitting the retro-active change was actually
 a change.  RVI has generally not wanted to do that in the past.
 
+It was pointed out that this requires VTYPE to be initialized during
+program startup, and that this would defeat the kernel's lazy state
+preservation optimization which avoids needing to spill vector state
+for programs which don't use vector - because vset* is a vector
+instruction.
 
 Option 2 - Enforce the ABI as written
 =====================================
