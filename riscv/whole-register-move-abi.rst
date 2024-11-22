@@ -23,7 +23,7 @@ unconditionally copy a dang register* is broken at a level which
 just can't be saved, however we will probably have to workaround
 this in software regardless.
 
-See also discussion here: https://github.com/llvm/llvm-project/issues/114518 and https://gcc.gnu.org/bugzilla/show_bug.cgi?id=117544.
+See also discussion here: https://github.com/llvm/llvm-project/issues/114518 and https://gcc.gnu.org/bugzilla/show_bug.cgi?id=117544, and https://github.com/riscv-non-isa/riscv-elf-psabi-doc/pull/454.
 
 ABI Impact
 ----------
