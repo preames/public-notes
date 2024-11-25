@@ -92,3 +92,33 @@ Rematerialization of LUI/ADDI sequences
 =======================================
 
 Given an LUI/ADDI sequence - either from a constant or a relocation - we should be able to rematerialize either or both instructions if required to reduce register pressure during allocation.
+
+
+Register Pressure Reduction
+===========================
+
+Improvement to switch lowering - if generate an jump table for the labels, check to see if the result can be turned into a lookup table instead.  We're already paying the load cost.
+
+Investigate simple improvements to ShrinkWrapping.
+
+Consider firewalling cold call paths.
+
+Define a fastcc variants where argument-0 and return don't require the same register and internalize aggressively - mostly helps LTO.
+
+IPRA - Can we reduce need to spill some?
+
+Prefer bnez (addi a0, a0, C) when doing so avoids the need for a immediate materialization and a0 has no other uses.
+
+Prefer bnez (lshr a0, a0, XLen-1) for sign check, same logic as previous.  Also generalizes to bexti cases for any single bit check.
+
+Use arithmetic more aggressively for select c, i32 C1, i32 C2 to avoid need for control flow.  (Doesn't really impact register pressure, may actually hurt.)
+
+Aggressively duplicate (addi a0, x0, C) to users before register allocation OR itnegrate rematerialization into first CSR path.
+
+Aggressively duplicate (addi a0, a0, C) when user is vector load or store to user to avoid long live ranges.  Or combine remat in first cSR + full remat.
+
+Investigate full rematerialization.
+
+Investigate negated compound branch thing reported 2024-11-24 on discourse.
+
+

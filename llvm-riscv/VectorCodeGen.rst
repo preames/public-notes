@@ -245,3 +245,14 @@ Shuffle Idioms during Lowering
 * large element shifts with sufficient undef elements
 
   
+
+Register Pressure Reduction
+===========================
+
+Investigate subregister extract feeding widening instruction.  Can we narrow to begin with, or at least improve the spill/fill to be narrower width?  Might be a schedule bias towards putting the extract close to def?  Consider remat of subvector extract of rematable?
+
+Weighting of high lmul register spills to discourage them more than low LMUL.
+
+Explore "exploded" register classes before resorting to spilling?
+
+Investigate operand swapping for purposes of .vx and .vf matching.
