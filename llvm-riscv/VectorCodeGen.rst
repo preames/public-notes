@@ -244,7 +244,25 @@ Shuffle Idioms during Lowering
 * byteswap and rotates via ROTL
 * large element shifts with sufficient undef elements
 
-  
+Deinterleave
+
+* vcompress fallback - both shuffle and deinterleave intrinsics
+* Shift and truncate - any power of two such that SEW * N <= ELEN
+* Implement unzip proposals
+* Avoid splitting with slidedown eagerly?  Or should we canonicalize in that direction?
+* for power-of-twos, can divide source registers (even VLA) and then slideup results.  Need to know register size is a multiple of factor.
+* Overlapping slide and select - all active elements in prefix, then shuffle that if needed.  2 linear + small shuffle.  VLA forms just require some adjusted slide amounts, and a complicated shuffle mask
+
+Interleave/Spread
+
+* For single source form, widening add w/zero
+* For single source form, ZEXT for factors 2,4,8 where result type is legal.
+* implement zip proposals
+
+Repeat
+
+* Spread + masked slide?
+* Larger SEW vrgather for small sequences
 
 Register Pressure Reduction
 ===========================
