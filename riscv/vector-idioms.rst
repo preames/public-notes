@@ -295,6 +295,27 @@ Then `zip_odd` produces::
    vmv1r vd, vs2
    vslideup.vi   vd, vs1, 1, v0
 
+Adjacent Element Swap
++++++++++++++++++++++
+
+Given an input vector of the form::
+  a_0, a_1, a_2, a_3, ..
+
+Produce::
+  a_1, a_0, a_3, a_2, ..
+
+.. code::
+
+   vtmp1 = deinterleave2(V1, 0)
+   vtmp2 = deinterleave2(V1, 1)
+   vd = interleave2(vtmp1, vtmp2)
+
+   // populate v0 = 101010...
+   vslide1up.vx vtmp, vsrc, zero
+   vslide1down.vx vtmp, vsrc, zero, v0
+
+   vslide1down.vx vtmp, vsrc, zero
+   vzipeven.vv vtmp, vsrc, vtmp
 
 Element Wise Operations
 =======================
