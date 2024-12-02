@@ -246,7 +246,7 @@ Shuffle Idioms during Lowering
 
 Deinterleave
 
-* vcompress fallback - both shuffle and deinterleave intrinsics
+* vcompress fallback - use m1 splat to reduce pressure in deinterleave2
 * Shift and truncate - any power of two such that SEW * N <= ELEN
 * Implement unzip proposals
 * Avoid splitting with slidedown eagerly?  Or should we canonicalize in that direction?
@@ -274,3 +274,11 @@ Weighting of high lmul register spills to discourage them more than low LMUL.
 Explore "exploded" register classes before resorting to spilling?
 
 Investigate operand swapping for purposes of .vx and .vf matching.
+
+Implement foldMemoryOperand for sub-vector insert.  Example code to improve::
+
+  addi  a0, sp, 16
+  vl8r.v    v16, (a0)                       # Unknown-size Folded Reload
+  vmv4r.v   v12, v16
+
+Note that in some examples, we could improve the store to only spill half of the vector type, but that seems to be a decently large change and generic codegen doesn't seem to have support for it already (which is slightly odd).
