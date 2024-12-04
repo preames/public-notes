@@ -92,7 +92,18 @@ Repeating Subvector (i.e. Splat SEW>64)
 
 Assume the subvector you wish to splat is in the low elements of the vector, and that the size is a power of two.
 
-For sizeof(subvec) < VLENB, use vslideup.vi to produce a 2x vector.  Repeat until next item applies.
+For sizeof(subvec) < VLENB:
+
+.. code::
+
+   // For VLA
+   vid v1
+   vand.vi v1, v1, <imm>
+   vrgather v3, v2, v1
+
+   // For VLS
+   vslideup.vi v3, v2, <imm>
+   // repeat O(log VLENB) as needed, or use above
 
 For sizeof(subvec) >= VLENB, use whole register moves to "splat" across as many VREGs as required.
 
