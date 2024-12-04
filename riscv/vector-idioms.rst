@@ -99,7 +99,8 @@ For sizeof(subvec) >= VLENB, use whole register moves to "splat" across as many 
 Vector Rotate
 +++++++++++++
 
-::
+.. code::
+
    vslidedown.vi v1, v2, <imm>
    vslideup.vi v1, v2, <imm2>
 
