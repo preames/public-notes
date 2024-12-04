@@ -42,8 +42,8 @@ Extract:
    OR
    vfmv.f.s FN, VTMP
 
-LMUL Sensatitiy
-  Note that vmerge, vslideup, and vslidedown are likely to be O(LMUL) in cost.  As a result, these operations scale linearly with the vector LMUL.  If the index being extract is known to be in a smaller LMUL prefix or (for VLS code) a specific sub-register, using a smaller LMUL for the insert or extract is very likely profitable.
+LMUL Sensitivity
+  Note that vmerge, vslideup, and vslidedown are likely to be O(LMUL) in cost.  As a result, these operations scale linearly with the vector LMUL.  If the index being inserted/extracted is known to be in a smaller LMUL prefix or (for VLS code) a specific sub-register, using a smaller LMUL for the insert or extract is very likely profitable.
 
 Non-Immediate Index
   All of the examples given are for immediate indices because these are by far the most common in practice.  You can write .vx forms of most of these, but there's no easy VLS or prefix optimizations available.
@@ -52,7 +52,7 @@ Non-Immediate Index
 Shuffles (Rearranging Elements)
 ===============================
 
-We have a bunch of known shuffles with lowerings which are better than general vrgather.  A few that have native hardware support (see ISA manual):
+We have a bunch of known shuffles with lowerings which are better than general vrgather.vv.  A few that have native hardware support (see ISA manual):
 
 * Vector Select
 * Slide Up and Down
@@ -61,7 +61,7 @@ And a couple of generally useful tactics:
 
 * Split and merge (for two source operand shuffles)
 * Split at VREG boundary (assumes VLS)
-* e16 constants with vrgather.ei16 (all fixed length vectors)
+* e16 constants with vrgatherei16.vv (all fixed length vectors)
 * Emulated vrgather.ei4 for VL<=16
 
 Splat from Scalar
@@ -99,7 +99,7 @@ For sizeof(subvec) < VLENB:
    // For VLA
    vid v1
    vand.vi v1, v1, <imm>
-   vrgather v3, v2, v1
+   vrgather.vv v3, v2, v1
 
    // For VLS
    vslideup.vi v3, v2, <imm>
@@ -123,15 +123,15 @@ For m1, the naive strategy works just fine.
 .. code:: 
 
   // VLA
-  vid v1
+  vid.v v1
   csrr t0, vlenb
   slli t0, log_2(SEW/8)
-  vrsub v1, t0
+  vrsub.vx v1, t0
   vrgather.vv vd, vsrc, v1
 
   // If exact VLEN is known, VLMAX is constant
-  vid v1
-  vrsub v1, VLMAX
+  vid.v v1
+  vrsub.vi v1, VLMAX
   vrgather.vv vd, vsrc, v1
 
 For m2 and above, we want to avoid an O(LMUL^2) vrgather.vv.  Our basic strategy will be:
@@ -148,7 +148,7 @@ Vector Compress
 
 A vector compress operation returns a vector where every element in the source appears at most once, a location at or strictly less than it's position in the original vector.  Elements can be discarded.  See the `vcompress` instruction definition in the ISA manual.
 
-vcompress scales better with LMUL than a general vrgather, and at least the SpaceMit X60, has higher throughput even at m1. It also has the advantage of requiring smaller vector constants at one bit per element as opposed to vrgather which is a minimum of 8 bits per element. The downside to using vcompress is that we can't fold a vselect into it, as there is no masked vcompress variant.  This can cause increased register pressure in some cases.
+vcompress scales better with LMUL than a general vrgather.vv, and at least the SpaceMit X60, has higher throughput even at m1. It also has the advantage of requiring smaller vector constants at one bit per element as opposed to vrgather which is a minimum of 8 bits per element. The downside to using vcompress is that we can't fold a vselect into it, as there is no masked vcompress variant.  This can cause increased register pressure in some cases.
 
 Note that there are many sub-cases which can be more efficiently lowered.  Examples:
 
@@ -167,10 +167,10 @@ The sheep-and-goals (SAG) operator is from "Hacker's Delight".  It performs a st
 
 .. code::
 
-   vcompress vd, vs1, v0
+   vcompress.vm vd, vs1, v0
    vcpop.m t0, v0
    vmnot v0, v0
-   vcompress vtmp, vs1, v0   
+   vcompress.vm vtmp, vs1, v0   
    vslideup.vx vd, vtmp, t0
 
 Note that if the population count of the mask is known (e.g. it's a constant), the vcpop.m can be skipped and vslideup.vi can be used.
@@ -189,22 +189,22 @@ Then `interleave(2)` produces::
 .. code::
    
    // (SEW <= 32 only, assuming zvbb)
-   vwsll vd, vs1, sizeof(SEW)
-   vwadd vd, vd, vs2
+   vwsll.vi vd, vs1, sizeof(SEW)
+   vwadd.wv vd, vd, vs2
 
    // (SEW = 64 using split shuffle assuming m1 inputs)
    vmv1r vd_0, vs2
    vslideup.vi vd_0, vs1, VLMAX/2
    vmv1r vd_1, vs2
    vslidedown.vi vd_0, vs1, VLMAX/2
-   vlse16.v vtmp, (a0) // load [0, VLMAX/2, 1, VLMAX/2+1] shuffle index vector
-   vrgather.ei16 vd_0, vd_0, vtmp
-   vrgather.ei16 vd_1, vd_1, vtmp
+   vle16.v vtmp, (a0) // load [0, VLMAX/2, 1, VLMAX/2+1] shuffle index vector
+   vrgatherei16.vv vd_0, vd_0, vtmp
+   vrgatherei16.vv vd_1, vd_1, vtmp
 
    // (SEW = 64 using m2 shuffle)
-   vlse16.v vtmp, (a0) // load [0, VLMAX/2, 1, VLMAX/2+1] shuffle index vector
+   vle16.v vtmp, (a0) // load [0, VLMAX/2, 1, VLMAX/2+1] shuffle index vector
    vd = {vs0, vs1} // may involve whole register moves
-   vrgather.ei16 vd, vd, vtmp
+   vrgatherei16.vv vd, vd, vtmp
 
 `interleave(N)` is defined in an analogous manner, but with a corresponding larger number of input registers.
    
@@ -246,9 +246,9 @@ Then `repeat(3)` produces::
 
 Approaches:
 
-* See interleave(2) stratagies with V1 being both input operands.
+* See interleave(2) strategies with V1 being both input operands.
 * Spread + masked slide (particularly for SEW<=32, and N=2)
-* Larger SEW vrgather for small sequences
+* Larger SEW vrgather.vv for small sequences
 
    
 Deinterleave (a.k.a. Unzip)
@@ -264,16 +264,16 @@ Then `deinterleave(2)` produces::
 
 .. code::
 
-   // (SEW <= 32 only, assuming zvbb)
-   vtmp = vnsrl vs1, sizeof(SEW)
-   vtmp = vnsrl vs1, 0
+   // (SEW <= 32 only)
+   vtmp = vnsrl.wi vs1, sizeof(SEW)
+   vtmp = vnsrl.wi vs1, 0
    vslideup.vi vd, vtmp, VL/2
 
    // (SEW = 64)
    v0 = {1010..}
-   vcompress vd, vs1, v0
+   vcompress.vm vd, vs1, v0
    vmnot v0, v0 // {0101..}
-   vcompress vtmp, vs1, v0
+   vcompress.vm vtmp, vs1, v0
    vslideup.vi vd, vtmp, VL/2
 
 If you only need one of the sub-series, the above simplify in the obvious ways.
@@ -297,14 +297,14 @@ Then `zip_odd` produces::
 .. code::
 
    // zip_even
-   vid vtmp
+   vid.v vtmp
    vand.vi vtmp, vtmp, 1
    vmseq.vi v0, vtmp, 0
    vmv1r vd, vs1
    vslideup.vi   vd, vs2, 1, v0
 
    // zip_odd
-   vid vtmp
+   vid.v vtmp
    vand.vi vtmp, vtmp, 1
    vmseq.vi v0, vtmp, 0
    vmv1r vd, vs2
@@ -341,7 +341,7 @@ UInt4 and SInt4 Unpack
 Nibble data is relatively common.  Specific use cases:
 
 * Quantized ML/AI
-* Small vrgather index lists (for VL<=16 shuffles)
+* Small vrgather.vv index lists (for VL<=16 shuffles)
 
 UInt4 zero extend to e8::
 
@@ -361,7 +361,7 @@ SInt4 sign extend to e8::
 
   Note: You might be able to do the sign extend via subtraction in the case above
 
-When unpacking int4, note that if *order* is unimportant, then the interleave can be replaced with a simple slideup instead.  If the resulting order *is* important - for instance, a vrgather index vector - consider where the source data can be stored in an inverted order to allow the vslideup trick.
+When unpacking int4, note that if *order* is unimportant, then the interleave can be replaced with a simple slideup instead.  If the resulting order *is* important - for instance, a vrgather.vv index vector - consider where the source data can be stored in an inverted order to allow the vslideup trick.
 
 Alternatively, if the next step is done element wise, the interleave can be deferred by performing the element wise operation twice.
 
@@ -393,7 +393,7 @@ Heavily used in linear algebra, but also a useful building block for other idiom
 
 Same Width SEW=8,16,32,64::
 
-  vmul[u].vv v1, v1, v2
+  vmul.vv v1, v1, v2
   vmv.v.x v3, zero
   vredsum.vs v3, v1, v3
   vmv.x.s a0, v3
@@ -422,8 +422,8 @@ UInt4 Source::
   vand.vi v4, v1, 15
   vsrl.vi v1, v2, 4
   vand.vi v2, v2, 15
-  vmul[u].vv v1, v1, v3
-  vmul[u].vv v2, v2, v4
+  vmul.vv v1, v1, v3
+  vmul.vv v2, v2, v4
   // Toggle SEW=16
   vwadd.vv v2, v2, v1
   vmv.v.x v3, zero
@@ -438,7 +438,7 @@ UInt4 Source::
   vand.vi v2, v2, 15
   vslideup v1, v3, VL/2
   vslideup v2, v4, VL/2
-  vmul[u].vv v1, v1, v2
+  vmul.vv v1, v1, v2
   // Toggle SEW=16
   vmv.v.x v3, zero
   vwredsum.vs v3, v1, v3
@@ -495,10 +495,10 @@ a[i] += b[i*2] + b[i*2 + 1] + b[i*2 + 2] + b[i*2 + 3]::
   v2 = packed_horzontal_add_pairs(v2) @ SrcSEW*2 -> SrcSEW*4
 
   // Option C - A slightly optimized version of 'B'
-  v2 = packed_horzontal_add_pairs(v2) @ SrcSEW -> SrcSEW*2
+  v2 = packed_horizontal_add_pairs(v2) @ SrcSEW -> SrcSEW*2
   v4 = deinterleave2(v2, 0) @ SrcSEW * 2
   v5 = deinterleave2(v2, 1) @ SrcSEW * 2
-  vadd v2, v4, v5 # NOT vwadd due to excess bits
+  vadd.vv v2, v4, v5 # NOT vwadd due to excess bits
   vwadd.wv v1, v1, v2 # accumulate
 
 Packed Horizontal Add (Octo) Accumulate
