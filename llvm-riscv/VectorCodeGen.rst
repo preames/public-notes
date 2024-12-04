@@ -246,8 +246,6 @@ Shuffle Idioms during Lowering
 
 Deinterleave
 
-* vcompress fallback - use m1 splat to reduce pressure in deinterleave2
-* Shift and truncate - any power of two such that SEW * N <= ELEN
 * Implement unzip proposals
 * Avoid splitting with slidedown eagerly?  Or should we canonicalize in that direction?
 * for power-of-twos, can divide source registers (even VLA) and then slideup results.  Need to know register size is a multiple of factor.
@@ -255,9 +253,9 @@ Deinterleave
 
 Interleave/Spread
 
-* For single source form, widening add w/zero
 * For single source form, ZEXT for factors 2,4,8 where result type is legal.
 * implement zip proposals
+* bad matching of seg4 store case for store of deinterleave4.
 
 Repeat
 

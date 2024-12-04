@@ -40,10 +40,10 @@ Extract:
    vslidedown.vi vTMP, vN, imm
    vmv.x.s xN, VTMP
    OR
-   vFmv.F.s FN, VTMP
+   vfmv.f.s FN, VTMP
 
 LMUL Sensatitiy
-  Note that vmerge, vslideup, and vslidedown are likely to be O(LMUL) in cost.  As a result, these operations scale linearly with the vector LMUL.  If the index being extract is known to be in a smaller LMUL prefix or (for VLA code) a specific sub-register, using a smaller LMUL for the insert or extract is very likely profitable.
+  Note that vmerge, vslideup, and vslidedown are likely to be O(LMUL) in cost.  As a result, these operations scale linearly with the vector LMUL.  If the index being extract is known to be in a smaller LMUL prefix or (for VLS code) a specific sub-register, using a smaller LMUL for the insert or extract is very likely profitable.
 
 Non-Immediate Index
   All of the examples given are for immediate indices because these are by far the most common in practice.  You can write .vx forms of most of these, but there's no easy VLS or prefix optimizations available.
@@ -52,14 +52,10 @@ Non-Immediate Index
 Shuffles (Rearranging Elements)
 ===============================
 
-We have a bunch of known shuffles with lowerings which are better than general vrgather.  Eventually, we need to write all these down somewhere, but for now, here's simple a list of cases we can handle.  Check the output of clang, or ask around for details.
+We have a bunch of known shuffles with lowerings which are better than general vrgather.  A few that have native hardware support (see ISA manual):
 
 * Vector Select
 * Slide Up and Down
-* Element Bit Rotate (Reverse)
-* Vector Rotate
-* e256 w/VLA
-* Compress
 
 And a couple of generally useful tactics:
 
@@ -99,6 +95,13 @@ Assume the subvector you wish to splat is in the low elements of the vector, and
 For sizeof(subvec) < VLENB, use vslideup.vi to produce a 2x vector.  Repeat until next item applies.
 
 For sizeof(subvec) >= VLENB, use whole register moves to "splat" across as many VREGs as required.
+
+Vector Rotate
++++++++++++++
+
+::
+   vslidedown.vi v1, v2, <imm>
+   vslideup.vi v1, v2, <imm2>
 
 Vector Reverse
 ++++++++++++++
@@ -359,6 +362,13 @@ Unsigned (ABDU)::
   vmaxu.vv v8, v8, v9
   vsub.vv v8, v8, v10
 
+Element Wise Bit Rotate
++++++++++++++++++++++++
+
+Approaches:
+
+* vror.vi w/zvbb
+* vsll, vsrl and vor
 
 Reduction Variants
 ==================
