@@ -253,14 +253,8 @@ Deinterleave
 
 Interleave/Spread
 
-* For single source form, ZEXT for factors 2,4,8 where result type is legal.
 * implement zip proposals
 * bad matching of seg4 store case for store of deinterleave4.
-
-Repeat
-
-* Spread + masked slide?
-* Larger SEW vrgather for small sequences
 
 Register Pressure Reduction
 ===========================
