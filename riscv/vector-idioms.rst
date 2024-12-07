@@ -187,8 +187,13 @@ Then `interleave(2)` produces::
   a_0, b_0, a_1, b_1, ...
 
 .. code::
+
+   // (SEW <= 32 only)
+   vwaddu.vv vtmp, vs1, vs2
+   li a0, -1                        
+   vwmaccu.vx vtmp, a0, vs2
    
-   // (SEW <= 32 only, assuming zvbb)
+   // (SEW <= 32 only, with zvbb)
    vwsll.vi vd, vs1, sizeof(SEW)
    vwadd.wv vd, vd, vs2
 
@@ -328,6 +333,10 @@ Produce::
    // populate v0 = 101010...
    vslide1up.vx vtmp, vsrc, zero
    vslide1down.vx vtmp, vsrc, zero, v0
+
+   // SEW < 64 with zvbb
+   Toggle SEW=SrcSEW*2
+   vror.vi vsrc, vsrc, sizeof(sew)
 
    vslide1down.vx vtmp, vsrc, zero
    vzipeven.vv vtmp, vsrc, vtmp
