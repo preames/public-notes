@@ -4,6 +4,7 @@ Vector Idioms (nomenclature, and lowerings)
 
 This page is a dumping ground for notes on various idiomatic patterns which show up in vector code, and thoughts on how each idiom can be implemented in RVV (RISC-V Vector).  The primary purpose of this page is to provide a common reference for nomenclature.  A secondary purpose is so that I can remember ideas I've come up with before.
 
+.. contents::
 
 Inserts and Extracts
 ====================
