@@ -425,6 +425,14 @@ Mixed Width AccumSEW>SrcSEW::
 
   (The basic idea on the above is to do the multiply in the narrowest legal SEW, and delay promotion until after the reduction if possible.)
 
+AccumSEW=32, SrcSEW=8 (w/ the `proposed Zvqdotq extension <https://github.com/riscv/riscv-dot-product/>`_)::
+
+  vmv.v.x v3, zero
+  vmv.v.x v4, zero
+  vqdot.vv v3, v1, v2
+  vredsum.vs v3, v3, v4
+  vmv.x.s a0, v3
+  
 UInt4 Source::
 
   // Simple, but slightly slower
@@ -516,6 +524,13 @@ a[i] += b[i*2] + b[i*2 + 1] + b[i*2 + 2] + b[i*2 + 3]::
   v5 = deinterleave2(v2, 1) @ SrcSEW * 2
   vadd.vv v2, v4, v5 # NOT vwadd due to excess bits
   vwadd.wv v1, v1, v2 # accumulate
+
+AccumSEW=32, SrcSEW=8 (w/ the `proposed Zvqdotq extension <https://github.com/riscv/riscv-dot-product/>`_)::
+
+  lui/addi a0, <1,1,1,1>
+  vmv.v.x v3, zero
+  vqdot.vx v3, v1, a0
+
 
 Packed Horizontal Add (Octo) Accumulate
 ++++++++++++++++++++++++++++++++++++++++
