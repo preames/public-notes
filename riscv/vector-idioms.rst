@@ -120,19 +120,19 @@ Vector Reverse
 
 For m1, the naive strategy works just fine.
 
-.. code:: 
+.. code::
 
-  // VLA
+  vid.v v1
+  vrsub.vx/i v1, VL
+  vrgather.vv vd, vsrc, v1
+
+  // For VLA, can come from vsetvli in tail folded loop
+  // OR e.g.
   vid.v v1
   csrr t0, vlenb
   slli t0, log_2(SEW/8)
-  vrsub.vx v1, t0
-  vrgather.vv vd, vsrc, v1
 
-  // If exact VLEN is known, VLMAX is constant
-  vid.v v1
-  vrsub.vi v1, VLMAX
-  vrgather.vv vd, vsrc, v1
+  // For VLS (i.e. exact VLEN is known) then VL is a constant
 
 For m2 and above, we want to avoid an O(LMUL^2) vrgather.vv.  Our basic strategy will be:
 
@@ -212,6 +212,8 @@ Then `interleave(2)` produces::
    vrgatherei16.vv vd, vd, vtmp
 
 `interleave(N)` is defined in an analogous manner, but with a corresponding larger number of input registers.
+
+NOTE: This is describing the standalone shuffle.  If this operation is followed by a store, consider a segment store.
    
 Element Spread(N)
 +++++++++++++++++
@@ -284,6 +286,9 @@ Then `deinterleave(2)` produces::
 If you only need one of the sub-series, the above simplify in the obvious ways.
 
 You can also extend these approaches to more than two alternating sub-series.
+
+NOTE: This is describing the standalone shuffle.  If this operation follows a load, consider a segment load instead.
+
    
 Zip Even & Zip Odd
 ++++++++++++++++++
@@ -481,6 +486,7 @@ a[i] += b[i*2] + b[i*2 + 1]::
   // Extend if SrcSEW*2 != DstSEW
   vadd.vv v1, v4, v1
 
+If this operation follows a load, consider a segment load followed by a widening add.
 
 Packed Horizontal Add (Quads) Accumulate
 +++++++++++++++++++++++++++++++++++++++++++
