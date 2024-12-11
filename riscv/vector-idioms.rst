@@ -312,15 +312,32 @@ Then `zip_odd` produces::
    vand.vi vtmp, vtmp, 1
    vmseq.vi v0, vtmp, 0
    vmv1r vd, vs1
-   vslideup.vi   vd, vs2, 1, v0
+   vslideup.vi   vd, vs2, 1, v0.t
+
+   // 4 instructions SEW < 32
+   vs1 = deinterleave2(vs1, 0)
+   vs2 = deinterleave2(vs2, 0)
+   vd = interleave(vs1, vs2)
 
    // zip_odd
    vid.v vtmp
    vand.vi vtmp, vtmp, 1
    vmseq.vi v0, vtmp, 0
    vmv1r vd, vs2
-   vslideup.vi   vd, vs1, 1, v0
+   vslidedown.vi vd, vs1, 1, v0.t
 
+   // 4 instructions SEW < 32
+   vs1 = deinterleave2(vs1, 1)
+   vs2 = deinterleave2(vs2, 1)
+   vd = interleave(vs1, vs2)
+
+
+A few special cases:
+
+* With fixed length vectors < XLEN elements, the mask creation sequences above can be replaced with LUI/ADDI + vmv.s.x which is likely strictly preferable.
+* VL=1 zipeven is just an unmasked slideup.
+* If preceeded by a load, or followed by a store, the deinterleave/interleave scheme above may be folded into a segment load or store.
+   
 Adjacent Element Swap
 +++++++++++++++++++++
 
