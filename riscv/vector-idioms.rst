@@ -49,6 +49,50 @@ LMUL Sensitivity
 Non-Immediate Index
   All of the examples given are for immediate indices because these are by far the most common in practice.  You can write .vx forms of most of these, but there's no easy VLS or prefix optimizations available.
 
+Mask Creation and Manipulations
+===============================
+
+Small Constant Masks (VL < ELEN)
+--------------------------------
+
+For masks w/VL < ELEN, prefer creation of a scalar constant and insert
+into the low element of an ELEN vector for most cases.  e.g. 
+
+.. code::
+
+   // VL=4
+   vsetvli t0, x0, e8, m1, ta, ma
+   li t0, 0b1100
+   vmv.v.i v0, 0b0111
+
+   // VL=8
+   vsetvli t0, x0, e8, m1, ta, ma
+   li t0, 0b11100111
+   vmv.v.x v0, t0
+
+Repeating Masks
+---------------
+
+For a mask with a repeating sequence where the sequence length is a multiple
+of 8, use vmv.v.x or vmv.v.i and splat the pattern across all lanes of an m1
+vector.
+
+.. code::
+
+   // Even element mask
+   vsetvli t0, x0, e8, m1, ta, ma
+   li t0, 0b01010101
+   vmv.v.x v0, t0
+
+   // Odd element mask
+   vsetvli t0, x0, e8, m1, ta, ma
+   li t0, 0b10101010
+   vmv.v.x v0, t0
+
+   // Every 8th element
+   vsetvli t0, x0, e8, m1, ta, ma
+   vmv.v.x v0, 0b0001
+
 
 Shuffles (Rearranging Elements)
 ===============================
