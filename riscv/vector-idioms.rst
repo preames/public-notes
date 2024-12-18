@@ -347,8 +347,8 @@ Here's sequences for a `deinterleave(2,Offset)`.
 
 Notes:
 
- * The m1 sequence relies on the observation that only even elements are used from both registers in the m2 source register group, and that all of the required elements can fit within a m1 register with the right slide applied.
- * Note that the index vector described is a pain point with this sequence.  The sequence is shown with a load from constant pool, but for a VLA use case, an alternate sequence would be required.  I believe that can be done in 4-5 m1 instructions, but I haven't bothered to quite work it out as the cases I've looked at in practice all have fixed VLs. 
+* The m1 sequence relies on the observation that only even elements are used from both registers in the m2 source register group, and that all of the required elements can fit within a m1 register with the right slide applied.
+* Note that the index vector described is a pain point with this sequence.  The sequence is shown with a load from constant pool, but for a VLA use case, an alternate sequence would be required.  I believe that can be done in 4-5 m1 instructions, but I haven't bothered to quite work it out as the cases I've looked at in practice all have fixed VLs. 
 * For e64, m2 and m4, the same trick from m1 can be applied pairwise within the vector register group.  (Note that m8 is ill defined as described above.)
    
 Here's the code for the full `deinterleave(2)` shuffle:
