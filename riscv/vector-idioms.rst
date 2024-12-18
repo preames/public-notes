@@ -306,13 +306,51 @@ Approaches:
 Deinterleave (a.k.a. Unzip)
 +++++++++++++++++++++++++++
 
+There are two common variants of deinterleave.  The difference between them basically comes down to whether you want some subset of the lanes in individual registers, or if you want all of the lanes in a register (group) but reordered.  The former produces a result which is 1/Factor of the input size, the later produces an output equal to the input size.
+
 Given an input vector of the form::
   V1 = a_0, a_1, ..
 
-Then `deinterleave(2)` produces::
+Then the full `deinterleave(2)` produces::
   a_0, a_2, a_4, ..., a_1, a_3, a_5, ...
 
-(With variants that want the two sub-series in the same register, or two different output registers.)
+And `deinterleave(2,0)` produces::
+  a_0, a_2, a_4, ...
+
+Here's sequences for a `deinterleave(2,Offset)`.
+
+.. code::
+
+   // SEW <= 32 only (preferred sequence)
+   vnsrl.vi v2, v2, 0 // offset=0
+   vtmp = vnsrl.wi vs1, sizeof(SEW) // offset=1
+
+   vid.v v1
+   vsrl.vi v1, v1, 1
+   vrgather.vv v, v2, v1
+
+   li t0, 0b01010101
+   vmv.v.x v1, t0
+   vcompress.vv v3, v2, v0.t
+
+   // SEW = 64, result LMUL=m1  -- note that fractional LMUL ill defined for e64
+   vsetvli a0, zero, e64, m1, ta, mu
+   li t0, 0b10101010
+   vmv.v.x v0, t0
+   vslideup.vi v9, v8, 1, v0.t
+   vle16 v2, (a0) /// 0, 2, 4, ... 1, 3, 5, 7
+   vrgather.vv v8, v9, v2
+
+   // Note that the first three instructions after the vsetvli form a zipeven
+   // and the later two form a `deinterleave(2)` full shuffle.
+
+ Notes:
+
+ * The m1 sequence relies on the observation that only even elements are used from both registers in the m2 source register group, and that all of the required elements can fit within a m1 register with the right slide applied.
+ * Note that the index vector described is a pain point with this sequence.  The sequence is shown with a load from constant pool, but for a VLA use case, an alternate sequence would be required.  I believe that can be done in 4-5 m1 instructions, but I haven't bothered to quite work it out as the cases I've looked at in practice all have fixed VLs. 
+* For e64, m2 and m4, the same trick from m1 can be applied pairwise within the vector register group.  (Note that m8 is ill defined as described above.)
+   
+Here's the code for the full `deinterleave(2)` shuffle:
 
 .. code::
 
@@ -321,18 +359,23 @@ Then `deinterleave(2)` produces::
    vtmp = vnsrl.wi vs1, 0
    vslideup.vi vd, vtmp, VL/2
 
-   // (SEW = 64)
+   // SEW = 64, LMUL = m1
+   vle16 v2, (a0) /// 0, 2, 4, ... 1, 3, 5, 7
+   vrgather.vv vd, vs1, v2
+   
+   // SEW = 64, LMUL > m1
    v0 = {1010..}
    vcompress.vm vd, vs1, v0
    vmnot v0, v0 // {0101..}
    vcompress.vm vtmp, vs1, v0
    vslideup.vi vd, vtmp, VL/2
 
-If you only need one of the sub-series, the above simplify in the obvious ways.
+   // SEW = 64, LMUL > m1 (preferred)
+   // This formation allows the splitting as above, which means this is O(2*LMUL)
+   concat_vector(deinterleave(2,0), deinterleave(2,0))
+   
 
 You can also extend these approaches to more than two alternating sub-series.
-
-NOTE: This is describing the standalone shuffle.  If this operation follows a load, consider a segment load instead.
 
    
 Zip Even & Zip Odd
@@ -352,11 +395,9 @@ Then `zip_odd` produces::
 .. code::
 
    // zip_even
-   vid.v vtmp
-   vand.vi vtmp, vtmp, 1
-   vmseq.vi v0, vtmp, 0
-   vmv1r vd, vs1
-   vslideup.vi   vd, vs2, 1, v0.t
+   li t0, 0b10101010
+   vmv.v.x v0, t0
+   vslideup.vi   vs1, vs2, 1, v0.t
 
    // 4 instructions SEW < 32
    vs1 = deinterleave2(vs1, 0)
@@ -364,11 +405,9 @@ Then `zip_odd` produces::
    vd = interleave(vs1, vs2)
 
    // zip_odd
-   vid.v vtmp
-   vand.vi vtmp, vtmp, 1
-   vmseq.vi v0, vtmp, 0
-   vmv1r vd, vs2
-   vslidedown.vi vd, vs1, 1, v0.t
+   li t0, 0b01010101
+   vmv.v.x v0, t0
+   vslidedown.vi vs2, vs1, 1, v0.t
 
    // 4 instructions SEW < 32
    vs1 = deinterleave2(vs1, 1)
