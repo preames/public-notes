@@ -344,7 +344,8 @@ Here's sequences for a `deinterleave(2,Offset)`.
    // Note that the first three instructions after the vsetvli form a zipeven
    // and the later two form a `deinterleave(2)` full shuffle.
 
- Notes:
+
+Notes:
 
  * The m1 sequence relies on the observation that only even elements are used from both registers in the m2 source register group, and that all of the required elements can fit within a m1 register with the right slide applied.
  * Note that the index vector described is a pain point with this sequence.  The sequence is shown with a load from constant pool, but for a VLA use case, an alternate sequence would be required.  I believe that can be done in 4-5 m1 instructions, but I haven't bothered to quite work it out as the cases I've looked at in practice all have fixed VLs. 
@@ -362,7 +363,7 @@ Here's the code for the full `deinterleave(2)` shuffle:
    // SEW = 64, LMUL = m1
    vle16 v2, (a0) /// 0, 2, 4, ... 1, 3, 5, 7
    vrgather.vv vd, vs1, v2
-   
+
    // SEW = 64, LMUL > m1
    v0 = {1010..}
    vcompress.vm vd, vs1, v0
@@ -373,7 +374,6 @@ Here's the code for the full `deinterleave(2)` shuffle:
    // SEW = 64, LMUL > m1 (preferred)
    // This formation allows the splitting as above, which means this is O(2*LMUL)
    concat_vector(deinterleave(2,0), deinterleave(2,0))
-   
 
 You can also extend these approaches to more than two alternating sub-series.
 
