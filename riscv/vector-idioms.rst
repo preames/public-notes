@@ -53,7 +53,7 @@ Mask Creation and Manipulations
 ===============================
 
 Small Constant Masks (VL < ELEN)
---------------------------------
+++++++++++++++++++++++++++++++++
 
 For masks w/VL < ELEN, prefer creation of a scalar constant and insert
 into the low element of an ELEN vector for most cases.  e.g. 
@@ -71,7 +71,7 @@ into the low element of an ELEN vector for most cases.  e.g.
    vmv.v.x v0, t0
 
 Repeating Masks
----------------
++++++++++++++++
 
 For a mask with a repeating sequence where the sequence length is a multiple
 of 8, use vmv.v.x or vmv.v.i and splat the pattern across all lanes of an m1
