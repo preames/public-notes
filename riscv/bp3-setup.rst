@@ -88,7 +88,7 @@ Do the following:
    ./jevents.py riscv arch pmu-events.c
    popd
    sudo apt install libelf-dev libdw-dev flex bison
-   sudo make -C tools/ NO_LIBBPF=1 prefix=/usr/local/ perf_install
+   sudo make -C tools/ NO_LIBBPF=1 WERROR=0 prefix=/usr/local/ perf_install
 
 These instructions are inspired by `this blog post <https://dev.to/luzero/bringing-up-bpi-f3-part-25-27o4>`_.  Note that I'm running on the  `bianbu-23.10-desktop-k1-v1.0rc3-release-20240525133016` image, and that the default counter names appear to work for me in `perf stat`.  The synthetic `instructions` and `cycles` events do not work with `perf record`.  Reasonable proxies are `inst_issues` and `m_mode_cycles`.  
 
