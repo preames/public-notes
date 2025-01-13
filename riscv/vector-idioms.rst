@@ -93,6 +93,10 @@ vector.
    vsetvli t0, x0, e8, m1, ta, ma
    vmv.v.x v0, 0b0001
 
+Arithmetic Tricks
++++++++++++++++++
+
+There are many common arithmetic idioms for creating bit patterns which involve add/sub. (e.g. see Hacker's Delight)  Without an add/sub instruction which operates at full mask width, these can be hard to adapt.  For masks less than ELEN, element wise operations can be used.  For masks greater than ELEN, add and subtract can be emulated at reasonable cost (see below) for 128b and (maybe) e256.  Emulating for fully generic VLA sequences is possible, but quite expensive.
 
 Shuffles (Rearranging Elements)
 ===============================
@@ -496,6 +500,19 @@ Approaches:
 
 * vror.vi w/zvbb
 * vsll, vsrl and vor
+
+e128 Vector Arithmetic
+++++++++++++++++++++++
+
+For add (subtract), the following strategy can be used:
+
+* vmadc (vsbc), then mask out odd lanes via vmand
+* left shift carry mask by one bit
+* vadc (vsbc)
+
+Alternatively, you can shift the source vector down by one element, and then the result of vadc (vsbc) up by one to avoid the (possibly expensive) mask shift.
+
+The basic idea can be extended to e256, e512, etc... with more rounds
 
 Reduction Variants
 ==================
