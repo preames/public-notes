@@ -96,7 +96,16 @@ vector.
 Arithmetic Tricks
 +++++++++++++++++
 
-There are many common arithmetic idioms for creating bit patterns which involve add/sub. (e.g. see Hacker's Delight)  Without an add/sub instruction which operates at full mask width, these can be hard to adapt.  For masks less than ELEN, element wise operations can be used.  For masks greater than ELEN, add and subtract can be emulated at reasonable cost (see below) for 128b and (maybe) e256.  Emulating for fully generic VLA sequences is possible, but quite expensive.
+There are many common arithmetic idioms for creating bit patterns which involve add/sub. (e.g. see Hacker's Delight)  Without an add/sub instruction which operates at full mask width, these can be hard to adapt.  For masks less than ELEN, element wise operations can be used.  For masks greater than ELEN, add and subtract can be emulated at reasonable cost (see below) for 128b and (maybe) e256.  Emulating for fully generic VLA sequences is possible, but quite expensive as there is a large bound on propagation distance and thus number of required rounds.
+
+Useful Applications
+
+* x & -x for isolating right most set bit (use a masked reduction to extract that element)
+* !x + (x + 1) for setting only the right most zero bit.  For 0...1 style masks, combine with a logical not to get left most active lane.
+* Given 000..111 mask, negating above gives leftmost inactive bit.
+* x + x can be used to perform a left shift by one of a mask (which is otherwise hard).
+
+(These idioms are either well known, or from Hacker's Delight.)
 
 Shuffles (Rearranging Elements)
 ===============================
