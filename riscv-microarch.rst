@@ -27,6 +27,8 @@ WikiChip. `<https://en.wikichip.org/wiki/sifive>`_ -- Some information on the va
 
 "SiFive U74 Core Complex Manual". `<https://sifive.cdn.prismic.io/sifive/ad5577a0-9a00-45c9-a5d0-424a3d586060_u74_core_complex_manual_21G3.pdf>`_
 
+Inside SiFive’s P550 Microarchitecture https://chipsandcheese.com/p/inside-sifives-p550-microarchitecture
+
 SemiDynamics
 ------------
 
