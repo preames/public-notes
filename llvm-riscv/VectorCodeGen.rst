@@ -246,7 +246,7 @@ Shuffle Idioms during Lowering
 
 Deinterleave
 
-* Implement unzip proposals
+* Implement unzip proposals.  Note widening.
 * Avoid splitting with slidedown eagerly?  Or should we canonicalize in that direction?
 * for power-of-twos, can divide source registers (even VLA) and then slideup results.  Need to know register size is a multiple of factor.
 * Overlapping slide and select - all active elements in prefix, then shuffle that if needed.  2 linear + small shuffle.  VLA forms just require some adjusted slide amounts, and a complicated shuffle mask
@@ -256,8 +256,22 @@ Interleave/Spread
 * implement zip proposals
 * bad matching of seg4 store case for store of deinterleave4.
 
+VLA Idioms
+
+* Any two elements (e.g 0, 2, 0, 2, 2, 2, 0, 0) can be done as a pair of vrgather.vi.
+* See deinterleave(2) idea above.  Can also be generalized for vcompress (by sliding down mask, and then sliding up result).
+* Span Local, but non-repeating - via slidedown on the index vector - has a known source.  (Surely we can generalize this logic)
+* Reverse with undef prefix (e.g. -1, -1, -1, -1, 1, 0) can be done as low LMUL, then single slide.  Only linear savings, but still useful.
+
+Bias DAG combine via isShuffleMaskLegal.  See also the TTI stuff below to do the same with IR input.
+
+BSWAP interactions - can we untangle this a bit?
+
+
 Register Pressure Reduction
 ===========================
+
+Not setting isCheapAsAMove, canRemat, and isCopy properly on all instructions, go through and fix that up.  Check the other flags to see if any are useful.
 
 Investigate subregister extract feeding widening instruction.  Can we narrow to begin with, or at least improve the spill/fill to be narrower width?  Might be a schedule bias towards putting the extract close to def?  Consider remat of subvector extract of rematable?
 

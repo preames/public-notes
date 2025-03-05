@@ -122,3 +122,16 @@ Investigate full rematerialization.
 Investigate negated compound branch thing reported 2024-11-24 on discourse.
 
 
+Disjoint OR
+-----------
+
+(From an older list of notes, may be stale.)
+
+* SelectAddrRegScale
+* the addw thing
+* SelectAddrRegImm (the large offset cases)
+* SelectAdd/RegReg
+* SelectShiftMask
+* In GEP AddrMatch
+
+
