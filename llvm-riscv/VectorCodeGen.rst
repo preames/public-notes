@@ -274,3 +274,14 @@ Implement foldMemoryOperand for sub-vector insert.  Example code to improve::
   vmv4r.v   v12, v16
 
 Note that in some examples, we could improve the store to only spill half of the vector type, but that seems to be a decently large change and generic codegen doesn't seem to have support for it already (which is slightly odd).
+
+
+TTI getShuffleCost
+==================
+
+* VLS two register case (during splitting) can be modeled as a single vrgather + masking.  Have to undo the mask rewriting done processShuffleMask.  No current profitable test case.
+* Need to model various one source shuffles.
+* Likely need to extract some kind of "classifyShuffle" routine for use in both TLI and TTI.  Needs to integrate both cost and legality which is really annoying.
+* Need to revisit length changing shuffles - getInstructionCost doesn't allow them, but SLP *does*.
+  
+  
