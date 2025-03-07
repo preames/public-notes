@@ -98,6 +98,7 @@ Tentative conclusions:
 As an aside, note that MachineSink will also do rematerialization directly into a physical register (via PerformSinkAndFold).  However, this one does require that the original instruction be removeable, and isn't problematic in the same way as above.  In at least one case, I did see it expose a problem in VLOptimizer.  The symbom in VLOptimizer was that we failed following assert because we had a physical register not a virtual one.
 
 .. code::
+
    assert(MI.getOperand(0).isReg() &&
           isVectorRegClass(MI.getOperand(0).getReg(), MRI) &&
           "All supported instructions produce a vector register result");
