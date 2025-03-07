@@ -14,6 +14,7 @@ If you are a new contributor looking for ideas, you're welcome to review these n
 I've been looking at adding isAsCheapAsAMove to a few vector instructions, and ran into a bit of weirdness around rematerialization.  I think this might apply to the scalar side as well.  This is currently triggered by the following diff:
 
 .. code::
+   
    diff --git a/llvm/lib/Target/RISCV/RISCVInstrInfo.cpp b/llvm/lib/Target/RISCV/RISCVInstrInfo.cpp
    index f767223f96cd..c99280a7b29b 100644
    --- a/llvm/lib/Target/RISCV/RISCVInstrInfo.cpp
