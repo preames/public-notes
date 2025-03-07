@@ -52,6 +52,10 @@ Next from the debug-only=isel trace:
 
 .. code::
 
+   selectOrSplit VR:%4 [32r,2208r:0) 0@32r  weight:1.058618e-02
+   hints: $v0
+   assigning %4 to $v0: V0 [32r,2208r:0) 0@32r
+   ...
    selectOrSplit VRM8NoV0:%66 [2080r,2112r:0) 0@2080r  weight:4.629630e-03
    assigning %66 to $v16m8: V16 [2080r,2112r:0) 0@2080r V17 [2080r,2112r:0) 0@2080r V18 [2080r,2112r:0) 0@2080r V19 [2080r,2112r:0) 0@2080r V20 [2080r,2112r:0) 0@2080r V21 [2080r,2112r:0) 0@2080r V22 [2080r,2112r:0) 0@2080r V23 [2080r,2112r:0) 0@2080r
    ...
