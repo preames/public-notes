@@ -13,70 +13,70 @@ If you are a new contributor looking for ideas, you're welcome to review these n
 
 I've been looking at adding isAsCheapAsAMove to a few vector instructions, and ran into a bit of weirdness around rematerialization.  I think this might apply to the scalar side as well.  This is currently triggered by the following diff:
 
-diff --git a/llvm/lib/Target/RISCV/RISCVInstrInfo.cpp b/llvm/lib/Target/RISCV/RISCVInstrInfo.cpp
-index f767223f96cd..c99280a7b29b 100644
---- a/llvm/lib/Target/RISCV/RISCVInstrInfo.cpp
-+++ b/llvm/lib/Target/RISCV/RISCVInstrInfo.cpp
-@@ -1649,6 +1649,14 @@ bool RISCVInstrInfo::isAsCheapAsAMove(const MachineInstr &MI) const {
-             MI.getOperand(1).getReg() == RISCV::X0) ||
-            (MI.getOperand(2).isImm() && MI.getOperand(2).getImm() == 0);
-   }
-+
-+  switch (RISCV::getRVVMCOpcode(MI.getOpcode())) {
-+  default:
-+    break;
-+  case RISCV::VID_V:
-+    return MI.getOperand(1).isUndef();
-+  }
-+
-   return MI.isAsCheapAsAMove();
- }
- 
-diff --git a/llvm/lib/Target/RISCV/RISCVInstrInfoVPseudos.td b/llvm/lib/Target/RISCV/RISCVInstrInfoVPseudos.td
-index 6d3c005583c2..e5728afe18ea 100644
---- a/llvm/lib/Target/RISCV/RISCVInstrInfoVPseudos.td
-+++ b/llvm/lib/Target/RISCV/RISCVInstrInfoVPseudos.td
-@@ -6686,7 +6686,7 @@ defm PseudoVIOTA_M: VPseudoVIOTA_M;
- //===----------------------------------------------------------------------===//
- // 15.9. Vector Element Index Instruction
- //===----------------------------------------------------------------------===//
--let isReMaterializable = 1 in
-+let isReMaterializable = 1, isAsCheapAsAMove = 1 in
- defm PseudoVID : VPseudoVID_V;
- } // Predicates = [HasVInstructions]
- 
+   diff --git a/llvm/lib/Target/RISCV/RISCVInstrInfo.cpp b/llvm/lib/Target/RISCV/RISCVInstrInfo.cpp
+   index f767223f96cd..c99280a7b29b 100644
+   --- a/llvm/lib/Target/RISCV/RISCVInstrInfo.cpp
+   +++ b/llvm/lib/Target/RISCV/RISCVInstrInfo.cpp
+   @@ -1649,6 +1649,14 @@ bool RISCVInstrInfo::isAsCheapAsAMove(const MachineInstr &MI) const {
+                MI.getOperand(1).getReg() == RISCV::X0) ||
+               (MI.getOperand(2).isImm() && MI.getOperand(2).getImm() == 0);
+      }
+   +
+   +  switch (RISCV::getRVVMCOpcode(MI.getOpcode())) {
+   +  default:
+   +    break;
+   +  case RISCV::VID_V:
+   +    return MI.getOperand(1).isUndef();
+   +  }
+   +
+      return MI.isAsCheapAsAMove();
+    }
 
-diff --git a/llvm/test/CodeGen/RISCV/rvv/stepvector.ll b/llvm/test/CodeGen/RISCV/rvv/stepvector.ll
-index 62339130678d..64b4ce0ecdad 100644
---- a/llvm/test/CodeGen/RISCV/rvv/stepvector.ll
-+++ b/llvm/test/CodeGen/RISCV/rvv/stepvector.ll
-@@ -533,13 +533,14 @@ define <vscale x 16 x i64> @stepvector_nxv16i64() {
- ; RV32-NEXT:    addi sp, sp, -16
- ; RV32-NEXT:    .cfi_def_cfa_offset 16
- ; RV32-NEXT:    csrr a0, vlenb
-+; RV32-NEXT:    addi a1, sp, 8
- ; RV32-NEXT:    sw a0, 8(sp)
- ; RV32-NEXT:    sw zero, 12(sp)
--; RV32-NEXT:    addi a0, sp, 8
--; RV32-NEXT:    vsetvli a1, zero, e64, m8, ta, ma
--; RV32-NEXT:    vlse64.v v16, (a0), zero
-+; RV32-NEXT:    vsetvli a0, zero, e64, m8, ta, ma
-+; RV32-NEXT:    vlse64.v v8, (a1), zero
-+; RV32-NEXT:    vid.v v16
-+; RV32-NEXT:    vadd.vv v16, v16, v8
- ; RV32-NEXT:    vid.v v8
--; RV32-NEXT:    vadd.vv v16, v8, v16
- ; RV32-NEXT:    addi sp, sp, 16
- ; RV32-NEXT:    .cfi_def_cfa_offset 0
- ; RV32-NEXT:    ret
-@@ -550,6 +551,7 @@ define <vscale x 16 x i64> @stepvector_nxv16i64() {
- ; RV64-NEXT:    vsetvli a1, zero, e64, m8, ta, ma
- ; RV64-NEXT:    vid.v v8
- ; RV64-NEXT:    vadd.vx v16, v8, a0
-+; RV64-NEXT:    vid.v v8
- ; RV64-NEXT:    ret
-   %v = call <vscale x 16 x i64> @llvm.stepvector.nxv16i64()
-   ret <vscale x 16 x i64> %v
+   diff --git a/llvm/lib/Target/RISCV/RISCVInstrInfoVPseudos.td b/llvm/lib/Target/RISCV/RISCVInstrInfoVPseudos.td
+   index 6d3c005583c2..e5728afe18ea 100644
+   --- a/llvm/lib/Target/RISCV/RISCVInstrInfoVPseudos.td
+   +++ b/llvm/lib/Target/RISCV/RISCVInstrInfoVPseudos.td
+   @@ -6686,7 +6686,7 @@ defm PseudoVIOTA_M: VPseudoVIOTA_M;
+    //===----------------------------------------------------------------------===//
+    // 15.9. Vector Element Index Instruction
+    //===----------------------------------------------------------------------===//
+   -let isReMaterializable = 1 in
+   +let isReMaterializable = 1, isAsCheapAsAMove = 1 in
+    defm PseudoVID : VPseudoVID_V;
+    } // Predicates = [HasVInstructions]
+
+
+   diff --git a/llvm/test/CodeGen/RISCV/rvv/stepvector.ll b/llvm/test/CodeGen/RISCV/rvv/stepvector.ll
+   index 62339130678d..64b4ce0ecdad 100644
+   --- a/llvm/test/CodeGen/RISCV/rvv/stepvector.ll
+   +++ b/llvm/test/CodeGen/RISCV/rvv/stepvector.ll
+   @@ -533,13 +533,14 @@ define <vscale x 16 x i64> @stepvector_nxv16i64() {
+    ; RV32-NEXT:    addi sp, sp, -16
+    ; RV32-NEXT:    .cfi_def_cfa_offset 16
+    ; RV32-NEXT:    csrr a0, vlenb
+   +; RV32-NEXT:    addi a1, sp, 8
+    ; RV32-NEXT:    sw a0, 8(sp)
+    ; RV32-NEXT:    sw zero, 12(sp)
+   -; RV32-NEXT:    addi a0, sp, 8
+   -; RV32-NEXT:    vsetvli a1, zero, e64, m8, ta, ma
+   -; RV32-NEXT:    vlse64.v v16, (a0), zero
+   +; RV32-NEXT:    vsetvli a0, zero, e64, m8, ta, ma
+   +; RV32-NEXT:    vlse64.v v8, (a1), zero
+   +; RV32-NEXT:    vid.v v16
+   +; RV32-NEXT:    vadd.vv v16, v16, v8
+    ; RV32-NEXT:    vid.v v8
+   -; RV32-NEXT:    vadd.vv v16, v8, v16
+    ; RV32-NEXT:    addi sp, sp, 16
+    ; RV32-NEXT:    .cfi_def_cfa_offset 0
+    ; RV32-NEXT:    ret
+   @@ -550,6 +551,7 @@ define <vscale x 16 x i64> @stepvector_nxv16i64() {
+    ; RV64-NEXT:    vsetvli a1, zero, e64, m8, ta, ma
+    ; RV64-NEXT:    vid.v v8
+    ; RV64-NEXT:    vadd.vx v16, v8, a0
+   +; RV64-NEXT:    vid.v v8
+    ; RV64-NEXT:    ret
+      %v = call <vscale x 16 x i64> @llvm.stepvector.nxv16i64()
+      ret <vscale x 16 x i64> %v
 
 
 The whole rest of this is triggered by the question "Why do we duplicate the vid.v at the end of the RV64 check"?  This doesn't appear to be profitable.  We're just increasing dynamic instruction count with no benefit.
