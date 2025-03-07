@@ -53,7 +53,7 @@ Next from the debug-only=isel trace:
 .. code::
 
    selectOrSplit VRM8NoV0:%66 [2080r,2112r:0) 0@2080r  weight:4.629630e-03
-assigning %66 to $v16m8: V16 [2080r,2112r:0) 0@2080r V17 [2080r,2112r:0) 0@2080r V18 [2080r,2112r:0) 0@2080r V19 [2080r,2112r:0) 0@2080r V20 [2080r,2112r:0) 0@2080r V21 [2080r,2112r:0) 0@2080r V22 [2080r,2112r:0) 0@2080r V23 [2080r,2112r:0) 0@2080r
+   assigning %66 to $v16m8: V16 [2080r,2112r:0) 0@2080r V17 [2080r,2112r:0) 0@2080r V18 [2080r,2112r:0) 0@2080r V19 [2080r,2112r:0) 0@2080r V20 [2080r,2112r:0) 0@2080r V21 [2080r,2112r:0) 0@2080r V22 [2080r,2112r:0) 0@2080r V23 [2080r,2112r:0) 0@2080r
    ...
    evicting $v16m8 interference: Cascade 12
    unassigning %66 from $v16m8: V16 V17 V18 V19 V20 V21 V22 V23
