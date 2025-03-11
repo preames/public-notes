@@ -109,6 +109,14 @@ Next from the debug-only=isel trace:
 
 
 I'm very suspicious of the decisinn to split here.  I suspect (but have no fully convinced myself) that this is related to the "undef" tied def.  I think that's being treated as a use of %66, which seems inappropriate.  We split, and then immediate spill and fold the copy into the reload.
+
+However, disabling that heuristic (via an #ifdef in local code) causes no change in the behavior.  We still fall through into the spilling logic and have exactly the same result.
+
+Observations:
+
+* We could try some kind of local redundant copy elimination - however doing so exposes either a) a bunch of rescheduling or b) if the scheduling is restricted allocation failures for FMAs.  We really do need vmv0 to survive into register allocation...
+* The particular case being seen is compounded by a bad scheduling decision.  We're reordering the vlse before the vsrl/vadd sequence, thus greatly increasing register presure through the sequence.  This is a suspicious scheduling choice, but is mostly likely due to the issue in https://github.com/llvm/llvm-project/pull/126608 (which I really need to get back to.)
+* For this particular example, we could use a vmv.v.x instead of the vlse.  This would help due to remat support.  See https://github.com/llvm/llvm-project/pull/130530.  This is a narrow fix for this issue, not a root issue.
    
 
 2025-03-06, isAsCheapAsAMove and Remat
@@ -207,3 +215,82 @@ As an aside, note that MachineSink will also do rematerialization directly into 
           "All supported instructions produce a vector register result");
 
 I went back to extract a reproducer, and things had shifted enough I couldn't easily reproduce.  I don't know the issue has been fixed
+
+
+2025-03-10, Spill and Immediate Refill continued
+------------------------------------------------
+
+Picking up from above, with a new test case as the vmv.v.x change "fixed"
+the prior one.
+
+.. code::
+
+   define <vscale x 16 x double> @vp_round_nxv16f64(<vscale x 16 x double> %va, <vscale x 16 x i1> %m, i32 zeroext %evl) {
+     %v = call <vscale x 16 x double> @llvm.vp.round.nxv16f64(<vscale x 16 x double> %va, <vscale x 16 x i1> %m, i32 %evl)
+     ret <vscale x 16 x double> %v
+   }
+
+Tracing through the print-after-all and debug-only=regalloc, the interesting
+bit in this one is:
+
+.. code::
+
+   selectOrSplit VRM8NoV0:%24 [48r,560r:0)[560r,912r:1) 0@48r 1@560r  weight:4.794304e-03
+   hints: $v16m8
+   assigning %24 to $v16m8: V16 [48r,560r:0)[560r,912r:1) 0@48r 1@560r V17 [48r,560r:0)[560r,912r:1) 0@48r 1@560r V18 [48r,560r:0)[560r,912r:1) 0@48r 1@560r V19 [48r,560r:0)[560r,912r:1) 0@48r 1@560r V20 [48r,560r:0)[560r,912r:1) 0@48r 1@560r V21 [48r,560r:0)[560r,912r:1) 0@48r 1@560r V22 [48r,560r:0)[560r,912r:1) 0@48r 1@560r V23 [48r,560r:0)[560r,912r:1) 0@48r 1@560r
+
+   selectOrSplit VRM8NoV0:%36 [64r,880r:0)[880r,896r:1) 0@64r 1@880r  weight:4.918831e-03
+   hints: $v8m8
+   assigning %36 to $v8m8: V8 [64r,880r:0)[880r,896r:1) 0@64r 1@880r V9 [64r,880r:0)[880r,896r:1) 0@64r 1@880r V10 [64r,880r:0)[880r,896r:1) 0@64r 1@880r V11 [64r,880r:0)[880r,896r:1) 0@64r 1@880r V12 [64r,880r:0)[880r,896r:1) 0@64r 1@880r V13 [64r,880r:0)[880r,896r:1) 0@64r 1@880r V14 [64r,880r:0)[880r,896r:1) 0@64r 1@880r V15 [64r,880r:0)[880r,896r:1) 0@64r 1@880r
+
+   selectOrSplit VR:%30 [32r,736e:0)[736e,848r:1) 0@32r 1@736e  weight:7.475329e-03
+   hints: $v0
+   missed hint $v0
+   Analyze counted 8 instrs in 2 blocks, through 1 blocks.
+   $v0	no positive bundles
+   assigning %30 to $v24: V24 [32r,736e:0)[736e,848r:1) 0@32r 1@736e
+
+   selectOrSplit VR:%18 [288r,416e:0)[416e,528r:1) 0@288r 1@416e  weight:1.262500e-02
+   hints: $v0
+   missed hint $v0
+   Analyze counted 7 instrs in 1 blocks, through 0 blocks.
+   $v0	no positive bundles
+   assigning %18 to $v25: V25 [288r,416e:0)[416e,528r:1) 0@288r 1@416e
+
+   ...
+   
+   selectOrSplit VRM8NoV0:%14 [368r,416r:0) 0@368r  weight:4.464286e-03
+   RS_Split Cascade 0
+   Analyze counted 2 instrs in 1 blocks, through 0 blocks.
+   Inline spilling VRM8NoV0:%14 [368r,416r:0) 0@368r  weight:4.464286e-03
+   From original %14
+   Merged spilled regs: SS#0 [368r,416r:0) 0@x  weight:0.000000e+00
+   spillAroundUses %14
+       rewrite: 368r	%49:vrm8nov0 = PseudoVFSGNJX_VV_M8_E64_MASK undef %49:vrm8nov0(tied-def 0), %24:vrm8nov0, %24:vrm8nov0, $v0, %13:gprnox0, 6, 3
+
+       spill:   376r	VS8R_V killed %49:vrm8nov0, %stack.0 :: (store unknown-size into %stack.0, align 8)
+       reload:   392r	%50:vrm8nov0 = VL8RE8_V %stack.0 :: (load unknown-size from %stack.0, align 8)
+       rewrite: 416r	early-clobber %18:vr = nofpexcept PseudoVMFLT_VFPR64_M8_MASK %18:vr(tied-def 0), killed %50:vrm8nov0, %17:fpr64, $v0, %13:gprnox0, 6, 1
+
+   Inflated %50 to VRM8
+   queuing new interval: %49 [368r,376r:0) 0@368r  weight:INF
+   Enqueuing %49
+   queuing new interval: %50 [392r,416r:0) 0@392r  weight:INF
+   Enqueuing %50
+
+Note that this is with tryInstructionSplit disabled due to the same red-herring
+as above.
+
+Interesting observations here:
+
+* It's surprising that neither v24 or v25 can be assigned to v0.  Looking at the MIR, this comes down a vmflt with both a mask and tied use.  We have the def marked early clobber (required to avoid overlap with the vector source), but the overlap rules for this instruction *do* allow overlap with v0.  Craig had previously suggested adding another pseudo for this case, and this seems worthwhile here.
+* The major point is why didn't we evict the v24, and v25?  The answer to that comes down to spill weight.  We don't think the m8 for %14 costs enough to be worth evicting the two m1 values - despite the fact they can be freely reassigned.
+* There's two sub-issues in that.  The first is that our spill weights are not accouting for the true cost of spilling the vector register group.  I mocked up a local patch, but finally realized I'd rediscovered https://github.com/llvm/llvm-project/pull/113675.
+* The second is that eviction doesn't appear to be taking the "cost" of the eviction into account.  This particular case, we can reassign as zero cost and thus should probably adjust the allocation for *any* other blocked allocation.  It's odd we don't do that.
+* In terms of allocation order, there's also a question of why we assigned v24, v25 and not say v7, v6.  I believe this simply comes down to the allocation order we chose for m1, which tries to avoid fragmenting the first register in each register group.  Maybe we tried a bit too hard there?  Or should use a different allocation if we know that v0-v7 is already fragamented?  (via a v0 use for instance...)
+* In a different take, I'm not sure that all the masking here is functionally required.  I thought in the default C environment, we had some freedom on when NaNs were reported.  Maybe we could loosen some constraints here?
+
+As an aside, when looking at the diff from the spill weights change, I noticed that explode_16x64 had a case where we're extracting the low element of a m8 vsrl.  It looks like we could reduce the width of shift to m1.  I might have missed an extra use though; I didn't look too hard.
+
+
+  
