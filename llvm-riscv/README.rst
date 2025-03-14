@@ -293,4 +293,31 @@ Interesting observations here:
 As an aside, when looking at the diff from the spill weights change, I noticed that explode_16x64 had a case where we're extracting the low element of a m8 vsrl.  It looks like we could reduce the width of shift to m1.  I might have missed an extra use though; I didn't look too hard.
 
 
-  
+2025-03-14, Re-analysis of above
+--------------------------------
+
+After the spill weight and vmv.v.x on rv32 changes, taking a new look at the previous test cases.
+
+vp_round_nxv16f64 is much improved.  It still has the vmflt issue, and we should pick that off and fix it just for code quality.  (i.e. we end up with some redundant mask copies for no purpose.)  The likely scheme involves an additional pseudo for this case.  
+
+vp_ctlz_v32i64 is much improved on rv64, but still shows a bunch of spilling on rv32.  The interesting cases are all triggered by performing SEW64 operations on rv32 and thus being unable to use .vx forms for most things.  Some observations from that one:
+
+* The value we're and-ing by is a byte mask - that is, it's conditionally zeroing individual bytes.  It's also repeating i32 halves.  As a result, we could avoid the vmv.v.x entirely by either switching VTYPE to SEW8 and using a vmerge.vxm w/zero and different mask, or by switching to SEW32 and using half the mask.  Note that the later would allow use of the .vx form.  Either of these might be worthwhile, but are rv32 specific optimizations.  On rv64, the vtype toggle probably isn't worth the two scalar instructions saved.
+* There's a rematerialization issue with the vmv.v.x at SEW64.  Why isn't the vmv.v.x being rematerialized?  Spilling (the current behavior) is definitely net worse.   More on this below.
+
+Tracing through the the InlineSpiller, and LiveRangeEdit, the thing that's preventing the rematerialization is that the GPRs operand to the vmv.v.x has a very short live range.  LiveRangeEdit checks in allUsesAvailableAt that the VNI at the use site matches the definition, and in this case, there is no VNI for the use site.  This is "correct", but a bit odd given that a) this is during vector regalloc, and b) the scalar statically dominates the use site.  If I relax this check in a hack, this test case does rematerialize properly.
+
+Ideas:
+
+* Special case registers which aren't in the register classes currently being allocated in split register allocation?  Would fix the vmv.v.x case, but feels a bit suspect.  Does require callers to update liveness.  Another approach, but still restricted to split alloc, is to spurious extend all the scalar ranges before vector regalloc, and then shrink to uses afterwards.
+* Allow extending liveness for vregs only.  Doing this is fairly trivial, but it means remat is allocation order sensative.
+* Extend vregs and previously allocated registers with no-use of the register before the new use.  Partially solves the allocation order problem, but only partly.  (The result might be more optimal if the GPR is reallocated to a different register.)
+* In this example, the scalar instruction is itself rematerializable.  Instead of updating liveness, we could force materialize the scalar sequence?  Doing that doesn't actually look to hard in the existing interface.  However, there's definitely a profitability question here.  On the other hand, the general ability to remat multiple instruction sequences (e.g. LUI/ADDI) seems super useful...
+
+Other off topic observations:
+
+* The use of masking in this entire sequence is questionable.  We could instead do a single mask at the end to preserve the lanes in the passthru.  This would reduce the register pressure through the sequence by one m8 register, which would help slightly with the remat problems.  However, in the rv64 case the masking happens to work out well, and we'd actually introduce 2 additional spill/fills for that.
+* A slightly crazy idea would be to teach the register allocator how to "split" high LMUL operations.  In this case, if we split to m4 (instead of m8), the mask values shrink porportionately.  I think at m4 we'd allocate cleanly.  We'd definitely do so at e.g. m2 or m1.
+* Another thing we could do is to "split" the vmv.v.x splat into a "m1 splat" followed by a series of whole register moves.  This might expose to the register allocator that only one vreg of the register group needs to be allocated until late.  We could merge this back into an m8 splat late, potentially.  This could also be a vmv.s.x and a vrgather.vi if that was easier - from a vtype toggle perspective.
+
+This looks complicated, no matter which option we chose.
