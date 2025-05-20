@@ -1,0 +1,13 @@
+diff --git a/makefiles/Makefile.clang b/makefiles/Makefile.clang
+index cefe725..ad5374a 100644
+--- a/makefiles/Makefile.clang
++++ b/makefiles/Makefile.clang
+@@ -3,7 +3,7 @@ CC=clang
+ CXX=clang++
+ # no FC for clang
+ FC=
+-flags = -O3 -fstrict-aliasing
++flags = -O3 -fstrict-aliasing -march=rv64gcv_zvl128b
+ vecflags = -fvectorize -fslp-vectorize-aggressive
+ novecflags = -fno-vectorize
+ omp_flags=-fopenmp=libomp

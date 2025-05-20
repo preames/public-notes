@@ -1,0 +1,372 @@
+$ PATH=~/llvm/18.x/bin/:$PATH ./run.sh 
+++ set -e
+++ clang -v
+clang version 18.1.8 (https://github.com/llvm/llvm-project.git 3b5b5c1ec4a3095ab096dd780e84d7ab81f3d7ff)
+Target: riscv64-unknown-linux-gnu
+Thread model: posix
+InstalledDir: /home/preames/llvm/18.x/bin
+Found candidate GCC installation: /usr/lib/gcc/riscv64-linux-gnu/13
+Selected GCC installation: /usr/lib/gcc/riscv64-linux-gnu/13
+++ git diff
+diff --git a/makefiles/Makefile.clang b/makefiles/Makefile.clang
+index cefe725..ad5374a 100644
+--- a/makefiles/Makefile.clang
++++ b/makefiles/Makefile.clang
+@@ -3,7 +3,7 @@ CC=clang
+ CXX=clang++
+ # no FC for clang
+ FC=
+-flags = -O3 -fstrict-aliasing
++flags = -O3 -fstrict-aliasing -march=rv64gcv_zvl128b
+ vecflags = -fvectorize -fslp-vectorize-aggressive
+ novecflags = -fno-vectorize
+ omp_flags=-fopenmp=libomp
+++ make COMPILER=clang clean
+make -C ./src COMPILER=clang clean
+make[1]: Entering directory '/home/preames/benchmark/TSVC_2/src'
+rm -f *.o *.s
+make[1]: Leaving directory '/home/preames/benchmark/TSVC_2/src'
+++ make COMPILER=clang
+make[1]: Entering directory '/home/preames/benchmark/TSVC_2/src'
+clang -O3 -fstrict-aliasing -march=rv64gcv_zvl128b -fvectorize -fslp-vectorize-aggressive -c -o tsvc_vec.o tsvc.c
+clang: warning: the flag '-fslp-vectorize-aggressive' has been deprecated and will be ignored [-Wunused-command-line-argument]
+clang -O3 -fstrict-aliasing -march=rv64gcv_zvl128b -fvectorize -fslp-vectorize-aggressive  -c -o dummy.o dummy.c
+clang: warning: the flag '-fslp-vectorize-aggressive' has been deprecated and will be ignored [-Wunused-command-line-argument]
+clang -O3 -fstrict-aliasing -march=rv64gcv_zvl128b -fvectorize -fslp-vectorize-aggressive  -c -o common.o common.c
+clang: warning: the flag '-fslp-vectorize-aggressive' has been deprecated and will be ignored [-Wunused-command-line-argument]
+clang tsvc_vec.o dummy.o common.o -lm -o ../bin/clang/tsvc_vec_default
+clang -O3 -fstrict-aliasing -march=rv64gcv_zvl128b -fno-vectorize -c -o tsvc_novec.o tsvc.c
+clang tsvc_novec.o dummy.o common.o -lm -o ../bin/clang/tsvc_novec_default
+rm common.o tsvc_vec.o dummy.o tsvc_novec.o
+make[1]: Leaving directory '/home/preames/benchmark/TSVC_2/src'
+make[1]: Entering directory '/home/preames/benchmark/TSVC_2/src'
+clang -O3 -fstrict-aliasing -march=rv64gcv_zvl128b -ffast-math -fvectorize -fslp-vectorize-aggressive -c -o tsvc_vec.o tsvc.c
+clang: warning: the flag '-fslp-vectorize-aggressive' has been deprecated and will be ignored [-Wunused-command-line-argument]
+clang -O3 -fstrict-aliasing -march=rv64gcv_zvl128b -ffast-math -fvectorize -fslp-vectorize-aggressive  -c -o dummy.o dummy.c
+clang: warning: the flag '-fslp-vectorize-aggressive' has been deprecated and will be ignored [-Wunused-command-line-argument]
+clang -O3 -fstrict-aliasing -march=rv64gcv_zvl128b -ffast-math -fvectorize -fslp-vectorize-aggressive  -c -o common.o common.c
+clang: warning: the flag '-fslp-vectorize-aggressive' has been deprecated and will be ignored [-Wunused-command-line-argument]
+clang tsvc_vec.o dummy.o common.o -lm -o ../bin/clang/tsvc_vec_relaxed
+clang -O3 -fstrict-aliasing -march=rv64gcv_zvl128b -ffast-math -fno-vectorize -c -o tsvc_novec.o tsvc.c
+clang tsvc_novec.o dummy.o common.o -lm -o ../bin/clang/tsvc_novec_relaxed
+rm common.o tsvc_vec.o dummy.o tsvc_novec.o
+make[1]: Leaving directory '/home/preames/benchmark/TSVC_2/src'
+make[1]: Entering directory '/home/preames/benchmark/TSVC_2/src'
+/home/preames/benchmark/TSVC_2/makefiles/Makefile.clang:21: No 'precise' math flags for clang!
+clang -O3 -fstrict-aliasing -march=rv64gcv_zvl128b  -fvectorize -fslp-vectorize-aggressive -c -o tsvc_vec.o tsvc.c
+clang: warning: the flag '-fslp-vectorize-aggressive' has been deprecated and will be ignored [-Wunused-command-line-argument]
+clang -O3 -fstrict-aliasing -march=rv64gcv_zvl128b  -fvectorize -fslp-vectorize-aggressive  -c -o dummy.o dummy.c
+clang: warning: the flag '-fslp-vectorize-aggressive' has been deprecated and will be ignored [-Wunused-command-line-argument]
+clang -O3 -fstrict-aliasing -march=rv64gcv_zvl128b  -fvectorize -fslp-vectorize-aggressive  -c -o common.o common.c
+clang: warning: the flag '-fslp-vectorize-aggressive' has been deprecated and will be ignored [-Wunused-command-line-argument]
+clang tsvc_vec.o dummy.o common.o -lm -o ../bin/clang/tsvc_vec_precise
+clang -O3 -fstrict-aliasing -march=rv64gcv_zvl128b  -fno-vectorize -c -o tsvc_novec.o tsvc.c
+clang tsvc_novec.o dummy.o common.o -lm -o ../bin/clang/tsvc_novec_precise
+rm common.o tsvc_vec.o dummy.o tsvc_novec.o
+make[1]: Leaving directory '/home/preames/benchmark/TSVC_2/src'
+++ ./bin/clang/tsvc_novec_relaxed
+Loop 	Time(sec) 	Checksum
+ s000	    24.236	512080000.000000
+ s111	    13.612	32000.410156
+s1111	    39.957	16005.822266
+ s112	    38.920	84617.781250
+s1112	    36.864	32001.644531
+ s113	    48.534	32000.644531
+s1113	    24.490	32001.644531
+ s114	    28.459	919.861389
+ s115	    72.714	31745.953125
+s1115	    31.443	0.065533
+ s116	   109.833	32000.000000
+ s118	    24.114	84488.507812
+ s119	    20.407	86338.992188
+s1119	    20.098	119099.882812
+ s121	    37.207	32009.031250
+ s122	    12.837	196490.921875
+ s123	    20.659	32003.287109
+ s124	    30.152	32001.644531
+ s125	    14.652	131072.000000
+ s126	    16.583	66954.960938
+ s127	    23.603	32003.287109
+ s128	    24.798	80000.000000
+ s131	    61.830	32009.031250
+ s132	    45.194	65538.562500
+ s141	    31.055	32487076.000000
+ s151	    61.830	32009.031250
+ s152	    29.396	152207.218750
+ s161	    19.855	64002.054688
+s1161	    30.304	64002.464844
+ s162	    21.206	32009.031250
+ s171	    12.655	196491.250000
+ s172	    13.113	196491.250000
+ s173	    63.680	32001.640625
+ s174	    63.846	32001.640625
+ s175	    14.365	32009.031250
+ s176	    13.648	32063.832031
+ s211	    29.543	63983.183594
+ s212	    27.774	132011.375000
+s1213	    23.128	132022.765625
+ s221	    14.178	1543685120.000000
+s1221	    13.396	630444416.000000
+ s222	     4.012	32000.000000
+ s231	   166.304	119099.882812
+ s232	     5.421	65536.000000
+s1232	   130.181	33958.011719
+ s233	   565.385	504912.625000
+s2233	   196.680	337652.906250
+ s235	   349.092	160023.984375
+ s241	    64.893	64000.000000
+ s242	     5.354	1535952000.000000
+ s243	    38.972	810624.937500
+ s244	    34.548	70102.437500
+s1244	    41.324	108496.453125
+s2244	    21.856	70102.890625
+ s251	    98.252	32004.371094
+s1251	   113.615	400005.968750
+s2251	    29.106	2.635709
+s3251	    41.620	12.595594
+ s252	    20.141	63999.000000
+ s253	    40.664	3200010240.000000
+ s254	    96.297	32000.000000
+ s255	    28.151	31968.515625
+ s256	    16.764	66207.703125
+ s257	    19.357	163072.000000
+ s258	     0.290	14.652790
+ s261	    27.708	260999.140625
+ s271	   120.733	689753.562500
+ s272	    26.218	64000.000000
+ s273	    41.413	99051.656250
+ s274	    40.505	3200195328.000000
+ s275	    35.263	65536.000000
+s2275	   653.175	65536.000000
+ s276	    95.899	689753.562500
+ s277	    26.108	32000.000000
+ s278	    34.405	64012.593750
+ s279	    18.001	64014.289062
+s1279	    26.108	64014.289062
+s2710	    24.332	96003.289062
+s2711	   120.869	689753.562500
+s2712	   113.694	289751.656250
+ s281	    30.167	32000.000000
+s1281	   176.697	inf
+ s291	    48.616	32000.000000
+ s292	    32.124	31968.515625
+ s293	    30.996	32000.000000
+s2101	    14.736	1704092.000000
+s2102	    19.254	256.000000
+s2111	    27.262	34545052.000000
+ s311	    89.435	10.950724
+s31111	     9.140	10.950724
+ s312	    89.456	1.030518
+ s313	    53.770	1.644725
+ s314	    44.721	1.000000
+ s315	    23.445	54857.000000
+ s316	    44.598	0.000031
+ s317	    22.326	0.000000
+ s318	    16.184	32002.000000
+ s319	    67.564	43.803417
+s3110	    20.963	514.000000
+s13110	    20.962	514.000000
+s3111	     7.985	10.950721
+s3112	     9.596	1.644725
+s3113	    64.459	2.000000
+ s321	    11.751	32000.000000
+ s322	    11.552	32000.000000
+ s323	    21.027	146484.968750
+ s331	    22.267	32000.000000
+ s332	    22.128	-1.000000
+ s341	    28.329	10.950724
+ s342	    32.426	10.950724
+ s343	    16.882	1567.833496
+ s351	    66.211	25600002048.000000
+s1351	    97.405	32010.253906
+ s352	    88.139	1.644841
+ s353	    19.999	3200002816.000000
+ s421	    49.129	32009.031250
+s1421	    51.060	16000.000000
+ s422	   102.510	257.701416
+ s423	    87.958	439.690308
+ s424	    54.693	822.360596
+ s431	   127.442	1674247.125000
+ s441	    35.966	196491.250000
+ s442	    14.515	114240.132812
+ s443	    48.310	361015.906250
+ s451	    29.008	32009.281250
+ s452	    62.315	32512.015625
+ s453	    24.251	21.901447
+ s471	    17.458	64004.933594
+ s481	    33.134	196491.250000
+ s482	    33.441	196491.250000
+ s491	    28.057	32001.644531
+s4112	    17.942	1127134.250000
+s4113	    22.819	32001.644531
+s4114	    25.427	32000.000000
+s4115	    16.658	1.038636
+s4116	    12.089	0.753265
+s4117	    22.546	32002.207031
+s4121	    17.254	196491.250000
+   va	    25.881	1.644884
+  vag	    29.204	1.644884
+  vas	    26.668	1.644885
+  vif	    22.432	1.644884
+  vpv	   126.272	1642411.250000
+  vtv	   126.289	32000.000000
+vpvtv	    69.070	689753.562500
+vpvts	    14.217	175255268098048.000000
+vpvpv	    83.780	1.644884
+vtvtv	    84.026	32000.000000
+vsumr	    89.421	10.950721
+vdotr	   107.403	1.644725
+ vbor	     9.831	31924.050781
+++ ./bin/clang/tsvc_vec_relaxed
+Loop 	Time(sec) 	Checksum
+ s000	     6.106	512080000.000000
+ s111	    17.308	32000.410156
+s1111	    10.471	16005.822266
+ s112	    17.947	84617.781250
+s1112	    11.392	32001.644531
+ s113	    10.469	32000.644531
+s1113	    24.696	32001.644531
+ s114	    29.820	919.861389
+ s115	    72.719	31745.953125
+s1115	    77.414	0.065533
+ s116	   113.723	32000.000000
+ s118	    41.519	85045.453125
+ s119	     8.290	86338.992188
+s1119	     5.489	119099.882812
+ s121	    11.900	32009.031250
+ s122	    13.074	196490.921875
+ s123	    20.635	32003.287109
+ s124	     9.603	32001.644531
+ s125	     7.518	131072.000000
+ s126	    17.865	66954.960938
+ s127	    11.427	32003.287109
+ s128	    27.490	80000.000000
+ s131	    20.012	32009.031250
+ s132	    11.582	65538.562500
+ s141	    32.878	32487076.000000
+ s151	    20.633	32009.031250
+ s152	     8.950	152207.218750
+ s161	    20.289	64002.054688
+s1161	    30.713	64002.464844
+ s162	     6.643	32009.031250
+ s171	     4.042	196491.250000
+ s172	    12.731	196491.250000
+ s173	    19.406	32001.640625
+ s174	    19.672	32001.640625
+ s175	     4.076	32009.031250
+ s176	     4.024	32063.832031
+ s211	    27.101	63983.183594
+ s212	    28.136	132011.375000
+s1213	    20.500	132022.765625
+ s221	    13.771	1543685120.000000
+s1221	     4.324	630444416.000000
+ s222	     4.096	32000.000000
+ s231	   192.755	119099.882812
+ s232	     5.115	65536.000000
+s1232	   220.454	33958.011719
+ s233	   715.440	504912.625000
+s2233	   161.173	337652.906250
+ s235	   394.173	160023.984375
+ s241	    64.804	64000.000000
+ s242	     5.357	1535952000.000000
+ s243	    12.140	810624.937500
+ s244	    34.416	70102.437500
+s1244	    40.791	108496.453125
+s2244	     8.977	70102.890625
+ s251	    27.339	32004.371094
+s1251	    49.388	400005.968750
+s2251	    28.852	2.635709
+s3251	    34.779	12.595594
+ s252	     4.698	63999.000000
+ s253	     8.336	3200010240.000000
+ s254	    13.248	32000.000000
+ s255	     5.318	31968.515625
+ s256	    19.304	66207.703125
+ s257	    39.352	163072.000000
+ s258	     0.290	14.652790
+ s261	    27.540	260999.140625
+ s271	    26.077	689753.562500
+ s272	     9.148	64000.000000
+ s273	    11.344	99051.656250
+ s274	     9.699	3200195328.000000
+ s275	    35.039	65536.000000
+^[[Bs2275	   850.506	65536.000000
+ s276	    40.993	689753.562500
+ s277	    26.116	32000.000000
+ s278	    11.862	64012.593750
+ s279	     7.789	64014.289062
+s1279	     9.522	64014.289062
+s2710	     4.763	96003.289062
+s2711	    26.083	689753.562500
+s2712	    26.084	289751.656250
+ s281	    30.184	32000.000000
+s1281	    48.865	inf
+ s291	    48.718	32000.000000
+ s292	    32.104	31968.515625
+ s293	     4.509	32000.000000
+s2101	    12.987	1704092.000000
+s2102	    18.498	256.000000
+s2111	    27.228	34545052.000000
+ s311	    15.493	10.950724
+s31111	     9.136	10.950724
+ s312	    21.339	1.030958
+ s313	    15.349	1.644884
+ s314	     7.760	1.000000
+ s315	    23.465	54857.000000
+ s316	     8.405	0.000031
+ s317	     1.267	0.000000
+ s318	    16.181	32002.000000
+ s319	    17.649	43.802910
+s3110	    20.970	514.000000
+s13110	    20.933	514.000000
+s3111	     0.896	10.950724
+s3112	     9.697	1.644725
+s3113	     7.172	2.000000
+ s321	    11.769	32000.000000
+ s322	    11.182	32000.000000
+ s323	    17.704	146484.968750
+ s331	    22.462	32000.000000
+ s332	    22.375	-1.000000
+ s341	    28.420	10.950724
+ s342	    32.412	10.950724
+ s343	    18.697	1567.833496
+ s351	    84.093	25600002048.000000
+s1351	    38.057	32010.253906
+ s352	    54.522	1.644891
+ s353	    17.195	3200002816.000000
+ s421	    15.602	32009.031250
+s1421	    17.661	16000.000000
+ s422	    30.259	257.701416
+ s423	    17.379	439.690308
+ s424	    17.533	822.360596
+ s431	    40.353	1674247.125000
+ s441	     9.489	196491.250000
+ s442	    14.557	114240.132812
+ s443	    14.897	361015.906250
+ s451	    29.022	32009.281250
+ s452	    19.236	32512.015625
+ s453	     5.178	21.901447
+ s471	     7.170	64004.933594
+ s481	    33.138	196491.250000
+ s482	    33.507	196491.250000
+ s491	    12.880	32001.644531
+s4112	     9.219	1127134.250000
+s4113	    12.681	32001.644531
+s4114	    14.097	32000.000000
+s4115	     7.850	1.038800
+s4116	     5.747	0.753265
+s4117	     9.001	32002.207031
+s4121	     6.515	196491.250000
+   va	    23.931	1.644884
+  vag	    14.365	1.644884
+  vas	    14.838	1.644885
+  vif	     2.770	1.644884
+  vpv	    40.104	1642411.250000
+  vtv	    40.099	32000.000000
+vpvtv	    26.063	689753.562500
+vpvts	     3.909	175255268098048.000000
+vpvpv	    26.126	1.644884
+vtvtv	    26.150	32000.000000
+vsumr	    15.667	10.950724
+vdotr	    30.748	1.644884
+ vbor	     0.983	31924.050781

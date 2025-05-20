@@ -1,0 +1,11 @@
+This is the installed clang which comes with the image, not built from source.
+Probably does not correspond to an official LLVM release.
+
+$ clang -v
+Ubuntu clang version 16.0.6 (15)
+Target: riscv64-unknown-linux-gnu
+Thread model: posix
+InstalledDir: /usr/bin
+Found candidate GCC installation: /usr/bin/../lib/gcc/riscv64-linux-gnu/13
+Selected GCC installation: /usr/bin/../lib/gcc/riscv64-linux-gnu/13
+
