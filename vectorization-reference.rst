@@ -43,7 +43,7 @@ Note that all the usual loop optimization choices apply, but with the additional
 
 **Predicated (Non-Loop) Epilogue**
 
-On machines which supported predicated execution - specifically only for those instructions which can fault - you can generate a single peeled vector iteration with predication.
+You can generate a single peeled vector iteration with predication.  This can be done with either software or hardware techniques (see below), but is usually only profitable with hardware support.
 
 This technique works well when the remainder is expected to be large relative to the original VF.
 
@@ -66,9 +66,19 @@ The benefit of this technique is that you have *multiple* vector bodies, each wi
 The only case LLVM uses this technique is when VF is large compared to expected TC.  Specifically, some cases on AVX512 fallback to AVX2 loops.
 
 
+Forms of Predication
+--------------------
 
+Predication is a general technique for "masking off" (that is, disabling) individual lanes or *otherwise avoiding faults in inactive lanes*.  Note that depending on usage, the result of the operations on the inactive lanes may either be defined (usually preserved, but not always) or undefined.
 
+I tend to only be interested in the case where the result is undefined as that's the one which arrises naturally in compilers.  Our goal is basically to avoid faults on inactive lanes, and nothing else.
 
+There are both hardware and software predication techniques!
 
+The most common form of hardware predication is "mask predication" where you have a per-lane mask which indicates whether a particular lane is active or not.
 
+RISCV also supports "VL predication", "VSTART predication", and "LMUL predication".  (These are my terms, not standardized.)  Each of them provides a way to deactivate some individual set of lanes.   Out of them, only VL predication is likely to be performant in any way, please don't use the others. 
 
+In software, the usual tactic is called "masking" or "masking off".  The basic idea is that you conditionally select a known safe (but otherwise useless) value for the inactive lanes.  For a divide, this might look like "udiv X, (select mask, Y, 1)".  For a load, this might be "LD (select mask, P, SomeDereferenceableGlobal)".  There is no masking technique for stores.
+
+There's also an entire family of related techniques for proving speculation safety (i.e. the absence of faults on inactive lanes *without* masking).  This isn't predication per se, but comes up in all the same cases, and is (almost) always profitable over any form of predication.
