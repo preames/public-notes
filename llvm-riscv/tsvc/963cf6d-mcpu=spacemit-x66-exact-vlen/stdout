@@ -1,0 +1,187 @@
+diff --git a/makefiles/Makefile.clang b/makefiles/Makefile.clang
+index cefe725..6b4c483 100644
+--- a/makefiles/Makefile.clang
++++ b/makefiles/Makefile.clang
+@@ -1,9 +1,9 @@
+ 
+-CC=clang
+-CXX=clang++
++CC=/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include
++CXX=/home/preames/llvm-dev/build/bin/clang++ --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++   -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/12.1.0/../../../../riscv64-unknown-linux-gnu/include/c++/12.1.0  -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/12.1.0/../../../../riscv64-unknown-linux-gnu/include/c++/12.1.0/riscv64-unknown-linux-gnu  -isystem  /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/12.1.0/../../../../riscv64-unknown-linux-gnu/include/c++/12.1.0/backward  -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/12.1.0/include   -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/12.1.0/include-fixed  -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/12.1.0/../../../../riscv64-unknown-linux-gnu/include  -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include
+ # no FC for clang
+ FC=
+-flags = -O3 -fstrict-aliasing
++flags = -O3 -fstrict-aliasing -mcpu=spacemit-x60 -mrvv-vector-bits=zvl
+ vecflags = -fvectorize -fslp-vectorize-aggressive
+ novecflags = -fno-vectorize
+ omp_flags=-fopenmp=libomp
+$ time ssh k1-dev-board -t "~/tsvc_vec_relaxed"
+Loop 	Time(sec) 	Checksum
+ s000	     7.138	512080000.000000
+ s111	    10.953	32000.410156
+s1111	    12.715	16005.822266
+ s112	    15.872	84617.781250
+s1112	    12.947	32001.644531
+ s113	    19.367	32000.644531
+s1113	    24.454	32001.644531
+ s114	    36.441	919.861389
+ s115	    26.232	31745.953125
+s1115	   105.434	0.065533
+ s116	    55.614	32000.000000
+ s118	    38.718	85045.453125
+ s119	    10.821	86338.992188
+s1119	     7.490	119099.882812
+ s121	    16.690	32009.031250
+ s122	     6.198	196490.921875
+ s123	    18.974	32003.287109
+ s124	    16.972	32001.644531
+ s125	    16.770	131072.000000
+ s126	    31.508	66954.960938
+ s127	    10.899	32003.287109
+ s128	    16.688	80000.000000
+ s131	    20.945	32009.031250
+ s132	    13.872	65538.562500
+ s141	    48.309	32487076.000000
+ s151	    20.683	32009.031250
+ s152	    13.685	152207.218750
+ s161	    20.281	64002.058594
+s1161	    30.359	64002.468750
+ s162	     7.788	32009.031250
+ s171	     5.035	196491.250000
+ s172	     5.151	196491.250000
+ s173	    36.441	32001.640625
+ s174	    41.977	32001.640625
+ s175	     5.290	32009.031250
+ s176	     4.157	32063.832031
+ s211	    47.024	63983.183594
+ s212	    24.107	132011.375000
+s1213	    21.391	132022.734375
+ s221	    13.613	1543685120.000000
+s1221	     6.534	630444416.000000
+ s222	     4.011	32000.000000
+ s231	   317.207	119099.882812
+ s232	     5.494	65536.000000
+s1232	   318.985	33958.011719
+ s233	   877.865	504912.625000
+s2233	   350.587	337652.906250
+ s235	   688.602	160023.968750
+ s241	    60.823	64000.000000
+ s242	     5.014	1535952000.000000
+ s243	    32.423	810624.937500
+ s244	    30.816	70102.429688
+s1244	    46.765	108496.445312
+s2244	    19.409	70102.890625
+ s251	    46.708	32004.371094
+s1251	   111.404	400005.968750
+s2251	    30.405	2.635709
+s3251	    61.117	12.595594
+ s252	     7.430	63999.000000
+ s253	    23.792	3200010240.000000
+ s254	    16.585	32000.000000
+ s255	     6.058	31968.515625
+ s256	    40.177	66207.703125
+ s257	    50.360	163072.000000
+ s258	     0.306	14.652790
+ s261	    29.271	260999.156250
+ s271	    22.407	689753.562500
+ s272	    11.993	64000.000000
+ s273	    15.289	99051.656250
+ s274	    13.882	3200195584.000000
+ s275	    55.536	65536.000000
+s2275	  1041.945	65536.000000
+ s276	    40.972	689753.562500
+ s277	    26.137	32000.000000
+ s278	    15.030	64012.597656
+ s279	     8.227	64014.289062
+s1279	    14.139	64014.289062
+s2710	     6.541	96003.281250
+s2711	    27.632	689753.562500
+s2712	    23.160	289751.656250
+ s281	    26.845	32000.000000
+s1281	    80.155	inf
+ s291	    40.324	32000.000000
+ s292	    32.123	31968.515625
+ s293	     4.660	32000.000000
+s2101	    13.162	1704092.000000
+s2102	    22.337	256.000000
+s2111	    27.580	34545052.000000
+ s311	    16.847	10.950724
+s31111	     5.125	10.950724
+ s312	    15.793	1.030974
+ s313	    22.316	1.644884
+ s314	    13.415	1.000000
+ s315	    22.196	54857.000000
+ s316	     8.460	0.000031
+ s317	     0.799	0.000000
+ s318	    16.188	32002.000000
+ s319	    19.914	43.802910
+s3110	    19.510	514.000000
+s13110	    19.465	514.000000
+s3111	     0.861	10.950724
+s3112	     9.676	1.644725
+s3113	     9.199	2.000000
+ s321	    11.851	32000.000000
+ s322	    10.627	32000.000000
+ s323	    19.045	146484.968750
+ s331	     1.846	32000.000000
+ s332	    22.128	-1.000000
+ s341	    26.168	10.950724
+ s342	    30.752	10.950724
+ s343	    40.691	1567.833496
+ s351	    49.639	25600002048.000000
+s1351	    77.194	32010.253906
+ s352	    55.144	1.644891
+ s353	    15.296	3200002816.000000
+ s421	    43.526	32009.031250
+s1421	    31.259	16000.000000
+ s422	    35.576	257.701416
+ s423	    18.068	439.690308
+ s424	    22.442	822.360596
+ s431	    39.240	1674247.125000
+ s441	    10.053	196491.250000
+ s442	     8.613	114240.132812
+ s443	    15.216	361015.906250
+^[[B s451	    28.553	32009.281250
+ s452	    20.553	32512.015625
+ s453	     5.136	21.901447
+ s471	     4.952	64004.933594
+ s481	    33.049	196491.250000
+ s482	    33.379	196491.250000
+ s491	    13.076	32001.644531
+s4112	     8.196	1127134.250000
+s4113	    11.700	32001.644531
+s4114	    14.128	32000.000000
+s4115	     7.055	1.038800
+s4116	     4.930	0.753265
+s4117	     9.118	32002.207031
+s4121	     5.521	196491.250000
+   va	    25.589	1.644884
+  vag	    11.806	1.644884
+  vas	    11.366	1.644885
+  vif	     2.820	1.644884
+  vpv	    37.629	1642411.250000
+  vtv	    37.629	32000.000000
+vpvtv	    22.097	689753.562500
+vpvts	     3.818	175255268098048.000000
+vpvpv	    21.485	1.644884
+vtvtv	    22.133	32000.000000
+vsumr	    15.485	10.950724
+vdotr	    30.488	1.644884
+ vbor	     0.839	31924.050781
+Connection to 192.168.2.19 closed.
+
+real	114m47.882s
+user	0m0.022s
+sys	0m0.020s
+$ ~/llvm-dev/build/bin/clang -v
+clang version 21.0.0git (git@github.com:preames/llvm-project.git 963cf6d4eafd3276b721c9265ea8e13c5c095807)
+Target: x86_64-unknown-linux-gnu
+Thread model: posix
+InstalledDir: /home/preames/llvm-dev/build/bin
+Build config: +assertions
+Found candidate GCC installation: /usr/lib/gcc/x86_64-linux-gnu/11
+Found candidate GCC installation: /usr/lib/gcc/x86_64-linux-gnu/12
+Found candidate GCC installation: /usr/lib/gcc/x86_64-linux-gnu/9
+Selected GCC installation: /usr/lib/gcc/x86_64-linux-gnu/12
+Candidate multilib: .;@m64
+Selected multilib: .;@m64
