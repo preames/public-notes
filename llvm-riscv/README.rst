@@ -321,3 +321,96 @@ Other off topic observations:
 * Another thing we could do is to "split" the vmv.v.x splat into a "m1 splat" followed by a series of whole register moves.  This might expose to the register allocator that only one vreg of the register group needs to be allocated until late.  We could merge this back into an m8 splat late, potentially.  This could also be a vmv.s.x and a vrgather.vi if that was easier - from a vtype toggle perspective.
 
 This looks complicated, no matter which option we chose.
+
+
+2025-06-15, Vector Code Gen in TSCV_2
+-------------------------------------
+
+Some of these are copied from older notes (consolidating written ones), some are new observations.
+
+Masking
+========
+
+Looking at masked predication primarily.  
+
+*s1115*
+
+Has a unit strided load which is not being recognized.  Appears to be due to gather-scater-lowering seeing two vector indices on a gep when one of them is a splat.  Fixed this in instcombine, but there's still a open question of why loop-vectorizer wasn't recognizing the unit strided load instead of emitting a gather in this case.
+
+This appears to be distinct from the rerolling cases as we get a single masked.load in this case.
+
+*s112 but also many others*
+
+We materialize the address of globals used by the dummy call outside the nested loop which creates some very long live ranges.  The dummy call is inside the outer loop of the nest which is somewhat high trip count, so this isn't insane.
+
+We could definitely sink the ADDIs into the loop (as we have to insert mv to put them into argument registers anyway).  Given the size of the arrays, and the small offset into the ADDI, it's not clear that e.g. global-merge could eliminate address copies or anything.  Probably worth a slightly closer look, but nothing immediately obvious?
+
+Hm, at least some of the addresses are being spilled.  But only in a few functions (e.g. s2102)  Why aren't we rematerializing these instead?  Also, looks like maybe some LSR choices are sub-optimal in that inner loop resulting in larger scalar register pressure?
+
+Another slightly crazy idea - would spilling to FP registers be better than spilling to stack?  We've got a bunch of free floating point registers in s2102.
+
+Small, but it looks like we might not be remating "fmv.w.x fs0, zero" and inserting a copy just before the dummy call instead.  Still in s2102.
+
+On the other hand, the function name constants are tiny.  We already rematerialize the address so that we don't have a long live range (and emit a tail call for the calc_checksum - cool) - but do we have any room for packing these before the function or something?
+
+Alternatively, some kind of global merge + wrapper stub for calc_checksum and initialize_arrays could take only the offset into the merged table?  This would be a codesize win at best in this case.
+
+*masked interleave*
+
+When looking into tail folding, I noticed we weren't forming interleave groups in TSVC.  The obvious fix was that we were missing a TTI hook, but doing that reveals a few related problems.
+
+* InterleavedAccessPass doesn't handle masked.load or masked.store.
+* getInterleavedMemOperationCost doesn't handle masked scalable cases in the fallback path (it could by costing he intrinsics)
+* The mask generation for the tail folded fixed vector case is terrible.  (And the scalable is probably worse.)
+* When all of the above is fixed, interleavedAccessCanBeWidened has a power of two bailout which needs removed.
+
+I added some basic tests in a85525f87. 
+
+Default
+=======
+
+This is coming from a pass looking at the default (non tail folded) vectorization for these loops with fastmath.
+
+*s110*
+
+* we have a case where we perform a reduce of an fadd fed by a strided_load + a reversed normal load.  We're currently materializing the reverse, but could fold the reverse into the stride on the other operand of the fadd.
+* Also , why do we have an inloop reduction here at all?  With fastmath this should be an out of loop reduction?
+
+*s2101*
+
+We have the following sequence::
+  	vadd.vx	v20, v12, s11
+	vadd.vv	v20, v20, v16
+	vsetvli	zero, zero, e32, m2, ta, ma
+	vluxei64.v	v24, (zero), v20
+
+In the above, s11 should be folded into base operand of vluxei64
+
+Looking at the IR, we have geps of the following form::
+   %5 = getelementptr inbounds nuw [256 x [256 x float]], ptr @bb, i64 0, <vscale x 4 x i64> %vec.ind, <vscale x 4 x i64> %vec.ind
+
+%vec.ind appears to be a canonical vector IV advancing by a fixed stride.  I haven't stared at this yet, but it seems very likely we can improve the indexing of this case.
+
+
+*s442*
+
+Looking at the vluxei64 addressing, it looks like this would be a strided load except that here are two different base pointers for the elements.
+
+We can definitely improve the strided part of the addressing in this case (by adding the step * scale) and avoid one shift.
+
+We might be able to do something fancy with two masked strided loads, but not sure if that's worthwhile?
+
+EVL
+===
+
+The widening induction issue still results in too many cases of missed optimization to make the code generation particularly interesting.
+
+*s112 and s1112*
+
+We were previously failing to remove vp.reverse pairs, but that has now been fixed.  There is likely still room to improve vp.reverse of mask genration; not bitreverse per se (nothing obvious to do there without zvbb), but the actual mask generation sequence.
+
+We also had a costing issue with reverse costing being quadratic vs linear, but that's now fixed and we've chosen a more natural vectorization factor.
+
+*blend*
+
+If we have a control flow merge managed via a VPBlend, this isn't getting rewriten using EVL.  As a result, we end up with uses of the header mask which are removable.

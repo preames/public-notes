@@ -1,0 +1,20 @@
+These are a collection of local experiments with slightly hacked up
+aspects of vectorization lowering to perform limit study experiments.
+
+Based on 88738a74f05ba4002f38b8bdeebd944762c8ae7b, local branch
+wip-vectorize-experiments
+
+improved-active-lane-mask.log -- uses an improved active lane mask lowering
+which includes both a sound and unsound component (ult vid, usubsat(TC, I))
+in i32 unconditionally.
+
+evl-via-umin.log -- pin the second to last iteration to VF via a umin
+instruction.  This contains basic functionality, but not the feature
+unlock parts.
+
+evl-via-umin-no-restrictions.log -- built on the previous, but remove
+all restrictions for EVL vectorization which don't apply to maks
+tail folding
+
+mask-early-expand.log -- expand the header mask to vid <u splat(sub(TC-Index))
+early in loop vect instead of using active.lane.mask
