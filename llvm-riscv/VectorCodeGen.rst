@@ -299,3 +299,9 @@ TTI getShuffleCost
 * Need to revisit length changing shuffles - getInstructionCost doesn't allow them, but SLP *does*.
   
   
+foldAsLoad/Store
+=================
+
+* a VLE followed by a oneuse vmerge can be folded into a masked VLE (for one operand of the vmerge at least).  Doing so would reduce register pressure for a fill sequence.
+* a vmv.s.x w/non-zero VL can fold to a scalar store to the stack slot.
+* vextract and vinsert can fold to scalar load and store respectively.
