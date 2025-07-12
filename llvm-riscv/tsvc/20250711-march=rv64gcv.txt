@@ -1,0 +1,820 @@
+$ ./run.sh 
+ default (unpredicated)
+Your branch is up to date with 'origin/master'.
+patching file makefiles/Makefile.clang
++++ make clean
+make -C ./src COMPILER=GNU clean
+make[1]: Entering directory '/home/preames/benchmarking/TSVC_2/src'
+rm -f *.o *.s
+make[1]: Leaving directory '/home/preames/benchmarking/TSVC_2/src'
++++ /home/preames/llvm-dev/build/bin/clang -v
+clang version 21.0.0git (https://github.com/llvm/llvm-project.git a89021bc83705172b4a4cdac0a95ff50f4f868b1)
+Target: x86_64-unknown-linux-gnu
+Thread model: posix
+InstalledDir: /home/preames/llvm-dev/build/bin
+Build config: +assertions
+Found candidate GCC installation: /usr/lib/gcc/x86_64-linux-gnu/11
+Found candidate GCC installation: /usr/lib/gcc/x86_64-linux-gnu/12
+Found candidate GCC installation: /usr/lib/gcc/x86_64-linux-gnu/9
+Selected GCC installation: /usr/lib/gcc/x86_64-linux-gnu/12
+Candidate multilib: .;@m64
+Selected multilib: .;@m64
++++ git diff
+diff --git a/makefiles/Makefile.clang b/makefiles/Makefile.clang
+index cefe725..8466905 100644
+--- a/makefiles/Makefile.clang
++++ b/makefiles/Makefile.clang
+@@ -1,9 +1,9 @@
+ 
+-CC=clang
+-CXX=clang++
++CC=/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include
++CXX=/home/preames/llvm-dev/build/bin/clang++ --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++   -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/12.1.0/../../../../riscv64-unknown-linux-gnu/include/c++/12.1.0  -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/12.1.0/../../../../riscv64-unknown-linux-gnu/include/c++/12.1.0/riscv64-unknown-linux-gnu  -isystem  /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/12.1.0/../../../../riscv64-unknown-linux-gnu/include/c++/12.1.0/backward  -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/12.1.0/include   -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/12.1.0/include-fixed  -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/12.1.0/../../../../riscv64-unknown-linux-gnu/include  -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include
+ # no FC for clang
+ FC=
+-flags = -O3 -fstrict-aliasing
++flags = -O3 -fstrict-aliasing -march=rv64gcv
+ vecflags = -fvectorize -fslp-vectorize-aggressive
+ novecflags = -fno-vectorize
+ omp_flags=-fopenmp=libomp
++++ make COMPILER=clang
+make[1]: Entering directory '/home/preames/benchmarking/TSVC_2/src'
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -fvectorize -fslp-vectorize-aggressive -c -o tsvc_vec.o tsvc.c
+clang: warning: the flag '-fslp-vectorize-aggressive' has been deprecated and will be ignored [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-rtlib=libgcc' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-stdlib=libstdc++' [-Wunused-command-line-argument]
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -fvectorize -fslp-vectorize-aggressive  -c -o dummy.o dummy.c
+clang: warning: the flag '-fslp-vectorize-aggressive' has been deprecated and will be ignored [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-rtlib=libgcc' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-stdlib=libstdc++' [-Wunused-command-line-argument]
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -fvectorize -fslp-vectorize-aggressive  -c -o common.o common.c
+clang: warning: the flag '-fslp-vectorize-aggressive' has been deprecated and will be ignored [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-rtlib=libgcc' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-stdlib=libstdc++' [-Wunused-command-line-argument]
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include tsvc_vec.o dummy.o common.o -lm -o ../bin/clang/tsvc_vec_default
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -fno-vectorize -c -o tsvc_novec.o tsvc.c
+clang: warning: argument unused during compilation: '-fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-rtlib=libgcc' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-stdlib=libstdc++' [-Wunused-command-line-argument]
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include tsvc_novec.o dummy.o common.o -lm -o ../bin/clang/tsvc_novec_default
+rm common.o tsvc_vec.o dummy.o tsvc_novec.o
+make[1]: Leaving directory '/home/preames/benchmarking/TSVC_2/src'
+make[1]: Entering directory '/home/preames/benchmarking/TSVC_2/src'
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -ffast-math -fvectorize -fslp-vectorize-aggressive -c -o tsvc_vec.o tsvc.c
+clang: warning: the flag '-fslp-vectorize-aggressive' has been deprecated and will be ignored [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-rtlib=libgcc' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-stdlib=libstdc++' [-Wunused-command-line-argument]
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -ffast-math -fvectorize -fslp-vectorize-aggressive  -c -o dummy.o dummy.c
+clang: warning: the flag '-fslp-vectorize-aggressive' has been deprecated and will be ignored [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-rtlib=libgcc' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-stdlib=libstdc++' [-Wunused-command-line-argument]
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -ffast-math -fvectorize -fslp-vectorize-aggressive  -c -o common.o common.c
+clang: warning: the flag '-fslp-vectorize-aggressive' has been deprecated and will be ignored [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-rtlib=libgcc' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-stdlib=libstdc++' [-Wunused-command-line-argument]
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include tsvc_vec.o dummy.o common.o -lm -o ../bin/clang/tsvc_vec_relaxed
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -ffast-math -fno-vectorize -c -o tsvc_novec.o tsvc.c
+clang: warning: argument unused during compilation: '-fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-rtlib=libgcc' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-stdlib=libstdc++' [-Wunused-command-line-argument]
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include tsvc_novec.o dummy.o common.o -lm -o ../bin/clang/tsvc_novec_relaxed
+rm common.o tsvc_vec.o dummy.o tsvc_novec.o
+make[1]: Leaving directory '/home/preames/benchmarking/TSVC_2/src'
+make[1]: Entering directory '/home/preames/benchmarking/TSVC_2/src'
+/home/preames/benchmarking/TSVC_2/makefiles/Makefile.clang:21: No 'precise' math flags for clang!
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv  -fvectorize -fslp-vectorize-aggressive -c -o tsvc_vec.o tsvc.c
+clang: warning: the flag '-fslp-vectorize-aggressive' has been deprecated and will be ignored [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-rtlib=libgcc' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-stdlib=libstdc++' [-Wunused-command-line-argument]
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv  -fvectorize -fslp-vectorize-aggressive  -c -o dummy.o dummy.c
+clang: warning: the flag '-fslp-vectorize-aggressive' has been deprecated and will be ignored [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-rtlib=libgcc' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-stdlib=libstdc++' [-Wunused-command-line-argument]
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv  -fvectorize -fslp-vectorize-aggressive  -c -o common.o common.c
+clang: warning: the flag '-fslp-vectorize-aggressive' has been deprecated and will be ignored [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-rtlib=libgcc' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-stdlib=libstdc++' [-Wunused-command-line-argument]
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include tsvc_vec.o dummy.o common.o -lm -o ../bin/clang/tsvc_vec_precise
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv  -fno-vectorize -c -o tsvc_novec.o tsvc.c
+clang: warning: argument unused during compilation: '-fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-rtlib=libgcc' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-stdlib=libstdc++' [-Wunused-command-line-argument]
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include tsvc_novec.o dummy.o common.o -lm -o ../bin/clang/tsvc_novec_precise
+rm common.o tsvc_vec.o dummy.o tsvc_novec.o
+make[1]: Leaving directory '/home/preames/benchmarking/TSVC_2/src'
++++ /home/preames/llvm-dev/build/bin/llvm-objdump -D --section=.text bin/clang/tsvc_vec_relaxed
++++ scp bin/clang/tsvc_vec_relaxed 'k1-dev-board:~/'
+tsvc_vec_relaxed                                                                                                                      100%  187KB  22.3KB/s   00:08    
++++ ssh k1-dev-board -t '~/tsvc_vec_relaxed'
+Loop 	Time(sec) 	Checksum
+ s000	     5.412	512080000.000000
+ s111	     9.237	32000.410156
+s1111	    10.107	16005.822266
+ s112	    18.723	84617.781250
+s1112	     8.139	32001.644531
+ s113	    10.729	32000.644531
+s1113	    24.725	32001.644531
+ s114	    29.406	919.861389
+ s115	    25.574	31745.953125
+s1115	    82.546	0.065533
+ s116	    65.429	32000.000000
+ s118	    35.945	85046.140625
+ s119	     8.207	86338.992188
+s1119	     5.434	119099.882812
+ s121	    12.721	32009.031250
+ s122	     4.125	196490.921875
+ s123	    20.825	32003.287109
+ s124	     9.626	32001.644531
+ s125	     8.607	131072.000000
+ s126	    18.336	66954.960938
+ s127	    10.979	32003.287109
+ s128	    14.428	80000.000000
+ s131	    21.244	32009.031250
+ s132	    11.604	65538.562500
+ s141	    30.135	32487076.000000
+ s151	    21.201	32009.031250
+ s152	     8.930	152207.218750
+ s161	    15.116	64002.054688
+s1161	    30.209	64002.464844
+ s162	     5.492	32009.031250
+ s171	     4.015	196491.250000
+ s172	     4.037	196491.250000
+ s173	    21.764	32001.640625
+ s174	    23.837	32001.640625
+ s175	     4.275	32009.031250
+ s176	     3.925	32063.832031
+ s211	    27.926	63983.183594
+ s212	    23.842	132011.375000
+s1213	    20.803	132022.765625
+ s221	    13.201	1543685120.000000
+s1221	     4.321	630444416.000000
+ s222	     4.013	32000.000000
+ s231	   174.915	119099.882812
+ s232	     5.238	65536.000000
+s1232	   222.443	33958.011719
+^[[F s233	   749.146	504912.625000
+s2233	   228.736	337652.906250
+ s235	   364.397	160023.984375
+ s241	    60.188	64000.000000
+ s242	     4.913	1535952000.000000
+ s243	    14.897	810624.937500
+ s244	    30.334	70102.437500
+s1244	    40.829	108496.453125
+s2244	     8.573	70102.890625
+ s251	    27.259	32004.371094
+s1251	    59.963	400005.968750
+s2251	    28.784	2.635709
+s3251	    33.109	12.595594
+ s252	     4.777	63999.000000
+ s253	     7.887	3200010240.000000
+ s254	    13.069	32000.000000
+ s255	     4.984	31968.515625
+ s256	    17.969	66207.703125
+ s257	    27.774	163072.000000
+ s258	     0.306	14.652790
+ s261	    28.289	260999.140625
+ s271	    22.164	689753.562500
+ s272	    10.655	64000.000000
+ s273	    14.321	99051.656250
+ s274	     9.825	3200195328.000000
+ s275	    46.657	65536.000000
+s2275	   760.960	65536.000000
+ s276	    39.986	689753.562500
+ s277	    26.112	32000.000000
+ s278	    14.623	64012.593750
+ s279	     8.391	64014.289062
+s1279	    10.729	64014.289062
+s2710	     4.943	96003.289062
+s2711	    22.205	689753.562500
+s2712	    22.591	289751.656250
+ s281	    26.202	32000.000000
+s1281	    60.079	inf
+ s291	    44.638	32000.000000
+ s292	    32.088	31968.515625
+ s293	     5.261	32000.000000
+s2101	    13.585	1704092.000000
+s2102	    19.242	256.000000
+s2111	    27.242	34545052.000000
+ s311	    15.482	10.950724
+s31111	     9.762	10.950724
+ s312	    21.878	1.030958
+ s313	    15.258	1.644884
+ s314	     7.737	1.000000
+ s315	    23.466	54857.000000
+ s316	     8.376	0.000031
+ s317	     1.265	0.000000
+ s318	    17.280	32002.000000
+ s319	    18.038	43.802910
+s3110	    20.918	514.000000
+s13110	    20.852	514.000000
+s3111	     0.872	10.950724
+s3112	     9.657	1.644725
+s3113	     6.988	2.000000
+ s321	    11.702	32000.000000
+ s322	    10.574	32000.000000
+ s323	    16.891	146484.968750
+ s331	     3.579	32000.000000
+ s332	     2.724	-1.000000
+ s341	    28.466	10.950724
+ s342	    32.285	10.950724
+ s343	    21.947	1567.833496
+ s351	    65.695	25600002048.000000
+s1351	    37.860	32010.253906
+ s352	    55.337	1.644878
+ s353	    13.928	3200002816.000000
+ s421	    19.272	32009.031250
+s1421	    18.306	16000.000000
+ s422	    31.250	257.701416
+ s423	    17.892	439.690308
+ s424	    21.933	822.360596
+ s431	    39.650	1674247.125000
+ s441	     9.736	196491.250000
+ s442	     8.399	114240.132812
+ s443	    14.591	361015.906250
+ s451	    28.542	32009.281250
+ s452	    20.758	32512.015625
+ s453	     5.238	21.901447
+ s471	     6.747	64004.933594
+ s481	    32.993	196491.250000
+ s482	    33.395	196491.250000
+ s491	    13.784	32001.644531
+s4112	     8.114	1127134.250000
+s4113	    11.599	32001.644531
+s4114	    10.292	32000.000000
+s4115	     7.035	1.038800
+s4116	     4.675	0.753265
+s4117	     9.139	32002.207031
+s4121	     5.452	196491.250000
+   va	    28.552	1.644884
+  vag	    12.019	1.644884
+  vas	    11.376	1.644885
+  vif	     3.211	1.644884
+  vpv	    37.895	1642411.250000
+  vtv	    37.827	32000.000000
+vpvtv	    22.026	689753.562500
+vpvts	     3.839	175255268098048.000000
+vpvpv	    21.438	1.644884
+vtvtv	    22.282	32000.000000
+vsumr	    15.483	10.950724
+vdotr	    30.549	1.644884
+ vbor	     0.861	31924.050781
+Connection to 192.168.2.19 closed.
+
+real	87m49.889s
+user	0m0.017s
+sys	0m0.021s
+ EVL predication
+Your branch is up to date with 'origin/master'.
+patching file makefiles/Makefile.clang
++++ make clean
+make -C ./src COMPILER=GNU clean
+make[1]: Entering directory '/home/preames/benchmarking/TSVC_2/src'
+rm -f *.o *.s
+make[1]: Leaving directory '/home/preames/benchmarking/TSVC_2/src'
++++ /home/preames/llvm-dev/build/bin/clang -v
+clang version 21.0.0git (https://github.com/llvm/llvm-project.git a89021bc83705172b4a4cdac0a95ff50f4f868b1)
+Target: x86_64-unknown-linux-gnu
+Thread model: posix
+InstalledDir: /home/preames/llvm-dev/build/bin
+Build config: +assertions
+Found candidate GCC installation: /usr/lib/gcc/x86_64-linux-gnu/11
+Found candidate GCC installation: /usr/lib/gcc/x86_64-linux-gnu/12
+Found candidate GCC installation: /usr/lib/gcc/x86_64-linux-gnu/9
+Selected GCC installation: /usr/lib/gcc/x86_64-linux-gnu/12
+Candidate multilib: .;@m64
+Selected multilib: .;@m64
++++ git diff
+diff --git a/makefiles/Makefile.clang b/makefiles/Makefile.clang
+index cefe725..fec9a3c 100644
+--- a/makefiles/Makefile.clang
++++ b/makefiles/Makefile.clang
+@@ -1,9 +1,9 @@
+ 
+-CC=clang
+-CXX=clang++
++CC=/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include
++CXX=/home/preames/llvm-dev/build/bin/clang++ --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++   -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/12.1.0/../../../../riscv64-unknown-linux-gnu/include/c++/12.1.0  -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/12.1.0/../../../../riscv64-unknown-linux-gnu/include/c++/12.1.0/riscv64-unknown-linux-gnu  -isystem  /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/12.1.0/../../../../riscv64-unknown-linux-gnu/include/c++/12.1.0/backward  -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/12.1.0/include   -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/12.1.0/include-fixed  -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/12.1.0/../../../../riscv64-unknown-linux-gnu/include  -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include
+ # no FC for clang
+ FC=
+-flags = -O3 -fstrict-aliasing
++flags = -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-with-evl -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue
+ vecflags = -fvectorize -fslp-vectorize-aggressive
+ novecflags = -fno-vectorize
+ omp_flags=-fopenmp=libomp
++++ make COMPILER=clang
+make[1]: Entering directory '/home/preames/benchmarking/TSVC_2/src'
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-with-evl -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue -fvectorize -fslp-vectorize-aggressive -c -o tsvc_vec.o tsvc.c
+clang: warning: the flag '-fslp-vectorize-aggressive' has been deprecated and will be ignored [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-rtlib=libgcc' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-stdlib=libstdc++' [-Wunused-command-line-argument]
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-with-evl -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue -fvectorize -fslp-vectorize-aggressive  -c -o dummy.o dummy.c
+clang: warning: the flag '-fslp-vectorize-aggressive' has been deprecated and will be ignored [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-rtlib=libgcc' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-stdlib=libstdc++' [-Wunused-command-line-argument]
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-with-evl -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue -fvectorize -fslp-vectorize-aggressive  -c -o common.o common.c
+clang: warning: the flag '-fslp-vectorize-aggressive' has been deprecated and will be ignored [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-rtlib=libgcc' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-stdlib=libstdc++' [-Wunused-command-line-argument]
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include tsvc_vec.o dummy.o common.o -lm -o ../bin/clang/tsvc_vec_default
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-with-evl -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue -fno-vectorize -c -o tsvc_novec.o tsvc.c
+clang: warning: argument unused during compilation: '-fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-rtlib=libgcc' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-stdlib=libstdc++' [-Wunused-command-line-argument]
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include tsvc_novec.o dummy.o common.o -lm -o ../bin/clang/tsvc_novec_default
+rm common.o tsvc_vec.o dummy.o tsvc_novec.o
+make[1]: Leaving directory '/home/preames/benchmarking/TSVC_2/src'
+make[1]: Entering directory '/home/preames/benchmarking/TSVC_2/src'
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-with-evl -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue -ffast-math -fvectorize -fslp-vectorize-aggressive -c -o tsvc_vec.o tsvc.c
+clang: warning: the flag '-fslp-vectorize-aggressive' has been deprecated and will be ignored [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-rtlib=libgcc' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-stdlib=libstdc++' [-Wunused-command-line-argument]
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-with-evl -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue -ffast-math -fvectorize -fslp-vectorize-aggressive  -c -o dummy.o dummy.c
+clang: warning: the flag '-fslp-vectorize-aggressive' has been deprecated and will be ignored [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-rtlib=libgcc' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-stdlib=libstdc++' [-Wunused-command-line-argument]
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-with-evl -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue -ffast-math -fvectorize -fslp-vectorize-aggressive  -c -o common.o common.c
+clang: warning: the flag '-fslp-vectorize-aggressive' has been deprecated and will be ignored [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-rtlib=libgcc' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-stdlib=libstdc++' [-Wunused-command-line-argument]
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include tsvc_vec.o dummy.o common.o -lm -o ../bin/clang/tsvc_vec_relaxed
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-with-evl -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue -ffast-math -fno-vectorize -c -o tsvc_novec.o tsvc.c
+clang: warning: argument unused during compilation: '-fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-rtlib=libgcc' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-stdlib=libstdc++' [-Wunused-command-line-argument]
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include tsvc_novec.o dummy.o common.o -lm -o ../bin/clang/tsvc_novec_relaxed
+rm common.o tsvc_vec.o dummy.o tsvc_novec.o
+make[1]: Leaving directory '/home/preames/benchmarking/TSVC_2/src'
+make[1]: Entering directory '/home/preames/benchmarking/TSVC_2/src'
+/home/preames/benchmarking/TSVC_2/makefiles/Makefile.clang:21: No 'precise' math flags for clang!
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-with-evl -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue  -fvectorize -fslp-vectorize-aggressive -c -o tsvc_vec.o tsvc.c
+clang: warning: the flag '-fslp-vectorize-aggressive' has been deprecated and will be ignored [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-rtlib=libgcc' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-stdlib=libstdc++' [-Wunused-command-line-argument]
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-with-evl -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue  -fvectorize -fslp-vectorize-aggressive  -c -o dummy.o dummy.c
+clang: warning: the flag '-fslp-vectorize-aggressive' has been deprecated and will be ignored [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-rtlib=libgcc' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-stdlib=libstdc++' [-Wunused-command-line-argument]
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-with-evl -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue  -fvectorize -fslp-vectorize-aggressive  -c -o common.o common.c
+clang: warning: the flag '-fslp-vectorize-aggressive' has been deprecated and will be ignored [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-rtlib=libgcc' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-stdlib=libstdc++' [-Wunused-command-line-argument]
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include tsvc_vec.o dummy.o common.o -lm -o ../bin/clang/tsvc_vec_precise
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-with-evl -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue  -fno-vectorize -c -o tsvc_novec.o tsvc.c
+clang: warning: argument unused during compilation: '-fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-rtlib=libgcc' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-stdlib=libstdc++' [-Wunused-command-line-argument]
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include tsvc_novec.o dummy.o common.o -lm -o ../bin/clang/tsvc_novec_precise
+rm common.o tsvc_vec.o dummy.o tsvc_novec.o
+make[1]: Leaving directory '/home/preames/benchmarking/TSVC_2/src'
++++ /home/preames/llvm-dev/build/bin/llvm-objdump -D --section=.text bin/clang/tsvc_vec_relaxed
++++ scp bin/clang/tsvc_vec_relaxed 'k1-dev-board:~/'
+tsvc_vec_relaxed                                                                                                                              100%  139KB  11.4KB/s   00:12    
++++ ssh k1-dev-board -t '~/tsvc_vec_relaxed'
+Loop 	Time(sec) 	Checksum
+ s000	     5.084	512080000.000000
+ s111	    10.873	32000.410156
+s1111	     9.092	16005.822266
+ s112	    12.014	84617.781250
+s1112	     7.072	32001.644531
+ s113	     9.846	32000.644531
+s1113	    24.841	32001.644531
+ s114	    28.813	919.861389
+ s115	    24.079	31745.953125
+s1115	    91.440	0.065533
+ s116	    75.312	32000.000000
+ s118	    38.016	85209.921875
+ s119	     6.261	86338.992188
+s1119	     5.483	119099.882812
+ s121	    11.728	32009.031250
+ s122	     5.677	196490.921875
+ s123	    20.819	32003.287109
+ s124	     7.500	32001.644531
+ s125	     7.964	131072.000000
+ s126	    19.768	66954.960938
+ s127	    11.511	32003.287109
+ s128	    12.754	80000.000000
+ s131	    19.558	32009.031250
+ s132	     7.962	65538.562500
+ s141	    29.870	32487076.000000
+ s151	    19.533	32009.031250
+ s152	     7.670	152207.218750
+ s161	    16.070	64002.058594
+s1161	    30.144	64002.468750
+ s162	     5.337	32009.031250
+ s171	     3.697	196491.250000
+ s172	     3.698	196491.250000
+ s173	    17.758	32001.640625
+ s174	    18.651	32001.640625
+ s175	     3.954	32009.031250
+ s176	     3.709	32063.832031
+ s211	    28.543	63983.183594
+ s212	    23.789	132011.375000
+s1213	    20.605	132022.734375
+ s221	    13.338	1543685120.000000
+s1221	     4.265	630444416.000000
+ s222	     4.013	32000.000000
+ s231	   179.421	119099.882812
+ s232	     5.297	65536.000000
+s1232	   216.124	33958.011719
+ s233	   756.132	504912.625000
+s2233	   196.223	337652.906250
+ s235	   371.089	160023.968750
+ s241	    60.145	64000.000000
+ s242	     4.913	1535952000.000000
+ s243	    13.410	810624.937500
+ s244	    30.371	70102.429688
+s1244	    41.067	108496.445312
+s2244	     7.377	70102.890625
+ s251	    25.212	32004.371094
+s1251	    53.667	400005.968750
+s2251	    28.684	2.635709
+s3251	    22.480	12.595594
+ s252	     4.342	63999.000000
+ s253	     9.004	3200010240.000000
+ s254	    12.834	32000.000000
+ s255	     4.987	31968.515625
+ s256	    18.313	66207.703125
+ s257	    30.781	163072.000000
+ s258	     0.306	14.652790
+ s261	    28.641	260999.156250
+^[[B s271	    24.217	689753.562500
+ s272	     7.928	64000.000000
+ s273	     9.546	99051.656250
+ s274	     9.821	3200195584.000000
+ s275	    44.607	65536.000000
+s2275	   839.815	65536.000000
+ s276	    40.739	689753.562500
+ s277	    26.109	32000.000000
+ s278	    15.235	64012.597656
+ s279	    12.995	64014.289062
+s1279	    10.005	64014.289062
+s2710	     6.366	96003.281250
+s2711	    24.238	689753.562500
+s2712	    23.130	289751.656250
+ s281	    26.216	32000.000000
+s1281	    54.037	inf
+ s291	    44.799	32000.000000
+ s292	    32.080	31968.515625
+ s293	     4.567	32000.000000
+s2101	    13.499	1704092.000000
+s2102	    19.218	256.000000
+s2111	    27.139	34545052.000000
+ s311	    18.714	10.950724
+s31111	     9.261	10.950724
+ s312	    20.539	1.030928
+ s313	    16.806	1.644884
+ s314	     9.352	1.000000
+ s315	    23.466	54857.000000
+ s316	    11.069	0.000031
+ s317	     2.516	0.000000
+ s318	    17.276	32002.000000
+ s319	    16.989	43.802910
+s3110	    20.922	514.000000
+s13110	    20.967	514.000000
+s3111	     0.965	10.950724
+s3112	     9.692	1.644725
+s3113	     7.715	2.000000
+ s321	    11.617	32000.000000
+ s322	    10.549	32000.000000
+ s323	    16.670	146484.968750
+ s331	     3.337	32000.000000
+ s332	     2.705	-1.000000
+ s341	    28.462	10.950724
+ s342	    32.403	10.950724
+ s343	    20.997	1567.833496
+ s351	    84.969	25600002048.000000
+s1351	    34.796	32010.253906
+ s352	    57.256	1.644891
+ s353	    15.999	3200002816.000000
+ s421	    15.402	32009.031250
+s1421	    17.491	16000.000000
+ s422	    41.893	257.701416
+ s423	    17.512	439.690308
+ s424	    23.730	822.360596
+ s431	    36.717	1674247.125000
+ s441	    14.573	196491.250000
+ s442	    10.045	114240.132812
+ s443	    13.401	361015.906250
+ s451	    28.542	32009.281250
+ s452	    18.527	32512.015625
+ s453	     5.179	21.901447
+ s471	     6.260	64004.933594
+ s481	    32.950	196491.250000
+ s482	    33.371	196491.250000
+ s491	    12.972	32001.644531
+s4112	     8.196	1127134.250000
+s4113	    12.087	32001.644531
+s4114	     9.950	32000.000000
+s4115	     8.595	1.038800
+s4116	     5.138	0.753265
+s4117	     9.116	32002.207031
+s4121	     5.199	196491.250000
+   va	    23.527	1.644884
+  vag	    12.778	1.644884
+  vas	    12.782	1.644885
+  vif	     2.893	1.644884
+  vpv	    36.961	1642411.250000
+  vtv	    37.072	32000.000000
+vpvtv	    20.969	689753.562500
+vpvts	     3.710	175255268098048.000000
+vpvpv	    20.882	1.644884
+vtvtv	    20.813	32000.000000
+vsumr	    18.585	10.950724
+vdotr	    33.586	1.644884
+ vbor	     0.823	31924.050781
+Connection to 192.168.2.19 closed.
+
+real	88m47.520s
+user	0m0.024s
+sys	0m0.023s
+ mask predication
+Your branch is up to date with 'origin/master'.
+patching file makefiles/Makefile.clang
++++ make clean
+make -C ./src COMPILER=GNU clean
+make[1]: Entering directory '/home/preames/benchmarking/TSVC_2/src'
+rm -f *.o *.s
+make[1]: Leaving directory '/home/preames/benchmarking/TSVC_2/src'
++++ /home/preames/llvm-dev/build/bin/clang -v
+clang version 21.0.0git (https://github.com/llvm/llvm-project.git a89021bc83705172b4a4cdac0a95ff50f4f868b1)
+Target: x86_64-unknown-linux-gnu
+Thread model: posix
+InstalledDir: /home/preames/llvm-dev/build/bin
+Build config: +assertions
+Found candidate GCC installation: /usr/lib/gcc/x86_64-linux-gnu/11
+Found candidate GCC installation: /usr/lib/gcc/x86_64-linux-gnu/12
+Found candidate GCC installation: /usr/lib/gcc/x86_64-linux-gnu/9
+Selected GCC installation: /usr/lib/gcc/x86_64-linux-gnu/12
+Candidate multilib: .;@m64
+Selected multilib: .;@m64
++++ git diff
+diff --git a/makefiles/Makefile.clang b/makefiles/Makefile.clang
+index cefe725..a9dca25 100644
+--- a/makefiles/Makefile.clang
++++ b/makefiles/Makefile.clang
+@@ -1,9 +1,9 @@
+ 
+-CC=clang
+-CXX=clang++
++CC=/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include
++CXX=/home/preames/llvm-dev/build/bin/clang++ --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++   -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/12.1.0/../../../../riscv64-unknown-linux-gnu/include/c++/12.1.0  -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/12.1.0/../../../../riscv64-unknown-linux-gnu/include/c++/12.1.0/riscv64-unknown-linux-gnu  -isystem  /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/12.1.0/../../../../riscv64-unknown-linux-gnu/include/c++/12.1.0/backward  -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/12.1.0/include   -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/12.1.0/include-fixed  -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/12.1.0/../../../../riscv64-unknown-linux-gnu/include  -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include
+ # no FC for clang
+ FC=
+-flags = -O3 -fstrict-aliasing
++flags = -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-without-lane-mask -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue
+ vecflags = -fvectorize -fslp-vectorize-aggressive
+ novecflags = -fno-vectorize
+ omp_flags=-fopenmp=libomp
++++ make COMPILER=clang
+make[1]: Entering directory '/home/preames/benchmarking/TSVC_2/src'
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-without-lane-mask -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue -fvectorize -fslp-vectorize-aggressive -c -o tsvc_vec.o tsvc.c
+clang: warning: the flag '-fslp-vectorize-aggressive' has been deprecated and will be ignored [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-rtlib=libgcc' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-stdlib=libstdc++' [-Wunused-command-line-argument]
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-without-lane-mask -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue -fvectorize -fslp-vectorize-aggressive  -c -o dummy.o dummy.c
+clang: warning: the flag '-fslp-vectorize-aggressive' has been deprecated and will be ignored [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-rtlib=libgcc' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-stdlib=libstdc++' [-Wunused-command-line-argument]
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-without-lane-mask -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue -fvectorize -fslp-vectorize-aggressive  -c -o common.o common.c
+clang: warning: the flag '-fslp-vectorize-aggressive' has been deprecated and will be ignored [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-rtlib=libgcc' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-stdlib=libstdc++' [-Wunused-command-line-argument]
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include tsvc_vec.o dummy.o common.o -lm -o ../bin/clang/tsvc_vec_default
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-without-lane-mask -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue -fno-vectorize -c -o tsvc_novec.o tsvc.c
+clang: warning: argument unused during compilation: '-fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-rtlib=libgcc' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-stdlib=libstdc++' [-Wunused-command-line-argument]
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include tsvc_novec.o dummy.o common.o -lm -o ../bin/clang/tsvc_novec_default
+rm common.o tsvc_vec.o dummy.o tsvc_novec.o
+make[1]: Leaving directory '/home/preames/benchmarking/TSVC_2/src'
+make[1]: Entering directory '/home/preames/benchmarking/TSVC_2/src'
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-without-lane-mask -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue -ffast-math -fvectorize -fslp-vectorize-aggressive -c -o tsvc_vec.o tsvc.c
+clang: warning: the flag '-fslp-vectorize-aggressive' has been deprecated and will be ignored [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-rtlib=libgcc' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-stdlib=libstdc++' [-Wunused-command-line-argument]
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-without-lane-mask -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue -ffast-math -fvectorize -fslp-vectorize-aggressive  -c -o dummy.o dummy.c
+clang: warning: the flag '-fslp-vectorize-aggressive' has been deprecated and will be ignored [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-rtlib=libgcc' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-stdlib=libstdc++' [-Wunused-command-line-argument]
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-without-lane-mask -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue -ffast-math -fvectorize -fslp-vectorize-aggressive  -c -o common.o common.c
+clang: warning: the flag '-fslp-vectorize-aggressive' has been deprecated and will be ignored [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-rtlib=libgcc' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-stdlib=libstdc++' [-Wunused-command-line-argument]
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include tsvc_vec.o dummy.o common.o -lm -o ../bin/clang/tsvc_vec_relaxed
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-without-lane-mask -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue -ffast-math -fno-vectorize -c -o tsvc_novec.o tsvc.c
+clang: warning: argument unused during compilation: '-fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-rtlib=libgcc' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-stdlib=libstdc++' [-Wunused-command-line-argument]
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include tsvc_novec.o dummy.o common.o -lm -o ../bin/clang/tsvc_novec_relaxed
+rm common.o tsvc_vec.o dummy.o tsvc_novec.o
+make[1]: Leaving directory '/home/preames/benchmarking/TSVC_2/src'
+make[1]: Entering directory '/home/preames/benchmarking/TSVC_2/src'
+/home/preames/benchmarking/TSVC_2/makefiles/Makefile.clang:21: No 'precise' math flags for clang!
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-without-lane-mask -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue  -fvectorize -fslp-vectorize-aggressive -c -o tsvc_vec.o tsvc.c
+clang: warning: the flag '-fslp-vectorize-aggressive' has been deprecated and will be ignored [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-rtlib=libgcc' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-stdlib=libstdc++' [-Wunused-command-line-argument]
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-without-lane-mask -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue  -fvectorize -fslp-vectorize-aggressive  -c -o dummy.o dummy.c
+clang: warning: the flag '-fslp-vectorize-aggressive' has been deprecated and will be ignored [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-rtlib=libgcc' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-stdlib=libstdc++' [-Wunused-command-line-argument]
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-without-lane-mask -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue  -fvectorize -fslp-vectorize-aggressive  -c -o common.o common.c
+clang: warning: the flag '-fslp-vectorize-aggressive' has been deprecated and will be ignored [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-rtlib=libgcc' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-stdlib=libstdc++' [-Wunused-command-line-argument]
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include tsvc_vec.o dummy.o common.o -lm -o ../bin/clang/tsvc_vec_precise
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-without-lane-mask -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue  -fno-vectorize -c -o tsvc_novec.o tsvc.c
+clang: warning: argument unused during compilation: '-fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-rtlib=libgcc' [-Wunused-command-line-argument]
+clang: warning: argument unused during compilation: '-stdlib=libstdc++' [-Wunused-command-line-argument]
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include tsvc_novec.o dummy.o common.o -lm -o ../bin/clang/tsvc_novec_precise
+rm common.o tsvc_vec.o dummy.o tsvc_novec.o
+make[1]: Leaving directory '/home/preames/benchmarking/TSVC_2/src'
++++ /home/preames/llvm-dev/build/bin/llvm-objdump -D --section=.text bin/clang/tsvc_vec_relaxed
++++ scp bin/clang/tsvc_vec_relaxed 'k1-dev-board:~/'
+tsvc_vec_relaxed                                                                                                                              100%  155KB  15.7KB/s   00:09    
++++ ssh k1-dev-board -t '~/tsvc_vec_relaxed'
+Loop 	Time(sec) 	Checksum
+ s000	     8.565	512080000.000000
+ s111	    12.736	32000.410156
+s1111	    10.537	16005.822266
+ s112	    18.283	84617.781250
+s1112	    15.597	32001.644531
+ s113	    17.442	32000.644531
+s1113	    24.727	32001.644531
+ s114	    27.854	919.861389
+ s115	    30.786	31745.953125
+s1115	    87.327	0.065533
+ s116	    67.349	32000.000000
+ s118	    40.198	85209.921875
+ s119	     8.910	86338.992188
+s1119	     8.052	119099.882812
+ s121	    15.685	32009.031250
+ s122	     7.629	196490.921875
+ s123	    20.658	32003.287109
+ s124	     8.815	32001.644531
+ s125	    10.729	131072.000000
+ s126	    19.393	66954.960938
+ s127	    15.007	32003.287109
+ s128	    15.056	80000.000000
+ s131	    26.156	32009.031250
+ s132	    15.332	65538.562500
+ s141	    30.378	32487076.000000
+ s151	    26.205	32009.031250
+ s152	     9.187	152207.218750
+ s161	    16.641	64002.058594
+s1161	    30.185	64002.468750
+ s162	     6.637	32009.031250
+ s171	     4.988	196491.250000
+ s172	     5.275	196491.250000
+ s173	    26.678	32001.640625
+ s174	    27.311	32001.640625
+ s175	     5.562	32009.031250
+ s176	     5.297	32063.832031
+ s211	    25.116	63983.183594
+ s212	    23.872	132011.375000
+s1213	    21.984	132022.734375
+ s221	    12.821	1543685120.000000
+s1221	     4.539	630444416.000000
+ s222	     4.072	32000.000000
+ s231	   221.350	119099.882812
+ s232	     5.160	65536.000000
+s1232	   220.616	33958.011719
+ s233	   744.816	504912.625000
+s2233	   204.945	337652.906250
+ s235	   474.401	160023.968750
+ s241	    60.553	64000.000000
+ s242	     5.353	1535952000.000000
+ s243	    12.876	810624.937500
+ s244	    30.519	70102.429688
+s1244	    41.165	108496.445312
+s2244	    10.119	70102.890625
+ s251	    30.236	32004.371094
+s1251	    50.620	400005.968750
+s2251	    26.873	2.635709
+s3251	    41.069	12.595594
+ s252	     6.211	63999.000000
+ s253	     9.269	3200010240.000000
+ s254	    22.083	32000.000000
+ s255	     7.375	31968.515625
+ s256	    22.672	66207.703125
+ s257	    20.196	163072.000000
+ s258	     0.306	14.652790
+ s261	    29.436	260999.156250
+ s271	    28.625	689753.562500
+ s272	     9.992	64000.000000
+ s273	    13.226	99051.656250
+ s274	    11.049	3200195584.000000
+ s275	    79.302	65536.000000
+s2275	   755.493	65536.000000
+ s276	    55.525	689753.562500
+ s277	    26.122	32000.000000
+ s278	    16.980	64012.597656
+ s279	    11.387	64014.289062
+s1279	    10.336	64014.289062
+s2710	     7.979	96003.281250
+s2711	    28.642	689753.562500
+s2712	    28.373	289751.656250
+ s281	    26.365	32000.000000
+s1281	    51.756	inf
+ s291	    40.226	32000.000000
+ s292	    32.135	31968.515625
+ s293	     9.593	32000.000000
+s2101	    14.022	1704092.000000
+s2102	    19.136	256.000000
+s2111	    27.240	34545052.000000
+ s311	    33.407	10.950724
+s31111	     8.891	10.950724
+ s312	    20.732	1.030928
+ s313	    23.429	1.644884
+ s314	    16.722	1.000000
+ s315	    23.471	54857.000000
+ s316	    16.772	0.000031
+ s317	     2.521	0.000000
+ s318	    17.280	32002.000000
+ s319	    18.792	43.802910
+s3110	    20.985	514.000000
+s13110	    20.983	514.000000
+s3111	     1.735	10.950724
+s3112	     9.683	1.644725
+s3113	    15.531	2.000000
+ s321	    11.757	32000.000000
+ s322	    11.635	32000.000000
+ s323	    15.180	146484.968750
+ s331	     3.341	32000.000000
+ s332	     2.691	-1.000000
+ s341	    28.371	10.950724
+ s342	    32.422	10.950724
+ s343	    24.388	1567.833496
+ s351	    91.157	25600002048.000000
+s1351	    42.562	32010.253906
+ s352	    61.644	1.644891
+ s353	    16.417	3200002816.000000
+ s421	    21.419	32009.031250
+s1421	    24.461	16000.000000
+ s422	    40.988	257.701416
+ s423	    23.227	439.690308
+ s424	    20.139	822.360596
+ s431	    49.318	1674247.125000
+ s441	    15.361	196491.250000
+ s442	    10.865	114240.132812
+ s443	    18.996	361015.906250
+ s451	    28.496	32009.281250
+ s452	    23.660	32512.015625
+ s453	     8.820	21.901447
+ s471	    10.474	64004.933594
+ s481	    32.992	196491.250000
+ s482	    33.442	196491.250000
+ s491	    12.997	32001.644531
+s4112	     9.801	1127134.250000
+s4113	    13.141	32001.644531
+s4114	    11.953	32000.000000
+s4115	     8.997	1.038800
+s4116	     6.753	0.753265
+s4117	     9.979	32002.207031
+s4121	     6.544	196491.250000
+   va	    31.712	1.644884
+  vag	    15.258	1.644884
+  vas	    16.087	1.644885
+  vif	     4.669	1.644884
+  vpv	    49.877	1642411.250000
+  vtv	    49.872	32000.000000
+vpvtv	    26.135	689753.562500
+vpvts	     5.273	175255268098048.000000
+vpvpv	    26.309	1.644884
+vtvtv	    26.366	32000.000000
+vsumr	    33.438	10.950724
+vdotr	    46.872	1.644884
+ vbor	     1.088	31924.050781
+Connection to 192.168.2.19 closed.
+
+real	96m33.696s
+user	0m0.020s
+sys	0m0.027s
