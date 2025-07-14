@@ -1,0 +1,609 @@
+ default (unpredicated)
+Your branch is up to date with 'origin/master'.
+patching file makefiles/Makefile.clang
+make -C ./src COMPILER=GNU clean
+make[1]: Entering directory '/home/preames/benchmarking/TSVC_2/src'
+rm -f *.o *.s
+make[1]: Leaving directory '/home/preames/benchmarking/TSVC_2/src'
+diff --git a/makefiles/Makefile.clang b/makefiles/Makefile.clang
+index cefe725..8466905 100644
+--- a/makefiles/Makefile.clang
++++ b/makefiles/Makefile.clang
+@@ -1,9 +1,9 @@
+ 
+-CC=clang
+-CXX=clang++
++CC=/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include
++CXX=/home/preames/llvm-dev/build/bin/clang++ --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++   -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/12.1.0/../../../../riscv64-unknown-linux-gnu/include/c++/12.1.0  -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/12.1.0/../../../../riscv64-unknown-linux-gnu/include/c++/12.1.0/riscv64-unknown-linux-gnu  -isystem  /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/12.1.0/../../../../riscv64-unknown-linux-gnu/include/c++/12.1.0/backward  -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/12.1.0/include   -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/12.1.0/include-fixed  -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/12.1.0/../../../../riscv64-unknown-linux-gnu/include  -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include
+ # no FC for clang
+ FC=
+-flags = -O3 -fstrict-aliasing
++flags = -O3 -fstrict-aliasing -march=rv64gcv
+ vecflags = -fvectorize -fslp-vectorize-aggressive
+ novecflags = -fno-vectorize
+ omp_flags=-fopenmp=libomp
+make[1]: Entering directory '/home/preames/benchmarking/TSVC_2/src'
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -fvectorize -fslp-vectorize-aggressive -c -o tsvc_vec.o tsvc.c
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -fvectorize -fslp-vectorize-aggressive  -c -o dummy.o dummy.c
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -fvectorize -fslp-vectorize-aggressive  -c -o common.o common.c
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include tsvc_vec.o dummy.o common.o -lm -o ../bin/clang/tsvc_vec_default
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -fno-vectorize -c -o tsvc_novec.o tsvc.c
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include tsvc_novec.o dummy.o common.o -lm -o ../bin/clang/tsvc_novec_default
+rm common.o tsvc_vec.o dummy.o tsvc_novec.o
+make[1]: Leaving directory '/home/preames/benchmarking/TSVC_2/src'
+make[1]: Entering directory '/home/preames/benchmarking/TSVC_2/src'
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -ffast-math -fvectorize -fslp-vectorize-aggressive -c -o tsvc_vec.o tsvc.c
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -ffast-math -fvectorize -fslp-vectorize-aggressive  -c -o dummy.o dummy.c
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -ffast-math -fvectorize -fslp-vectorize-aggressive  -c -o common.o common.c
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include tsvc_vec.o dummy.o common.o -lm -o ../bin/clang/tsvc_vec_relaxed
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -ffast-math -fno-vectorize -c -o tsvc_novec.o tsvc.c
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include tsvc_novec.o dummy.o common.o -lm -o ../bin/clang/tsvc_novec_relaxed
+rm common.o tsvc_vec.o dummy.o tsvc_novec.o
+make[1]: Leaving directory '/home/preames/benchmarking/TSVC_2/src'
+make[1]: Entering directory '/home/preames/benchmarking/TSVC_2/src'
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv  -fvectorize -fslp-vectorize-aggressive -c -o tsvc_vec.o tsvc.c
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv  -fvectorize -fslp-vectorize-aggressive  -c -o dummy.o dummy.c
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv  -fvectorize -fslp-vectorize-aggressive  -c -o common.o common.c
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include tsvc_vec.o dummy.o common.o -lm -o ../bin/clang/tsvc_vec_precise
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv  -fno-vectorize -c -o tsvc_novec.o tsvc.c
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include tsvc_novec.o dummy.o common.o -lm -o ../bin/clang/tsvc_novec_precise
+rm common.o tsvc_vec.o dummy.o tsvc_novec.o
+make[1]: Leaving directory '/home/preames/benchmarking/TSVC_2/src'
+Loop 	Time(sec) 	Checksum
+^[[B s000	     5.314	512080000.000000
+ s111	     9.116	32000.410156
+s1111	     9.721	16005.822266
+ s112	    18.462	84617.781250
+s1112	     7.069	32001.644531
+ s113	    10.007	32000.644531
+s1113	    24.734	32001.644531
+ s114	    31.647	919.861389
+ s115	    25.376	31745.953125
+s1115	    77.324	0.065533
+ s116	    75.195	32000.000000
+ s118	    36.728	85046.140625
+ s119	     8.168	86338.992188
+s1119	     5.519	119099.882812
+ s121	    12.070	32009.031250
+ s122	     4.081	196490.921875
+ s123	    20.630	32003.287109
+ s124	     9.179	32001.644531
+ s125	     7.587	131072.000000
+ s126	    19.078	66954.960938
+ s127	     9.459	32003.287109
+ s128	    13.415	80000.000000
+ s131	    20.312	32009.031250
+ s132	    11.674	65538.562500
+ s141	    32.717	32487076.000000
+ s151	    20.323	32009.031250
+ s152	     8.110	152207.218750
+ s161	    15.791	64002.054688
+s1161	    30.195	64002.464844
+ s162	     5.513	32009.031250
+ s171	     3.903	196491.250000
+ s172	     4.026	196491.250000
+ s173	    19.174	32001.640625
+ s174	    20.635	32001.640625
+ s175	     4.235	32009.031250
+ s176	     3.841	32063.832031
+ s211	    29.828	63983.183594
+ s212	    23.852	132011.375000
+s1213	    20.464	132022.765625
+ s221	    13.250	1543685120.000000
+s1221	     4.255	630444416.000000
+ s222	     4.012	32000.000000
+ s231	   204.353	119099.882812
+ s232	     5.290	65536.000000
+s1232	   218.951	33958.011719
+ s233	   710.936	504912.625000
+s2233	   161.307	337652.906250
+ s235	   413.821	160023.984375
+ s241	    60.320	64000.000000
+ s242	     4.912	1535952000.000000
+ s243	    13.627	810624.937500
+ s244	    30.620	70102.437500
+s1244	    41.128	108496.453125
+s2244	     7.850	70102.890625
+ s251	    25.447	32004.371094
+s1251	    54.821	400005.968750
+s2251	    28.459	2.635709
+s3251	    29.585	12.595594
+ s252	     4.137	63999.000000
+ s253	     8.126	3200010240.000000
+ s254	    12.620	32000.000000
+ s255	     4.981	31968.515625
+ s256	    20.305	66207.703125
+ s257	    40.920	163072.000000
+ s258	     0.306	14.652790
+ s261	    28.936	260999.140625
+ s271	    22.515	689753.562500
+ s272	     9.803	64000.000000
+ s273	    12.980	99051.656250
+ s274	     8.805	3200195328.000000
+ s275	    38.363	65536.000000
+s2275	   750.796	65536.000000
+ s276	    40.213	689753.562500
+ s277	    26.343	32000.000000
+ s278	    13.649	64012.593750
+ s279	     7.857	64014.289062
+s1279	    10.082	64014.289062
+s2710	     4.917	96003.289062
+s2711	    22.518	689753.562500
+s2712	    22.321	289751.656250
+ s281	    26.177	32000.000000
+s1281	    54.692	inf
+ s291	    44.737	32000.000000
+ s292	    32.094	31968.515625
+ s293	     4.953	32000.000000
+s2101	    14.015	1704092.000000
+s2102	    19.232	256.000000
+s2111	    27.196	34545052.000000
+ s311	    15.497	10.950724
+s31111	     9.762	10.950724
+ s312	    21.832	1.030958
+ s313	    15.250	1.644884
+ s314	     7.742	1.000000
+ s315	    23.543	54857.000000
+ s316	     8.415	0.000031
+ s317	     1.268	0.000000
+ s318	    17.281	32002.000000
+ s319	    16.684	43.802910
+s3110	    20.808	514.000000
+s13110	    20.865	514.000000
+s3111	     0.869	10.950724
+s3112	     9.665	1.644725
+s3113	     6.949	2.000000
+ s321	    11.651	32000.000000
+ s322	    10.524	32000.000000
+ s323	    19.748	146484.968750
+ s331	     3.603	32000.000000
+ s332	     2.651	-1.000000
+ s341	    28.446	10.950724
+ s342	    32.424	10.950724
+ s343	    21.011	1567.833496
+^[[B^[[B s351	    65.447	25600002048.000000
+s1351	    35.867	32010.253906
+ s352	    55.371	1.644878
+ s353	    14.007	3200002816.000000
+ s421	    17.976	32009.031250
+s1421	    18.989	16000.000000
+ s422	    29.887	257.701416
+ s423	    17.505	439.690308
+ s424	    17.178	822.360596
+ s431	    39.278	1674247.125000
+ s441	     9.864	196491.250000
+ s442	     8.129	114240.132812
+ s443	    15.105	361015.906250
+ s451	    28.571	32009.281250
+ s452	    20.498	32512.015625
+ s453	     5.022	21.901447
+ s471	     5.167	64004.933594
+ s481	    32.905	196491.250000
+ s482	    33.366	196491.250000
+ s491	    13.964	32001.644531
+s4112	     8.377	1127134.250000
+s4113	    12.112	32001.644531
+s4114	     9.518	32000.000000
+s4115	     7.145	1.038800
+s4116	     4.675	0.753265
+s4117	     9.109	32002.207031
+s4121	     5.519	196491.250000
+   va	    23.481	1.644884
+  vag	    11.643	1.644884
+  vas	    11.668	1.644885
+  vif	     2.656	1.644884
+  vpv	    37.713	1642411.250000
+  vtv	    37.712	32000.000000
+vpvtv	    22.088	689753.562500
+vpvts	     3.817	175255268098048.000000
+vpvpv	    21.533	1.644884
+vtvtv	    22.054	32000.000000
+vsumr	    15.500	10.950724
+vdotr	    30.504	1.644884
+ vbor	     0.860	31924.050781
+ EVL predication
+Your branch is up to date with 'origin/master'.
+patching file makefiles/Makefile.clang
+make -C ./src COMPILER=GNU clean
+make[1]: Entering directory '/home/preames/benchmarking/TSVC_2/src'
+rm -f *.o *.s
+make[1]: Leaving directory '/home/preames/benchmarking/TSVC_2/src'
+diff --git a/makefiles/Makefile.clang b/makefiles/Makefile.clang
+index cefe725..fec9a3c 100644
+--- a/makefiles/Makefile.clang
++++ b/makefiles/Makefile.clang
+@@ -1,9 +1,9 @@
+ 
+-CC=clang
+-CXX=clang++
++CC=/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include
++CXX=/home/preames/llvm-dev/build/bin/clang++ --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++   -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/12.1.0/../../../../riscv64-unknown-linux-gnu/include/c++/12.1.0  -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/12.1.0/../../../../riscv64-unknown-linux-gnu/include/c++/12.1.0/riscv64-unknown-linux-gnu  -isystem  /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/12.1.0/../../../../riscv64-unknown-linux-gnu/include/c++/12.1.0/backward  -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/12.1.0/include   -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/12.1.0/include-fixed  -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/12.1.0/../../../../riscv64-unknown-linux-gnu/include  -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include
+ # no FC for clang
+ FC=
+-flags = -O3 -fstrict-aliasing
++flags = -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-with-evl -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue
+ vecflags = -fvectorize -fslp-vectorize-aggressive
+ novecflags = -fno-vectorize
+ omp_flags=-fopenmp=libomp
+make[1]: Entering directory '/home/preames/benchmarking/TSVC_2/src'
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-with-evl -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue -fvectorize -fslp-vectorize-aggressive -c -o tsvc_vec.o tsvc.c
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-with-evl -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue -fvectorize -fslp-vectorize-aggressive  -c -o dummy.o dummy.c
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-with-evl -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue -fvectorize -fslp-vectorize-aggressive  -c -o common.o common.c
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include tsvc_vec.o dummy.o common.o -lm -o ../bin/clang/tsvc_vec_default
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-with-evl -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue -fno-vectorize -c -o tsvc_novec.o tsvc.c
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include tsvc_novec.o dummy.o common.o -lm -o ../bin/clang/tsvc_novec_default
+rm common.o tsvc_vec.o dummy.o tsvc_novec.o
+make[1]: Leaving directory '/home/preames/benchmarking/TSVC_2/src'
+make[1]: Entering directory '/home/preames/benchmarking/TSVC_2/src'
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-with-evl -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue -ffast-math -fvectorize -fslp-vectorize-aggressive -c -o tsvc_vec.o tsvc.c
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-with-evl -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue -ffast-math -fvectorize -fslp-vectorize-aggressive  -c -o dummy.o dummy.c
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-with-evl -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue -ffast-math -fvectorize -fslp-vectorize-aggressive  -c -o common.o common.c
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include tsvc_vec.o dummy.o common.o -lm -o ../bin/clang/tsvc_vec_relaxed
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-with-evl -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue -ffast-math -fno-vectorize -c -o tsvc_novec.o tsvc.c
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include tsvc_novec.o dummy.o common.o -lm -o ../bin/clang/tsvc_novec_relaxed
+rm common.o tsvc_vec.o dummy.o tsvc_novec.o
+make[1]: Leaving directory '/home/preames/benchmarking/TSVC_2/src'
+make[1]: Entering directory '/home/preames/benchmarking/TSVC_2/src'
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-with-evl -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue  -fvectorize -fslp-vectorize-aggressive -c -o tsvc_vec.o tsvc.c
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-with-evl -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue  -fvectorize -fslp-vectorize-aggressive  -c -o dummy.o dummy.c
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-with-evl -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue  -fvectorize -fslp-vectorize-aggressive  -c -o common.o common.c
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include tsvc_vec.o dummy.o common.o -lm -o ../bin/clang/tsvc_vec_precise
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-with-evl -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue  -fno-vectorize -c -o tsvc_novec.o tsvc.c
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include tsvc_novec.o dummy.o common.o -lm -o ../bin/clang/tsvc_novec_precise
+rm common.o tsvc_vec.o dummy.o tsvc_novec.o
+make[1]: Leaving directory '/home/preames/benchmarking/TSVC_2/src'
+Loop 	Time(sec) 	Checksum
+ s000	     5.206	512080000.000000
+ s111	    10.983	32000.410156
+s1111	     9.427	16005.822266
+ s112	    12.123	84617.781250
+s1112	     8.141	32001.644531
+ s113	    10.690	32000.644531
+s1113	    25.113	32001.644531
+ s114	    29.134	919.861389
+ s115	    23.757	31745.953125
+s1115	    91.269	0.065533
+ s116	    64.741	32000.000000
+ s118	    39.205	85209.921875
+ s119	     6.615	86338.992188
+s1119	     5.751	119099.882812
+ s121	    11.846	32009.031250
+ s122	     5.703	196490.921875
+ s123	    20.935	32003.287109
+ s124	     8.017	32001.644531
+ s125	     7.859	131072.000000
+ s126	    20.415	66954.960938
+ s127	    11.784	32003.287109
+ s128	    13.564	80000.000000
+ s131	    19.860	32009.031250
+ s132	     7.917	65538.562500
+ s141	    30.055	32487076.000000
+ s151	    19.770	32009.031250
+ s152	     9.112	152207.218750
+ s161	    15.798	64002.058594
+s1161	    30.611	64002.468750
+ s162	     5.406	32009.031250
+ s171	     3.718	196491.250000
+ s172	     3.722	196491.250000
+ s173	    20.175	32001.640625
+ s174	    21.240	32001.640625
+ s175	     3.970	32009.031250
+ s176	     3.744	32063.832031
+ s211	    29.649	63983.183594
+ s212	    24.041	132011.375000
+s1213	    21.016	132022.734375
+ s221	    13.331	1543685120.000000
+s1221	     4.259	630444416.000000
+ s222	     4.012	32000.000000
+ s231	   181.380	119099.882812
+ s232	     5.233	65536.000000
+s1232	   219.850	33958.011719
+ s233	   718.960	504912.625000
+s2233	   194.671	337652.906250
+ s235	   364.464	160023.968750
+ s241	    60.187	64000.000000
+ s242	     4.984	1535952000.000000
+ s243	    17.185	810624.937500
+ s244	    30.419	70102.429688
+s1244	    41.152	108496.445312
+s2244	     7.483	70102.890625
+ s251	    24.422	32004.371094
+s1251	    66.944	400005.968750
+s2251	    28.804	2.635709
+s3251	    21.660	12.595594
+ s252	     4.592	63999.000000
+ s253	     9.003	3200010240.000000
+ s254	    12.504	32000.000000
+ s255	     4.983	31968.515625
+ s256	    18.466	66207.703125
+ s257	    34.065	163072.000000
+ s258	     0.306	14.652790
+ s261	    28.263	260999.156250
+ s271	    24.295	689753.562500
+ s272	     7.872	64000.000000
+ s273	     9.394	99051.656250
+ s274	     9.487	3200195584.000000
+ s275	    41.952	65536.000000
+s2275	   878.865	65536.000000
+ s276	    39.981	689753.562500
+ s277	    26.083	32000.000000
+ s278	    17.444	64012.597656
+ s279	    13.459	64014.289062
+s1279	    10.015	64014.289062
+s2710	     6.158	96003.281250
+s2711	    24.310	689753.562500
+s2712	    23.021	289751.656250
+ s281	    26.250	32000.000000
+s1281	    68.121	inf
+ s291	    44.778	32000.000000
+ s292	    31.942	31968.515625
+ s293	     4.600	32000.000000
+s2101	    13.393	1704092.000000
+s2102	    18.488	256.000000
+s2111	    27.213	34545052.000000
+ s311	    18.581	10.950724
+s31111	     9.267	10.950724
+ s312	    20.471	1.030928
+ s313	    16.757	1.644884
+ s314	     9.269	1.000000
+ s315	    23.478	54857.000000
+ s316	    11.145	0.000031
+ s317	     2.523	0.000000
+ s318	    17.315	32002.000000
+ s319	    16.182	43.802910
+s3110	    20.932	514.000000
+s13110	    20.972	514.000000
+s3111	     0.956	10.950724
+s3112	     9.690	1.644725
+s3113	     7.648	2.000000
+ s321	    11.622	32000.000000
+ s322	    10.535	32000.000000
+ s323	    18.456	146484.968750
+ s331	     3.338	32000.000000
+ s332	     2.741	-1.000000
+ s341	    28.473	10.950724
+ s342	    32.408	10.950724
+ s343	    17.339	1567.833496
+ s351	    84.975	25600002048.000000
+s1351	    33.190	32010.253906
+ s352	    57.259	1.644891
+ s353	    16.038	3200002816.000000
+ s421	    15.140	32009.031250
+s1421	    16.915	16000.000000
+ s422	    36.317	257.701416
+ s423	    16.855	439.690308
+ s424	    17.414	822.360596
+ s431	    36.790	1674247.125000
+ s441	    14.415	196491.250000
+ s442	    10.064	114240.132812
+ s443	    13.378	361015.906250
+ s451	    28.493	32009.281250
+ s452	    18.554	32512.015625
+ s453	     5.386	21.901447
+ s471	     5.450	64004.933594
+ s481	    33.034	196491.250000
+ s482	    33.342	196491.250000
+ s491	    12.785	32001.644531
+s4112	     8.191	1127134.250000
+s4113	    12.475	32001.644531
+s4114	    10.005	32000.000000
+s4115	     8.638	1.038800
+s4116	     5.144	0.753265
+s4117	     9.154	32002.207031
+s4121	     5.216	196491.250000
+   va	    22.618	1.644884
+  vag	    12.787	1.644884
+  vas	    13.301	1.644885
+  vif	     2.901	1.644884
+  vpv	    36.858	1642411.250000
+  vtv	    36.860	32000.000000
+vpvtv	    20.849	689753.562500
+vpvts	     3.703	175255268098048.000000
+vpvpv	    20.783	1.644884
+vtvtv	    20.716	32000.000000
+vsumr	    18.577	10.950724
+vdotr	    33.596	1.644884
+ vbor	     0.823	31924.050781
+ mask predication
+Your branch is up to date with 'origin/master'.
+patching file makefiles/Makefile.clang
+make -C ./src COMPILER=GNU clean
+make[1]: Entering directory '/home/preames/benchmarking/TSVC_2/src'
+rm -f *.o *.s
+make[1]: Leaving directory '/home/preames/benchmarking/TSVC_2/src'
+diff --git a/makefiles/Makefile.clang b/makefiles/Makefile.clang
+index cefe725..a9dca25 100644
+--- a/makefiles/Makefile.clang
++++ b/makefiles/Makefile.clang
+@@ -1,9 +1,9 @@
+ 
+-CC=clang
+-CXX=clang++
++CC=/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include
++CXX=/home/preames/llvm-dev/build/bin/clang++ --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++   -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/12.1.0/../../../../riscv64-unknown-linux-gnu/include/c++/12.1.0  -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/12.1.0/../../../../riscv64-unknown-linux-gnu/include/c++/12.1.0/riscv64-unknown-linux-gnu  -isystem  /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/12.1.0/../../../../riscv64-unknown-linux-gnu/include/c++/12.1.0/backward  -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/12.1.0/include   -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/12.1.0/include-fixed  -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/12.1.0/../../../../riscv64-unknown-linux-gnu/include  -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include
+ # no FC for clang
+ FC=
+-flags = -O3 -fstrict-aliasing
++flags = -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-without-lane-mask -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue
+ vecflags = -fvectorize -fslp-vectorize-aggressive
+ novecflags = -fno-vectorize
+ omp_flags=-fopenmp=libomp
+make[1]: Entering directory '/home/preames/benchmarking/TSVC_2/src'
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-without-lane-mask -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue -fvectorize -fslp-vectorize-aggressive -c -o tsvc_vec.o tsvc.c
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-without-lane-mask -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue -fvectorize -fslp-vectorize-aggressive  -c -o dummy.o dummy.c
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-without-lane-mask -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue -fvectorize -fslp-vectorize-aggressive  -c -o common.o common.c
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include tsvc_vec.o dummy.o common.o -lm -o ../bin/clang/tsvc_vec_default
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-without-lane-mask -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue -fno-vectorize -c -o tsvc_novec.o tsvc.c
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include tsvc_novec.o dummy.o common.o -lm -o ../bin/clang/tsvc_novec_default
+rm common.o tsvc_vec.o dummy.o tsvc_novec.o
+make[1]: Leaving directory '/home/preames/benchmarking/TSVC_2/src'
+make[1]: Entering directory '/home/preames/benchmarking/TSVC_2/src'
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-without-lane-mask -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue -ffast-math -fvectorize -fslp-vectorize-aggressive -c -o tsvc_vec.o tsvc.c
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-without-lane-mask -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue -ffast-math -fvectorize -fslp-vectorize-aggressive  -c -o dummy.o dummy.c
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-without-lane-mask -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue -ffast-math -fvectorize -fslp-vectorize-aggressive  -c -o common.o common.c
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include tsvc_vec.o dummy.o common.o -lm -o ../bin/clang/tsvc_vec_relaxed
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-without-lane-mask -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue -ffast-math -fno-vectorize -c -o tsvc_novec.o tsvc.c
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include tsvc_novec.o dummy.o common.o -lm -o ../bin/clang/tsvc_novec_relaxed
+rm common.o tsvc_vec.o dummy.o tsvc_novec.o
+make[1]: Leaving directory '/home/preames/benchmarking/TSVC_2/src'
+make[1]: Entering directory '/home/preames/benchmarking/TSVC_2/src'
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-without-lane-mask -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue  -fvectorize -fslp-vectorize-aggressive -c -o tsvc_vec.o tsvc.c
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-without-lane-mask -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue  -fvectorize -fslp-vectorize-aggressive  -c -o dummy.o dummy.c
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-without-lane-mask -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue  -fvectorize -fslp-vectorize-aggressive  -c -o common.o common.c
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include tsvc_vec.o dummy.o common.o -lm -o ../bin/clang/tsvc_vec_precise
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include -O3 -fstrict-aliasing -march=rv64gcv -mllvm -force-tail-folding-style=data-without-lane-mask -mllvm -prefer-predicate-over-epilogue=predicate-else-scalar-epilogue  -fno-vectorize -c -o tsvc_novec.o tsvc.c
+/home/preames/llvm-dev/build/bin/clang --sysroot=/rivos/riscv-gnu-toolchain/sysroot  -target riscv64-unknown-linux-gnu --gcc-toolchain=/rivos/riscv-gnu-toolchain -fuse-ld=/rivos/riscv-gnu-toolchain/bin/riscv64-unknown-linux-gnu-ld.bfd -rtlib=libgcc -stdlib=libstdc++ -isystem /rivos/llvm/lib/clang/17/include -isystem /rivos/riscv-gnu-toolchain/lib/gcc/riscv64-unknown-linux-gnu/11.1.0/../../../../riscv64-unknown-linux-gnu/include -isystem /rivos/riscv-gnu-toolchain/sysroot/usr/include tsvc_novec.o dummy.o common.o -lm -o ../bin/clang/tsvc_novec_precise
+rm common.o tsvc_vec.o dummy.o tsvc_novec.o
+make[1]: Leaving directory '/home/preames/benchmarking/TSVC_2/src'
+Loop 	Time(sec) 	Checksum
+ s000	     8.570	512080000.000000
+ s111	    12.803	32000.410156
+s1111	    10.203	16005.822266
+ s112	    17.878	84617.781250
+s1112	    15.368	32001.644531
+ s113	    17.076	32000.644531
+s1113	    24.835	32001.644531
+ s114	    27.803	919.861389
+ s115	    30.771	31745.953125
+s1115	    79.903	0.065533
+ s116	    68.755	32000.000000
+ s118	    40.022	85209.921875
+ s119	     8.636	86338.992188
+s1119	     8.031	119099.882812
+ s121	    16.089	32009.031250
+ s122	     7.599	196490.921875
+ s123	    20.726	32003.287109
+ s124	     8.959	32001.644531
+ s125	    10.774	131072.000000
+ s126	    20.239	66954.960938
+ s127	    13.598	32003.287109
+ s128	    15.353	80000.000000
+ s131	    26.821	32009.031250
+ s132	    15.317	65538.562500
+ s141	    29.868	32487076.000000
+ s151	    26.815	32009.031250
+ s152	     9.961	152207.218750
+ s161	    15.765	64002.058594
+s1161	    30.141	64002.468750
+ s162	     6.469	32009.031250
+ s171	     4.909	196491.250000
+ s172	     5.121	196491.250000
+ s173	    26.724	32001.640625
+ s174	    27.176	32001.640625
+ s175	     5.734	32009.031250
+ s176	     5.328	32063.832031
+ s211	    27.889	63983.183594
+ s212	    23.830	132011.375000
+s1213	    20.222	132022.734375
+ s221	    12.060	1543685120.000000
+s1221	     4.388	630444416.000000
+ s222	     4.014	32000.000000
+ s231	   225.596	119099.882812
+ s232	     5.100	65536.000000
+s1232	   219.606	33958.011719
+ s233	   762.623	504912.625000
+s2233	   213.340	337652.906250
+ s235	   480.575	160023.968750
+ s241	    60.326	64000.000000
+ s242	     5.363	1535952000.000000
+ s243	    14.996	810624.937500
+ s244	    30.386	70102.429688
+s1244	    41.097	108496.445312
+s2244	     9.036	70102.890625
+ s251	    30.315	32004.371094
+s1251	    60.089	400005.968750
+s2251	    29.067	2.635709
+s3251	    40.513	12.595594
+ s252	     6.148	63999.000000
+ s253	     9.231	3200010240.000000
+ s254	    22.041	32000.000000
+ s255	     7.366	31968.515625
+ s256	    22.781	66207.703125
+ s257	    22.820	163072.000000
+ s258	     0.307	14.652790
+ s261	    28.393	260999.156250
+ s271	    28.119	689753.562500
+ s272	    10.142	64000.000000
+ s273	    13.582	99051.656250
+ s274	    11.244	3200195584.000000
+ s275	    74.283	65536.000000
+s2275	   718.394	65536.000000
+ s276	    54.486	689753.562500
+ s277	    26.109	32000.000000
+ s278	    17.473	64012.597656
+ s279	    11.473	64014.289062
+s1279	    10.345	64014.289062
+s2710	     8.038	96003.281250
+s2711	    28.096	689753.562500
+s2712	    27.784	289751.656250
+ s281	    26.224	32000.000000
+s1281	    60.040	inf
+ s291	    40.209	32000.000000
+ s292	    32.136	31968.515625
+ s293	     9.597	32000.000000
+s2101	    14.033	1704092.000000
+s2102	    19.126	256.000000
+s2111	    27.246	34545052.000000
+ s311	    33.408	10.950724
+s31111	     8.886	10.950724
+ s312	    20.697	1.030928
+ s313	    24.217	1.644884
+ s314	    16.698	1.000000
+ s315	    23.489	54857.000000
+ s316	    16.725	0.000031
+ s317	     2.525	0.000000
+ s318	    17.322	32002.000000
+ s319	    18.719	43.802910
+s3110	    21.000	514.000000
+s13110	    20.991	514.000000
+s3111	     1.748	10.950724
+s3112	     9.692	1.644725
+s3113	    15.568	2.000000
+ s321	    11.644	32000.000000
+ s322	    11.619	32000.000000
+ s323	    17.696	146484.968750
+ s331	     3.339	32000.000000
+ s332	     2.756	-1.000000
+ s341	    28.391	10.950724
+ s342	    32.426	10.950724
+ s343	    24.312	1567.833496
+ s351	    90.903	25600002048.000000
+s1351	    42.892	32010.253906
+ s352	    61.596	1.644891
+ s353	    16.367	3200002816.000000
+ s421	    21.399	32009.031250
+s1421	    22.582	16000.000000
+ s422	    41.082	257.701416
+ s423	    23.178	439.690308
+ s424	    19.808	822.360596
+ s431	    49.777	1674247.125000
+ s441	    15.332	196491.250000
+ s442	    10.824	114240.132812
+ s443	    18.470	361015.906250
+ s451	    28.312	32009.281250
+ s452	    23.544	32512.015625
+ s453	     8.818	21.901447
+ s471	    12.318	64004.933594
+ s481	    33.016	196491.250000
+ s482	    33.396	196491.250000
+ s491	    13.822	32001.644531
+s4112	     9.731	1127134.250000
+s4113	    13.317	32001.644531
+s4114	    11.649	32000.000000
+s4115	     8.940	1.038800
+s4116	     6.752	0.753265
+s4117	     9.967	32002.207031
+s4121	     6.428	196491.250000
+   va	    31.999	1.644884
+  vag	    15.269	1.644884
+  vas	    15.705	1.644885
+  vif	     4.649	1.644884
+  vpv	    49.127	1642411.250000
+  vtv	    49.390	32000.000000
+vpvtv	    25.716	689753.562500
+vpvts	     5.115	175255268098048.000000
+vpvpv	    25.852	1.644884
+vtvtv	    25.773	32000.000000
+vsumr	    33.341	10.950724
+vdotr	    48.413	1.644884
+ vbor	     1.087	31924.050781
