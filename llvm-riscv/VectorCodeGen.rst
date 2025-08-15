@@ -289,6 +289,8 @@ Implement foldMemoryOperand for sub-vector insert.  Example code to improve::
 
 Note that in some examples, we could improve the store to only spill half of the vector type, but that seems to be a decently large change and generic codegen doesn't seem to have support for it already (which is slightly odd).
 
+Implement support for optimized spills and fills of REG_SEQUENCE when some sub-elements are dead or redundant.  The redundant (i.e. m1 to m8 splat) case is also approachable as a rematerialization problem, but is profitable independent of the liveness of the single operand, which is weird for remat.  Note that the splat is likely the same cost as a move of the large register class.
+
 
 TTI getShuffleCost
 ==================
