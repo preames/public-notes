@@ -32,11 +32,20 @@ lbm
 Due to a difference in clang and gcc set defaults for fp-contract, clang
 looks much worse on this benchmark due to a lack of FMA formation.
 
+roms
+----
+
+Known to be sensative to vectorization of calls to "exp(double)", make sure
+to build with recent SLEEF which supports a vector implementation of this
+routine and thus allows the vectorizer to vectorize the key loop.
+
 xalancbmk
 ---------
 
 -fwrapv-pointer is required with recemt clang versions to avoid a newly
 exposed UB, see https://github.com/llvm/llvm-test-suite/pull/236 for context.
+
+Known to be sensative to allocator performance (i.e. use jemalloc).
 
 
 Fortan/Flang
