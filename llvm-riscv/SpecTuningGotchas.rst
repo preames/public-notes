@@ -9,8 +9,8 @@ to avoid encountering known issues and wasting time.  This page has a very
 strong bias towards RISC-V specific and LLVM specific details, but might
 have seeds of useful information for others as well.
 
-Note that this builds on the standard SPEC public documentation.  I'm not
-going to mention any workaround already documented there.
+Note that this builds on the standard SPEC public documentation.  There's
+some duplication, but I don't repeat everything mentioned there.
 
 .. contents::
 
@@ -18,8 +18,11 @@ gcc
 ---
 
 Known to be extremely sensative to memcpy implementation.  If you're running
-on a vector enabled system, make sure your glibc is new enough to pickup
-the vectorization changes for these routines.
+on a vector enabled system, make sure your glibc is patched to pickup
+the vectorization changes for these routines.  Apparently
+`these patches >https://patchwork.sourceware.org/project/glibc/list/?series=44338>_`
+`*still* haven't made it upstream <https://patchwork.sourceware.org/project/glibc/patch/20250221095740.582183-3-daichengrong@iscas.ac.cn/#209206>_`
+to glibc.
 
 fotonik3d
 ---------
@@ -30,7 +33,21 @@ lbm
 ---
 
 Due to a difference in clang and gcc set defaults for fp-contract, clang
-looks much worse on this benchmark due to a lack of FMA formation.
+looks much worse on this benchmark due to a lack of FMA formation.  See
+https://discourse.llvm.org/t/impact-of-ffp-contract-defaults-on-benchmarking/87906
+for further context.  Roughly a 7.3% dynamic icount difference for `rva22u64`.
+
+namd
+----
+
+Same FMA issue as lbm, thought to a slightly lesser degree.  Roughly a 3.7%
+dynamic icount impact for `rva22u64`.
+
+povray
+------
+
+If you use -ffast-math, povray in both spec2006 and 2017 requires
+`-fhonor-infinities` or `-ffinite-math-only` to produce correct results.
 
 roms
 ----
@@ -42,8 +59,10 @@ routine and thus allows the vectorizer to vectorize the key loop.
 xalancbmk
 ---------
 
--fwrapv-pointer is required with recemt clang versions to avoid a newly
+`-fwrapv-pointer` is required with recemt clang versions to avoid a newly
 exposed UB, see https://github.com/llvm/llvm-test-suite/pull/236 for context.
+
+May require `-fdelayed-template-parsing`. Maybe in spec2006 too.
 
 Known to be sensative to allocator performance (i.e. use jemalloc).
 
