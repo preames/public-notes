@@ -20,8 +20,8 @@ gcc
 Known to be extremely sensative to memcpy implementation.  If you're running
 on a vector enabled system, make sure your glibc is patched to pickup
 the vectorization changes for these routines.  Apparently
-`these patches >https://patchwork.sourceware.org/project/glibc/list/?series=44338>_`
-`*still* haven't made it upstream <https://patchwork.sourceware.org/project/glibc/patch/20250221095740.582183-3-daichengrong@iscas.ac.cn/#209206>_`
+`these patches <https://patchwork.sourceware.org/project/glibc/list/?series=44338>`_
+`_still_ haven't made it upstream <https://patchwork.sourceware.org/project/glibc/patch/20250221095740.582183-3-daichengrong@iscas.ac.cn/#209206>`_
 to glibc.
 
 fotonik3d
