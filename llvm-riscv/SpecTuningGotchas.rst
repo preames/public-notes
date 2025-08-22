@@ -74,3 +74,7 @@ The fortran runtime build does not support cross compilation, so you can't
 link any fortran workload in a cross build.  You can hack the build system
 a bit to get around this, but the resulting binaries play somewhat loose
 with ABI contracts.
+
+Many of the fortran benchmarks require large stacks, and will simply crash
+with unhelpful output if given insufficient space.  Flang compiled binaries
+appear to need significantly more stack space than gfortran.
